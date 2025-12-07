@@ -1,0 +1,111 @@
+{
+  "general": {
+    "back": "Back",
+    "menu": "Menu",
+    "tap_here": "Tap Here.",
+    "yes": "Yes",
+    "no": "No",
+    "alert" : "ALERT",
+    "disclaimer_first_responders": "**Disclaimer:** This non-sensitive info is displayed for first responders only.",
+    "loading_transport_info": "Loading Transport Info...",
+    "edit": "Edit",
+    "change_need": "Change Need"
+  },
+  "header": {
+    "title_appointment": "Appointment",
+    "title_emergency_info": "Emergency Info",
+    "title_medical_menu": "Service",
+    "title_medicine": "Medicine",
+    "title_ride_status": "Ride Status"
+  },
+  "sidemenu": {
+    "profile": "Profile",
+    "language": "Language",
+    "logout": "Logout"
+  },
+  "language_page": {
+    "select_prompt": "Select Your Language"
+  },
+  "dashboard": {
+    "appointment_soon_alert": "APPOINTMENT SOON!",
+    "medical_access_card": "Medical Service",
+    "emergency_info_card": "Emergency Info",
+    "medical_history_card": "Medical History"
+  },
+  "medical_menu": {
+    "appointments_card": "Appointments",
+    "transportation_card": "Transportation",
+    "medicine_card": "Medicine",
+    "access_card_short": "Health Menu"
+  },
+  "transport_needs": {
+    "bed": "Bed",
+    "chair": "Chair",
+    "slow": "Slow",
+    "general": "General",
+    "other": "Other"
+  },
+  "appointment_flow": {
+    "transport_question_aria": "Transport Question",
+    "tap_instruction": "(Tap YES or NO)",
+    "select_need_prompt": "Select your need:",
+    "confirmed_need_label": "Confirmed Need",
+    "confirm_book_button": "Confirm & Book ✅",
+    "transport_booked_success": "Transport booked! Redirecting...",
+    "appointment_confirmed_success": "Appointment Confirmed! Redirecting..."
+  },
+  "emergency": {
+    "act_immediately": "ACT IMMEDIATELY",
+    "blood_type_label": "BLOOD TYPE",
+    "allergies_label": "ALLERGIES",
+    "conditions_label": "CONDITIONS",
+    "meds_taken_label": "MEDS TAKEN",
+    "emergency_contact_label": "EMERGENCY CONTACT",
+    "meds_example": "METFORMIN (500mg, Daily)",
+    "blood_type_example": "O POSITIVE",
+    "allergies_example": "PENICILLIN, LATEX",
+    "conditions_example": "TYPE 2 DIABETES, MILD ASTHMA"
+  },
+  "medicine": {
+    "pill_aria_label": "Pill",
+    "package_aria_label": "Package",
+    "reminder_daily": "Daily Reminder",
+    "reminder_cta": "TAKE YOUR PILL NOW",
+    "taken_success_alert": "Confirmed! Next pill due tomorrow morning.",
+    "low_alert": "⚠️ MEDICINE LOW! ⚠️",
+    "days_label": "days",
+    "running_out_prefix": "Running out in",
+    "delivery_question": "Need delivery to your house?",
+    "delivery_yes_button": "YES, DELIVER",
+    "delivery_no_button": "NO, I'LL GET IT",
+    "pickup_reminder_conf": "Okay, we will remind you daily to pick up your refill!",
+    "delivery_confirmed_header": "✅ Delivery Confirmed!",
+    "courier_label": "Courier",
+    "eta_label": "ETA"
+  },
+  "transport": {
+    "unknown_need": "Unknown Need",
+    "ride_status_header_booked": "Your Booked Need:",
+    "driver_assigned_header": "Driver Assigned",
+    "driver_name_label": "Name:",
+    "driver_type_label": "Type:",
+    "driver_color_label": "Color:",
+    "driver_plate_label": "Plate:",
+    "driver_aria_label": "Driver",
+    "back_to_menu": "Back to Menu"
+  },
+  "profile": {
+    "personal_details_header": "Personal Details",
+    "name_label": "Name",
+    "ic_label": "IC Number",
+    "dob_label": "Date of Birth",
+    "address_label": "Address",
+    "emergency_contact_label": "Emergency Contact",
+    "edit_button": "EDIT",
+    "contact_saved_alert": "Emergency contact saved as: {{contact}}",
+    "modal_title": "Edit Emergency Contact",
+    "contact_placeholder": "Name (Phone Number)",
+    "cancel_button": "CANCEL",
+    "save_button": "SAVE"
+  }
+}

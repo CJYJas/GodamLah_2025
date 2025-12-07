@@ -1,9 +1,11 @@
-// /frontend-react/src/components/MedicalDashboard.js
+// /frontend-react/src/components/MedicalDashboard.js (i18n Enabled)
 
 import React from 'react';
+import { useTranslation } from 'react-i18next'; // 1. Import useTranslation
 import HeaderBar from './HeaderBar'; 
 
 // --- Local Date Logic (Mocking blinking state) ---
+// (No changes to this logic, as it controls behavior, not text)
 const APPOINTMENT_DATE_STRING = '2025-12-10T10:00:00'; 
 const APPOINTMENT_DATE = new Date(APPOINTMENT_DATE_STRING);
 const MOCK_TODAY = new Date('2025-12-08'); 
@@ -14,7 +16,10 @@ const isAppointmentSoon = daysDiff >= 0 && daysDiff <= 3;
 // --- End Local Date Logic ---
 
 
+// --- SubIcon Component (Translates ARIA label and renders translated name) ---
 const SubIcon = ({ name, emoji, goToPage, pageTarget, isEasyMode, isBlinking }) => {
+    // 2. Initialize translation hook inside the component
+    const { t } = useTranslation();
 
     const blinkStyle = isBlinking ? {
         border: '5px solid red', 
@@ -44,7 +49,8 @@ const SubIcon = ({ name, emoji, goToPage, pageTarget, isEasyMode, isBlinking }) 
         >
             {/* Top Section: Emoji */}
             <div style={{ paddingBottom: '10px', borderBottom: '2px solid #007bff20' }}>
-                 <span role="img" aria-label={name} style={{
+                {/* 3. Translate ARIA label */}
+                <span role="img" aria-label={t('medical_menu.' + name.toLowerCase().replace(/\s/g, '_'))} style={{
                     fontSize: isEasyMode ? '80px' : '50px', 
                     display: 'block', 
                     marginBottom: '10px'
@@ -53,10 +59,10 @@ const SubIcon = ({ name, emoji, goToPage, pageTarget, isEasyMode, isBlinking }) 
 
             {/* Bottom Section: Label/Action */}
             <div style={{ 
-                 paddingTop: '10px',
-                 backgroundColor: isBlinking ? 'red' : '#1A73E8', 
-                 margin: '-20px', 
-                 marginTop: '10px'
+                    paddingTop: '10px',
+                    backgroundColor: isBlinking ? 'red' : '#1A73E8', 
+                    margin: '-20px', 
+                    marginTop: '10px'
             }}>
                 <p style={{
                     fontWeight: '900', 
@@ -64,7 +70,10 @@ const SubIcon = ({ name, emoji, goToPage, pageTarget, isEasyMode, isBlinking }) 
                     color: 'white', 
                     margin: '0',
                     padding: '12px'
-                }}>{name}</p>
+                }}>
+                    {/* The name prop is already the translated text passed from the parent function */}
+                    {name}
+                </p>
             </div>
 
             {isBlinking && (
@@ -81,28 +90,44 @@ const SubIcon = ({ name, emoji, goToPage, pageTarget, isEasyMode, isBlinking }) 
 };
 
 function MedicalDashboard({ isEasyMode, goToPage, onMenuClick }) { 
+    // 4. Initialize translation hook
+    const { t } = useTranslation();
+
     return (
         <div style={{ position: 'relative', minHeight: '400px', paddingBottom: '20px' }}>
             
-            {/* THIS IS THE ONLY HEADER BAR RENDERED ON THIS PAGE */}
             <HeaderBar
-                title="Medical Menu"
-                onBackClick={() => goToPage('dashboard')} // Goes back to the 4-icon dashboard
-                onMenuClick={onMenuClick} // Handles opening the Side Menu (☰)
+                // 5. Translate the header title
+                title={t('header.title_medical_menu')}
+                onBackClick={() => goToPage('dashboard')} 
+                onMenuClick={onMenuClick} 
                 isEasyMode={isEasyMode}
             />
             
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '15px' }}>
                 <SubIcon 
-                    name="Appointments" 
+                    // 6. Translate the name before passing it as a prop
+                    name={t('medical_menu.appointments_card')} 
                     emoji="🗓️" 
                     pageTarget="appointment" 
                     goToPage={goToPage} 
                     isEasyMode={isEasyMode}
                     isBlinking={isAppointmentSoon}
                 />
-                <SubIcon name="Transportation" emoji="🚑" pageTarget="transport" goToPage={goToPage} isEasyMode={isEasyMode}/>
-                <SubIcon name="Medicine" emoji="💊" pageTarget="medicine" goToPage={goToPage} isEasyMode={isEasyMode}/>
+                <SubIcon 
+                    name={t('medical_menu.transportation_card')} 
+                    emoji="🚑" 
+                    pageTarget="transport" 
+                    goToPage={goToPage} 
+                    isEasyMode={isEasyMode}
+                />
+                <SubIcon 
+                    name={t('medical_menu.medicine_card')} 
+                    emoji="💊" 
+                    pageTarget="medicine" 
+                    goToPage={goToPage} 
+                    isEasyMode={isEasyMode}
+                />
             </div>
         </div>
     );

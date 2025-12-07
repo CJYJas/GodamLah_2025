@@ -1,6 +1,9 @@
-import React, { useState, useEffect } from 'react';
-// 🌟 NEW IMPORT: Socket.IO client library
-import { io } from 'socket.io-client'; 
+// /frontend-react/src/App.js
+
+import React, { useState, useEffect, Suspense } from 'react';
+import { useTranslation } from 'react-i18next';
+
+// Component Imports
 import Dashboard from './components/Dashboard';
 import MedicalDashboard from './components/MedicalDashboard';
 import AppointmentFlow from './components/AppointmentFlow';
@@ -10,62 +13,62 @@ import SideMenu from './components/SideMenu';
 import ProfilePage from './components/ProfilePage';
 import LanguagePage from './components/LanguagePage';
 import EmergencyInfoPage from './components/EmergencyInfoPage';
-// Mock data
-const mockAppointmentData = { date: 'Dec 10', time: '10:00 AM', hasTransportBooked: false };
+
+// --- INITIAL MOCK DATA STATE (Will be overwritten by API) ---
+const initialDataState = {
+    appointment: { date: 'Loading...', time: 'Loading...' },
+    profile: {},
+    emergency: {},
+    medicine: {},
+    transport_need: null
+};
 
 function App() {
+    const { t } = useTranslation();
     const [currentPage, setCurrentPage] = useState('dashboard');
     const [isEasyMode] = useState(true);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [isListeningMode, setIsListeningMode] = useState(false); 
+    const [appData, setAppData] = useState(initialDataState);
 
-    // 🌟 ADDED: Socket.IO Connection and Event Listener
+    // --- API INTEGRATION: FETCH ALL INITIAL DATA ---
     useEffect(() => {
-        // Connect to the Flask SocketIO server on port 5000
-        const socket = io('http://localhost:5000'); 
+        const fetchAppointmentData = async () => {
+            try {
+                const response = await fetch('http://localhost:5000/api/get_all_data');
+                const result = await response.json();
 
-        socket.on('connect', () => {
-            console.log('✅ Socket.IO connected to Flask on port 5000.');
-        });
-
-        // Listen for the 'emergency_alert' event emitted from Flask
-        socket.on('emergency_alert', (data) => {
-            if (data.status === "HELP_TRIGGER") {
-                console.log("🚨 SocketIO received real-time emergency signal!");
-                
-                // 1. Activate the listening mode/overlay for visual feedback
-                setIsListeningMode(true); 
-                
-                // 2. Wait 5 seconds, then switch the page
-                setTimeout(() => {
-                    setIsListeningMode(false);
-                    setCurrentPage('emergency-info');
-                }, 5000);
+                if (result.status === 'success') {
+                    const userData = result.user_data;
+                    setAppData({
+                        appointment: { date: 'Dec 10', time: '10:00 AM' }, // Mock appointment date
+                        profile: userData.profile,
+                        emergency: userData.emergency,
+                        medicine: userData.medicine, // Assumed to contain needed mock data
+                        transport_need: userData.transport_need
+                    });
+                }
+            } catch (error) {
+                console.error("Failed to fetch data from central base:", error);
+                // Keep showing initial loading state or error message
             }
-        });
-
-        socket.on('disconnect', () => console.log("Socket.IO disconnected"));
-        
-        // Cleanup function to close the connection when the component unmounts
-        return () => {
-            socket.disconnect();
         };
-    }, []); // Run only once on mount
+        fetchAppointmentData();
+    }, []);
+    
+    const handleUpdateContact = (newContact) => {
+        setAppData(prev => ({
+            ...prev,
+            profile: { ...prev.profile, emergency_contact: newContact },
+            emergency: { ...prev.emergency, primaryContact: newContact }
+        }));
+    };
 
-    // Function to handle the state change when the EmergencyMonitor detects the command
-    const handleEmergencyTrigger = () => {
-        // NOTE: With Socket.IO, this function's logic is primarily handled 
-        // by the 'emergency_alert' listener above, which gets the signal 
-        // after the POST request is processed by Flask.
-        // However, we can use this to immediately trigger the visual listening overlay.
-        console.log("App received initial trigger from Monitor (POST sent). Activating visual overlay.");
-        setIsListeningMode(true);
-    }
-
+    const handleUpdateTransport = (newNeed) => {
+        setAppData(prev => ({ ...prev, transport_need: newNeed }));
+    };
 
     // PAGE ROUTING
     const renderPage = () => {
-        // ... (All your existing page rendering logic remains here) ...
         if (currentPage === 'dashboard') {
             return (
                 <Dashboard
@@ -91,10 +94,11 @@ function App() {
             return (
                 <AppointmentFlow
                     isEasyMode={isEasyMode}
-                    appointment={mockAppointmentData}
+                    appointment={appData.appointment}
                     goToTransportStatus={() => setCurrentPage('transport')}
                     goToMedicalDashboard={() => setCurrentPage('medical-dashboard')}
                     onMenuClick={() => setIsMenuOpen(true)}
+                    onTransportBooked={handleUpdateTransport} // Pass handler for transport update
                 />
             );
         }
@@ -106,6 +110,8 @@ function App() {
                     goToAppointmentFlow={() => setCurrentPage('appointment')}
                     goToMedicalDashboard={() => setCurrentPage('medical-dashboard')}
                     onMenuClick={() => setIsMenuOpen(true)}
+                    onTransportCleared={handleUpdateTransport} // Pass handler to clear transport locally
+                    transportNeed={appData.transport_need}
                 />
             );
         }
@@ -116,6 +122,7 @@ function App() {
                     isEasyMode={isEasyMode}
                     goToPage={setCurrentPage}
                     onMenuClick={() => setIsMenuOpen(true)}
+                    medicineData={appData.medicine}
                 />
             );
         }
@@ -126,6 +133,8 @@ function App() {
                     isEasyMode={isEasyMode}
                     goToPage={setCurrentPage}
                     onMenuClick={() => setIsMenuOpen(true)}
+                    profileData={appData.profile}
+                    onContactSaved={handleUpdateContact} // Pass handler for local profile update
                 />
             );
         }
@@ -146,6 +155,7 @@ function App() {
                     isEasyMode={isEasyMode}
                     goToPage={setCurrentPage}
                     onMenuClick={() => setIsMenuOpen(true)}
+                    emergencyData={appData.emergency} // Pass fetched data
                 />
             );
         }
@@ -153,6 +163,7 @@ function App() {
         return null;
     };
 
+    // ... (rest of App component styling and structure) ...
     const scrollbarHiddenStyle = {
         overflowY: 'auto',
         msOverflowStyle: 'none',
@@ -160,80 +171,82 @@ function App() {
     };
 
     return (
-        <div
-            style={{
-                padding: '20px',
-                backgroundColor: '#f0f0f0',
-                minHeight: '100vh',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-            }}
-        >
-
-            {/* Phone Frame */}
+        <Suspense fallback={<div>{t('app.loading_application')}</div>}>
             <div
                 style={{
-                    maxWidth: '400px',
-                    width: '100%',
-                    height: '750px',
-                    margin: '20px 0',
-                    border: '15px solid #333',
-                    borderRadius: '40px',
-                    boxShadow: '0 10px 40px rgba(0,0,0,0.5)',
-                    backgroundColor: '#000',
-                    position: 'relative',
-                    flexShrink: 0,
+                    padding: '20px',
+                    backgroundColor: '#f0f0f0',
+                    minHeight: '100vh',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
                 }}
             >
-                {/* Speaker / Notch */}
-                <div style={{}}></div>
 
-                {/* App Screen */}
+                {/* Phone Frame */}
                 <div
                     style={{
-                        height: '100%',
+                        maxWidth: '400px',
                         width: '100%',
-                        backgroundColor: '#ffffff',
-                        borderRadius: '25px',
-                        boxSizing: 'border-box',
-                        ...scrollbarHiddenStyle,
-                        opacity: isMenuOpen ? 0.3 : 1,
-                        pointerEvents: isMenuOpen ? 'none' : 'auto',
-                        transition: 'opacity 0.3s ease-out',
+                        height: '750px',
+                        margin: '20px 0',
+                        border: '15px solid #333',
+                        borderRadius: '40px',
+                        boxShadow: '0 10px 40px rgba(0,0,0,0.5)',
+                        backgroundColor: '#000',
+                        position: 'relative',
+                        flexShrink: 0,
                     }}
-                    className={`App ${isEasyMode ? 'easy-mode-theme' : 'standard-theme'}`}
                 >
-                    {renderPage()}
-                </div>
+                    {/* Speaker / Notch (empty div) */}
+                    <div></div>
 
-                {/* Menu Overlay */}
-                {isMenuOpen && (
+                    {/* App Screen */}
                     <div
-                        onClick={() => setIsMenuOpen(false)}
                         style={{
-                            position: 'absolute',
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            backgroundColor: 'rgba(0, 0, 0, 0.4)',
-                            zIndex: 100,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
+                            height: '100%',
+                            width: '100%',
+                            backgroundColor: '#ffffff',
+                            borderRadius: '25px',
+                            boxSizing: 'border-box',
+                            ...scrollbarHiddenStyle,
+                            opacity: isMenuOpen ? 0.3 : 1,
+                            pointerEvents: isMenuOpen ? 'none' : 'auto',
+                            transition: 'opacity 0.3s ease-out',
                         }}
+                        className={`App ${isEasyMode ? 'easy-mode-theme' : 'standard-theme'}`}
                     >
-                        <SideMenu
-                            isEasyMode={isEasyMode}
-                            isOpen={isMenuOpen}
-                            onClose={() => setIsMenuOpen(false)}
-                            goToPage={setCurrentPage}
-                        />
+                        {renderPage()}
                     </div>
-                )}
+
+                    {/* Menu Overlay */}
+                    {isMenuOpen && (
+                        <div
+                            onClick={() => setIsMenuOpen(false)}
+                            style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                bottom: 0,
+                                backgroundColor: 'rgba(0, 0, 0, 0.4)',
+                                zIndex: 100,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}
+                        >
+                            <SideMenu
+                                isEasyMode={isEasyMode}
+                                isOpen={isMenuOpen}
+                                onClose={() => setIsMenuOpen(false)}
+                                goToPage={setCurrentPage}
+                            />
+                        </div>
+                    )}
+                </div>
             </div>
-        </div>
+        </Suspense>
     );
 }
 

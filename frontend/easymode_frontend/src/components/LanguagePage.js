@@ -1,8 +1,10 @@
-// /frontend-react/src/components/LanguagePage.js
+// /frontend-react/src/components/LanguagePage.js (i18n Enabled)
 
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next'; // 1. Import useTranslation
 import HeaderBar from './HeaderBar';
 
+// 2. Language list structure is fine, but we'll use the i18n instance's functions.
 const languages = [
     { code: 'en', name: 'English', emoji: '🇬🇧' },
     { code: 'ms', name: 'Bahasa Melayu', emoji: '🇲🇾' },
@@ -11,37 +13,46 @@ const languages = [
 ];
 
 function LanguagePage({ isEasyMode, goToPage, onMenuClick }) {
-    // Mock the global language state being stored here
-    const [selectedLang, setSelectedLang] = useState('en'); 
+    // 3. Destructure the i18n instance and the t function
+    const { t, i18n } = useTranslation(); 
+
+    // The current language is derived directly from the i18n instance, 
+    // replacing the mock `selectedLang` state.
+    const currentLang = i18n.resolvedLanguage; 
 
     const handleSelectLanguage = (code) => {
-        setSelectedLang(code);
+        // 4. Use i18n.changeLanguage() to trigger the global language switch
+        i18n.changeLanguage(code); 
         console.log(`Language set to: ${code}`);
-        // In a real app: Update the global language state and force a re-render/reload.
+        // No need to manually force a re-render; i18next handles it.
     };
 
     return (
         <div style={{ padding: '0 20px 20px 20px', textAlign: 'center' }}>
             <HeaderBar
-                title="Language"
+                // 5. Translate the header title using a translation key
+                title={t('sidemenu.language')}
                 onBackClick={() => goToPage('dashboard')}
                 onMenuClick={onMenuClick}
                 isEasyMode={isEasyMode}
             />
 
             <h2 style={{ fontSize: isEasyMode ? '40px' : '30px', margin: '20px 0 30px 0', color: '#333' }}>
-                Select Your Language
+                {/* 6. Translate the main prompt */}
+                {t('language_page.select_prompt')}
             </h2>
 
             {languages.map(lang => (
                 <div
                     key={lang.code}
+                    // 7. Use the real handler
                     onClick={() => handleSelectLanguage(lang.code)}
                     style={{
                         padding: '20px',
                         margin: '15px 0',
-                        border: `4px solid ${selectedLang === lang.code ? 'green' : '#ddd'}`,
-                        backgroundColor: selectedLang === lang.code ? '#E6FBE6' : '#fff',
+                        // 8. Compare against the real current language
+                        border: `4px solid ${currentLang === lang.code ? 'green' : '#ddd'}`,
+                        backgroundColor: currentLang === lang.code ? '#E6FBE6' : '#fff',
                         borderRadius: '15px',
                         cursor: 'pointer',
                         textAlign: 'center',
@@ -54,9 +65,10 @@ function LanguagePage({ isEasyMode, goToPage, onMenuClick }) {
                     <p style={{ 
                         fontSize: isEasyMode ? '34px' : '22px', 
                         fontWeight: 'bold', 
-                        color: selectedLang === lang.code ? 'green' : '#333',
+                        color: currentLang === lang.code ? 'green' : '#333',
                         margin: '5px 0 0 0'
                     }}>
+                        {/* The language name is static and doesn't need translation itself */}
                         {lang.name}
                     </p>
                 </div>

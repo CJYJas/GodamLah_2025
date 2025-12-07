@@ -1,6 +1,7 @@
-// /frontend-react/src/components/ProfilePage.js (FINAL CLEAN LIST LAYOUT)
+// /frontend-react/src/components/ProfilePage.js (i18n Enabled)
 
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next'; // 1. Import useTranslation
 import HeaderBar from './HeaderBar';
 
 // --- Local Mock Profile Data (remains the same) ---
@@ -13,6 +14,9 @@ const mockProfileData = {
 };
 
 function ProfilePage({ isEasyMode, goToPage, onMenuClick }) {
+    // 2. Initialize translation hook
+    const { t } = useTranslation();
+
     const profile = mockProfileData;
     
     const [emergencyContact, setEmergencyContact] = useState(profile.initialEmergencyContact);
@@ -22,7 +26,8 @@ function ProfilePage({ isEasyMode, goToPage, onMenuClick }) {
         setEmergencyContact(newContact); 
         console.log("Profile Updated! New Emergency Contact:", newContact);
         setShowModal(false); 
-        alert(`Emergency contact saved as: ${newContact}`);
+        // 3. Translate the alert message using interpolation
+        alert(t('profile.contact_saved_alert', { contact: newContact }));
     };
 
     const handleCloseModal = () => {
@@ -32,7 +37,7 @@ function ProfilePage({ isEasyMode, goToPage, onMenuClick }) {
     // --- InfoCard Component (Clean Native List Style) ---
     const InfoCard = ({ icon, title, value, isEditable = false }) => (
         <div style={{
-            padding: '18px 0', // Increased vertical padding for more air
+            padding: '18px 0', 
             margin: '0', 
             width: '100%',
             backgroundColor: '#fff',
@@ -50,6 +55,7 @@ function ProfilePage({ isEasyMode, goToPage, onMenuClick }) {
                         color: isEditable ? 'darkorange' : '#6c757d'
                     }}>
                         <span role="img" aria-label={title} style={{marginRight: '10px'}}>{icon}</span>
+                        {/* Title prop is already the translated string, so just render it */}
                         {title.toUpperCase()}
                     </p>
 
@@ -66,7 +72,8 @@ function ProfilePage({ isEasyMode, goToPage, onMenuClick }) {
                                 flexShrink: 0,
                             }}
                         >
-                            EDIT ✍️
+                            {/* 4. Translate the EDIT button */}
+                            {t('profile.edit_button')} ✍️
                         </button>
                     )}
                 </div>
@@ -84,7 +91,7 @@ function ProfilePage({ isEasyMode, goToPage, onMenuClick }) {
     );
     // --- END InfoCard ---
 
-    // --- Edit Contact Modal Component (Remains the same) ---
+    // --- Edit Contact Modal Component (Translate all internal text) ---
     const EditContactModal = ({ currentContact, onSave, onClose, isEasyMode }) => {
         const [tempContact, setTempContact] = useState(currentContact);
 
@@ -118,7 +125,8 @@ function ProfilePage({ isEasyMode, goToPage, onMenuClick }) {
                         marginBottom: '25px', 
                         fontWeight: 'bold' 
                     }}>
-                        Edit Emergency Contact 🚨
+                        {/* 5. Translate the modal title */}
+                        {t('profile.modal_title')} 🚨
                     </h3>
 
                     {/* Input Field */}
@@ -126,6 +134,7 @@ function ProfilePage({ isEasyMode, goToPage, onMenuClick }) {
                         type="text"
                         value={tempContact}
                         onChange={(e) => setTempContact(e.target.value)}
+                        placeholder={t('profile.contact_placeholder')} // 6. Translate the placeholder
                         style={{
                             width: '90%',
                             padding: isEasyMode ? '15px' : '12px',
@@ -153,7 +162,8 @@ function ProfilePage({ isEasyMode, goToPage, onMenuClick }) {
                                 fontWeight: 'bold',
                             }}
                         >
-                            CANCEL ❌
+                            {/* 7. Translate the CANCEL button */}
+                            {t('profile.cancel_button')} ❌
                         </button>
                         
                         {/* Save Button */}
@@ -169,7 +179,8 @@ function ProfilePage({ isEasyMode, goToPage, onMenuClick }) {
                                 fontWeight: 'bold',
                             }}
                         >
-                            SAVE ✅
+                            {/* 8. Translate the SAVE button */}
+                            {t('profile.save_button')} ✅
                         </button>
                     </div>
                 </div>
@@ -182,29 +193,31 @@ function ProfilePage({ isEasyMode, goToPage, onMenuClick }) {
     return (
         <div style={{ padding: '0', textAlign: 'center', position: 'relative' }}>
             <HeaderBar
-                title="Profile"
+                // 9. Translate the header title
+                title={t('sidemenu.profile')}
                 onBackClick={() => goToPage('dashboard')}
                 onMenuClick={onMenuClick}
                 isEasyMode={isEasyMode}
             />
 
-            {/* Increased spacing on main heading to breathe */}
+            {/* Main heading */}
             <h2 style={{ fontSize: isEasyMode ? '40px' : '30px', margin: '30px 0 20px 0', color: '#333', padding: '0 20px' }}>
-                Personal Details
+                {/* 10. Translate the main section title */}
+                {t('profile.personal_details_header')}
             </h2>
             
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
                 
-                {/* Info Cards List (Clean, tight list structure) */}
-                <InfoCard icon="👤" title="Name" value={profile.name} isEasyMode={isEasyMode}/>
-                <InfoCard icon="🆔" title="IC Number" value={profile.icNumber} isEasyMode={isEasyMode}/>
-                <InfoCard icon="🎂" title="Date of Birth" value={profile.dateOfBirth} isEasyMode={isEasyMode}/>
-                <InfoCard icon="🏠" title="Address" value={profile.address} isEasyMode={isEasyMode}/>
+                {/* 11. Translate all Info Card titles before passing */}
+                <InfoCard icon="👤" title={t('profile.name_label')} value={profile.name} isEasyMode={isEasyMode}/>
+                <InfoCard icon="🆔" title={t('profile.ic_label')} value={profile.icNumber} isEasyMode={isEasyMode}/>
+                <InfoCard icon="🎂" title={t('profile.dob_label')} value={profile.dateOfBirth} isEasyMode={isEasyMode}/>
+                <InfoCard icon="🏠" title={t('profile.address_label')} value={profile.address} isEasyMode={isEasyMode}/>
 
-                {/* Editable Field */}
+                {/* Editable Field (Emergency Contact) */}
                 <InfoCard 
                     icon="🚨"
-                    title="Emergency Contact" 
+                    title={t('profile.emergency_contact_label')} 
                     value={emergencyContact} 
                     isEditable={true} 
                     isEasyMode={isEasyMode}

@@ -1,0 +1,111 @@
+{
+  "general": {
+    "back": "Balik",
+    "menu": "Menu",
+    "tap_here": "Tekan Sini",
+    "yes": "Ya",
+    "no": "Tak",
+    "change_need": "Perubahan",
+    "disclaimer_first_responders": "**Penafian:** Maklumat tidak sensitif ini dipaparkan untuk responden pertama sahaja.",
+    "loading_transport_info": "Dapat Info Pengangkutan...",
+    "edit": "Ubah",
+    "change_need": "Perlu Ubah"
+  },
+  "header": {
+    "title_appointment": "TemuJanji",
+    "title_emergency_info": "Info Kecemasan",
+    "title_medical_menu": "Perkhidmatan",
+    "title_medicine": "Ubat",
+    "title_ride_status": "Pengangkutan"
+  },
+  "sidemenu": {
+    "profile": "Profil",
+    "language": "Bahasa",
+    "logout": "Log Keluar"
+  },
+  "dashboard": {
+    "appointment_soon_alert": "Temu Janji akan Datang",
+    "medical_access_card": "Khidmat Perubatan",
+    "emergency_info_card": "Info Kecemasan",
+    "medical_history_card": "Histori Perubatan"
+  },
+  "language_page": {
+    "select_prompt": "Pilih Bahasa"
+  },
+  "medical_menu": {
+    "appointments_card": "Temu Janji",
+    "transportation_card": "Pengangkutan",
+    "medicine_card": "Ubat",
+    "access_card_short": "Khidmat Perubatan"
+  },
+  "transport_needs": {
+    "bed": "Katil",
+    "chair": "Roda",
+    "slow": "Perlahan",
+    "general": "Biasa",
+    "other": "Lain"
+  },
+  "emergency": {
+    "act_immediately": "BERTINDAK SEGERA",
+    "blood_type_label": "JENIS DARAH",
+    "allergies_label": "ALERGI",
+    "conditions_label": "KEADAAN",
+    "meds_taken_label": "UBAT YANG DIAMBIL",
+    "emergency_contact_label": "HUBUNGI KECEMASAN",
+    "meds_example": "METFORMIN (500mg, Harian)",
+    "blood_type_example": "O POSITIVE",
+    "allergies_example": "PENICILLIN, LATEX",
+    "conditions_example": "DIABETES JENIS 2, ASTHMA RINGAN"
+  },
+  "appointment_flow": {
+    "transport_question_aria": "Pengangkutan",
+    "tap_instruction": "(Pilih)",
+    "select_need_prompt": "Pilih Keperluan:",
+    "confirmed_need_label": "Keperluan",
+    "confirm_book_button": "Pasti & Tempah ✅",
+    "transport_booked_success": "Tempahan Berjaya...",
+    "appointment_confirmed_success": "Tempahan Temu Janji Berjaya..."
+  },
+  "medicine": {
+    "pill_aria_label": "Ubat",
+    "package_aria_label": "Packej",
+    "reminder_daily": "Peringatan",
+    "reminder_cta": "Ambil Ubat sekarang",
+    "taken_success_alert": "Bagus, Jangan lupa esok",
+    "low_alert": "⚠️ UBAT KURANG! ⚠️",
+    "days_label": "hari",
+    "running_out_prefix": "Kekurangan dalam",
+    "delivery_question": "Perlu khidmat penghantaran?",
+    "delivery_yes_button": "YA, HANTAR",
+    "delivery_no_button": "TIDAK PERLU",
+    "pickup_reminder_conf": "BAIK, PERINGATAN AKAN DIBERI",
+    "delivery_confirmed_header": "✅ TEMPAHAN BERJAYA",
+    "courier_label": "KOURIER",
+    "eta_label": "ETA"
+  },
+  "transport": {
+    "unknown_need": "Tiada Keperluan",
+    "ride_status_header_booked": "Tempahan Anda:",
+    "driver_assigned_header": "Pemandu",
+    "driver_name_label": "Nama:",
+    "driver_type_label": "Jenis:",
+    "driver_color_label": "Warna:",
+    "driver_plate_label": "Plat:",
+    "driver_aria_label": "Pemandu",
+    "back_to_menu": "Balik ke Menu"
+  },
+  "profile": {
+    "personal_details_header": "Info Diri",
+    "name_label": "Nama",
+    "ic_label": "NO IC",
+    "dob_label": "Tarikh Kelahiran",
+    "address_label": "Alamat",
+    "emergency_contact_label": "Hubungan Kecemasan",
+    "edit_button": "Ubah",
+    "contact_saved_alert": "Hubungan Kecemasan diubah: {{contact}}",
+    "modal_title": "Ubah Hubungan Kecemasan",
+    "contact_placeholder": "Nama (No Telefon)",
+    "cancel_button": "BATAL",
+    "save_button": "SIMPAN"
+  }
+}

@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom/client'; // Import the correct client method for React 18+
 import App from './App'; // Import your main component
+import './i18n';
 
 // --- Main Render Function ---
 

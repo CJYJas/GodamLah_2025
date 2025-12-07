@@ -1,110 +1,183 @@
-// /frontend-react/src/components/TransportStatus.js (FINALIZED)
+// /frontend-react/src/components/TransportStatus.js
 
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import HeaderBar from './HeaderBar';
 
-// --- LOCAL MOCK DATA (remains the same) ---
-const mockDriverInfo = {
-    name: 'Sarah K.',
-    carType: 'Blue Minivan',
-    carColor: 'Blue',
-    licensePlate: 'ABC 1234',
+// Icons for transport needs (used locally for display)
+const transportIcons = {
+    'bedridden': '🛏️',
+    'wheelchair': '♿',
+    'slow': '🚶',
+    'general': '👤',
+    'other': '❓'
 };
 
-// Mock user's specific need (This would normally come from AppointmentFlow component state)
-const mockTransportNeed = 'wheelchair'; 
+function TransportStatus({ isEasyMode, goToAppointmentFlow, goToMedicalDashboard, onMenuClick, onTransportCleared, transportNeed }) {
+    const { t } = useTranslation();
+    
+    const [rideData, setRideData] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
 
-const NEED_EMOJIS = {
-    wheelchair: { emoji: '♿', label: 'Wheelchair Access' },
-    bedridden: { emoji: '🛏️', label: 'Stretcher Required' },
-    slow: { emoji: '🚶', label: 'Slow Walking' },
-};
+    // --- API INTEGRATION: FETCH BOOKED RIDE/DRIVER DATA ---
+    useEffect(() => {
+        const fetchRideData = async () => {
+            if (!transportNeed) {
+                 setIsLoading(false);
+                 return;
+            }
+            try {
+                const response = await fetch('http://localhost:5000/api/get_transport');
+                const data = await response.json();
 
-// <<< NOTE: onMenuClick PROP ADDED TO FUNCTION SIGNATURE >>>
-function TransportStatus({ isEasyMode, goToMedicalDashboard, goToAppointmentFlow, onMenuClick }) {
-    // We now just use the local mock data directly, no need for useState/useEffect to fetch.
-    const driverInfo = mockDriverInfo; 
+                if (data.status === 'booked' && data.ride_data) {
+                    setRideData(data.ride_data);
+                }
+            } catch (error) {
+                console.error("Error fetching transport status:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
 
-    if (!driverInfo) {
-        return <h2 style={{fontSize: isEasyMode ? '48px' : '24px', textAlign: 'center'}}>Loading Transport Info...</h2>;
-    }
+        fetchRideData();
+    }, [transportNeed]);
 
-    const currentNeed = NEED_EMOJIS[mockTransportNeed] || { emoji: '❓', label: 'Unknown Need' };
-
-    const CardStyle = {
-        backgroundColor: '#fff',
-        padding: '20px',
-        borderRadius: '10px',
-        margin: '20px 0',
-        boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
-        borderLeft: '5px solid #1A73E8', 
+    // Function to map the backend key ('wheelchair') to the translated label
+    const getTranslatedLabel = (key) => {
+        // NOTE: This MUST map the backend key to the i18n key correctly
+        const i18nKeyMap = {
+            'bedridden': 'transport_needs.bed',
+            'wheelchair': 'transport_needs.chair',
+            'slow': 'transport_needs.slow',
+            'general': 'transport_needs.general',
+            'other': 'transport_needs.other',
+        };
+        const i18nKey = i18nKeyMap[key];
+        
+        // Return translated label, or the key itself if it's custom text
+        return i18nKey ? t(i18nKey) : key;
     };
+
+    // --- API INTEGRATION: CLEAR TRANSPORT NEED (Change Need button) ---
+    const handleChangeNeed = async () => {
+        try {
+            const response = await fetch('http://localhost:5000/api/clear_transport', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+            });
+
+            if (response.ok) {
+                console.log("Transport cleared on backend. Redirecting...");
+                onTransportCleared(null); // Clear local state in App.js
+                goToAppointmentFlow(); 
+            } else {
+                throw new Error("Failed to clear transport on backend.");
+            }
+        } catch (error) {
+            console.error("Error clearing transport:", error);
+            alert("Failed to change need due to a network error.");
+        }
+    };
+
+
+    if (isLoading) {
+        return (
+            <div style={{ padding: '70px 20px', textAlign: 'center' }}>
+                <HeaderBar title={t('header.title_ride_status')} onBackClick={goToMedicalDashboard} onMenuClick={onMenuClick} isEasyMode={isEasyMode} />
+                <h2 style={{marginTop: '30px', color: '#1A73E8'}}>{t('general.loading_transport_info')}</h2>
+            </div>
+        );
+    }
+    
+
+    const isBooked = transportNeed && rideData;
+    const currentNeedLabel = getTranslatedLabel(transportNeed || t('transport.unknown_need'));
 
     return (
         <div style={{ padding: '0 20px 20px 20px', textAlign: 'center' }}>
+            <HeaderBar title={t('header.title_ride_status')} onBackClick={goToMedicalDashboard} onMenuClick={onMenuClick} isEasyMode={isEasyMode} />
             
-            {/* <<< FIX: PASS onMenuClick PROP TO HEADERBAR >>> */}
-            <HeaderBar 
-                title="Ride Status" 
-                onBackClick={goToMedicalDashboard} 
-                onMenuClick={onMenuClick} // Passes the function to display the ☰ icon
-                isEasyMode={isEasyMode}
-            />
-            
-            {/* 1. Transport Needs Card */}
-            <div style={{...CardStyle, borderLeft: '5px solid orange', marginTop: '20px'}}>
-                <p style={{fontSize: isEasyMode ? '32px' : '20px', fontWeight: 'bold', margin: '0 0 10px 0', color: '#555'}}>
-                    Your Booked Need:
-                </p>
-                <span role="img" aria-label={currentNeed.label} style={{fontSize: isEasyMode ? '90px' : '50px', display: 'block'}}>
-                    {currentNeed.emoji}
-                </span>
-                <p style={{fontSize: isEasyMode ? '28px' : '18px', margin: '5px 0', fontWeight: 'bold', color: 'orange'}}>
-                    {currentNeed.label}
-                </p>
-                <button 
-                    onClick={goToAppointmentFlow}
-                    style={{ padding: '10px 20px', fontSize: isEasyMode ? '24px' : '16px', backgroundColor: 'orange', color: 'white', border: 'none', borderRadius: '8px', marginTop: '10px', fontWeight: 'bold' }}
-                >
-                    <span role="img" aria-label="Edit">🔄</span> Change Need
-                </button>
-            </div>
-            
-            {/* 2. Driver Info Card */}
-            <div style={{...CardStyle, borderLeft: '5px solid #4CAF50'}}> 
-                <h3 style={{fontSize: isEasyMode ? '32px' : '24px', margin: '0 0 20px 0', color: '#4CAF50'}}>Driver Assigned</h3>
-
-                <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
+            <div style={{ marginTop: '70px' }}>
+                
+                {/* Booked Need Section */}
+                <div style={{
+                    padding: '20px',
+                    borderRadius: '15px',
+                    border: '5px solid orange',
+                    backgroundColor: '#FFF8E1',
+                    marginBottom: '30px',
+                    boxShadow: '0 5px 15px rgba(255, 165, 0, 0.2)',
+                }}>
+                    <h3 style={{ fontSize: isEasyMode ? '34px' : '22px', color: 'orange', margin: '0 0 15px 0'}}>
+                        {t('transport.ride_status_header_booked')}
+                    </h3>
                     
-                    {/* Driver Details */}
-                    <div style={{ textAlign: 'left', fontSize: isEasyMode ? '26px' : '16px' }}>
-                        <p style={{margin: '5px 0'}}>Name: **{driverInfo.name}**</p>
-                        <p style={{margin: '5px 0'}}>Type: **{driverInfo.carType}**</p>
-                        <p style={{margin: '5px 0'}}>Color: **{driverInfo.carColor}**</p>
-                        <p style={{margin: '5px 0'}}>Plate: **{driverInfo.licensePlate}**</p>
+                    <div style={{ padding: '10px 0'}}>
+                        <span role="img" aria-label={currentNeedLabel} style={{ fontSize: isEasyMode ? '60px' : '40px', display: 'block' }}>
+                            {transportIcons[transportNeed] || '❓'}
+                        </span>
+                        
+                        <p style={{ fontSize: isEasyMode ? '36px' : '24px', fontWeight: 'bold', color: '#333', margin: '10px 0'}}>
+                            {currentNeedLabel}
+                        </p>
+                        
+                        <button 
+                            onClick={handleChangeNeed} 
+                            style={{
+                                padding: '10px 20px', 
+                                fontSize: isEasyMode ? '24px' : '16px',
+                                backgroundColor: 'orange',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '8px',
+                                fontWeight: 'bold',
+                                cursor: 'pointer',
+                                marginTop: '10px'
+                            }}
+                        >
+                            {t('general.change_need')} 🔄
+                        </button>
                     </div>
-
-                    {/* Driver Photo/Icon */}
-                    <span role="img" aria-label="Driver" style={{fontSize: isEasyMode ? '100px' : '50px'}}>🧑‍✈️</span>
                 </div>
-            </div>
 
-             {/* 3. Back Button (bottom action) */}
-             <button 
-                onClick={goToMedicalDashboard} 
-                style={{ 
-                    marginTop: '30px', 
-                    padding: '15px 40px', 
-                    fontSize: isEasyMode ? '30px' : '18px',
-                    backgroundColor: '#333',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '10px',
-                    fontWeight: 'bold'
-                }}
-            >
-                <span role="img" aria-label="Back">⬅️</span> Back to Menu
-            </button>
+                {/* Driver Assigned Section */}
+                {isBooked ? (
+                    <div style={{
+                        padding: '20px',
+                        borderRadius: '15px',
+                        border: '5px solid green',
+                        backgroundColor: '#E6FBE6',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        boxShadow: '0 5px 15px rgba(0, 128, 0, 0.2)',
+                    }}>
+                        <div>
+                            <h3 style={{ fontSize: isEasyMode ? '34px' : '22px', color: 'green', margin: '0 0 15px 0', textAlign: 'left'}}>
+                                {t('transport.driver_assigned_header')}
+                            </h3>
+                            <p style={{ margin: '5px 0', fontSize: isEasyMode ? '24px' : '16px', textAlign: 'left' }}>
+                                {t('transport.driver_name_label')} **{rideData.driver_name}**
+                            </p>
+                            <p style={{ margin: '5px 0', fontSize: isEasyMode ? '24px' : '16px', textAlign: 'left' }}>
+                                {t('transport.driver_type_label')} **{rideData.vehicle_type}**
+                            </p>
+                            <p style={{ margin: '5px 0', fontSize: isEasyMode ? '24px' : '16px', textAlign: 'left' }}>
+                                {t('transport.driver_color_label')} **{rideData.vehicle_color}**
+                            </p>
+                            <p style={{ margin: '5px 0', fontSize: isEasyMode ? '24px' : '16px', textAlign: 'left' }}>
+                                {t('transport.driver_plate_label')} **{rideData.vehicle_plate}**
+                            </p>
+                        </div>
+                        <span role="img" aria-label={t('transport.driver_aria_label')} style={{ fontSize: isEasyMode ? '80px' : '60px' }}>👮</span>
+                    </div>
+                ) : (
+                    <p style={{ fontSize: isEasyMode ? '24px' : '16px', color: '#999', marginTop: '50px' }}>
+                        {t('transport.back_to_menu')}
+                    </p>
+                )}
+            </div>
         </div>
     );
 }

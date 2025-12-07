@@ -1,9 +1,10 @@
-// /frontend-react/src/components/Dashboard.js (FINALIZED & COMPLETE)
+// /frontend-react/src/components/Dashboard.js (Styling Restored)
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
-// --- DashboardHeader: Simplified Menu Icon ---
-const DashboardHeader = ({ onMenuClick, isEasyMode }) => (
+// --- DashboardHeader (Rest of component uses t() and works correctly) ---
+const DashboardHeader = ({ onMenuClick, isEasyMode, t }) => ( 
     <div style={{ 
         display: 'flex', 
         justifyContent: 'flex-end', 
@@ -13,11 +14,11 @@ const DashboardHeader = ({ onMenuClick, isEasyMode }) => (
         top: 0,
         right: 0,
         width: '100%',
-        zIndex: 15, // Ensures the menu icon is tappable over the notification
+        zIndex: 15,
     }}>
         <button
             onClick={onMenuClick}
-            style={{
+            style={{ 
                 padding: '8px',
                 backgroundColor: 'transparent', 
                 border: 'none', 
@@ -30,51 +31,54 @@ const DashboardHeader = ({ onMenuClick, isEasyMode }) => (
             onMouseOver={e => e.currentTarget.style.color = '#1A73E8'} 
             onMouseOut={e => e.currentTarget.style.color = '#333'}
         >
-            <span role="img" aria-label="Menu">☰</span>
+            <span role="img" aria-label={t('general.menu')}>☰</span>
         </button>
     </div>
 );
 // --- END DashboardHeader ---
 
 
-// --- Icon Component Modification (Handles different colors) ---
-const Icon = ({ name, emoji, isActive, onClick, isProminent, isEasyMode, color = '#1A73E8', bgColor = '#E8F0FE' }) => {
-    // If isProminent is true, we force the coloring even if isActive is false.
+// --- Icon Component Modification (Rest of component works correctly) ---
+const Icon = ({ name, emoji, isActive, onClick, isProminent, isEasyMode, keyName, color = '#1A73E8', bgColor = '#E8F0FE' }) => {
+    
+    // ... Icon logic and styling remain the same ...
     const isColored = isActive || isProminent; 
-
-    // Define specific colors based on the icon's role
     let iconColor = color;
     let iconBgColor = bgColor;
     
-    if (name === "Emergency Info") {
-        iconColor = '#DC3545'; // Red for SOS
+    if (keyName === "dashboard.emergency_info_card") {
+        iconColor = '#DC3545';
         iconBgColor = '#FDE9E9';
-    } else if (name === "Medical History") {
-        iconColor = '#17A2B8'; // Cyan/Teal for History
+    } else if (keyName === "dashboard.medical_history_card") {
+        iconColor = '#17A2B8';
         iconBgColor = '#E8F7F9';
+    }
+    
+    const baseFontSize = isEasyMode ? 32 : 18;
+    let labelFontSize = baseFontSize;
+
+    if (name && name.length > 12) {
+        labelFontSize = isEasyMode ? 24 : 16;
     }
 
 
     return (
         <div 
-            // Clicks fire if the icon is active (blue) OR if it is a colored, prominent route (SOS/History)
             onClick={onClick} 
             style={{
                 padding: '25px', 
                 margin: '15px',
-                border: `5px solid ${isColored ? iconColor : '#e0e0e0'}`, // Color border
+                border: `5px solid ${isColored ? iconColor : '#e0e0e0'}`,
                 borderRadius: '15px', 
                 width: '40%',
                 textAlign: 'center',
-                backgroundColor: isColored ? iconBgColor : '#ffffff', // Color background
-                filter: isColored ? 'none' : 'grayscale(80%)', // No grayscale if colored
+                backgroundColor: isColored ? iconBgColor : '#ffffff',
+                filter: isColored ? 'none' : 'grayscale(80%)',
                 opacity: isColored ? 1 : 0.7, 
-                cursor: 'pointer', // Always pointer since icons are primary navigation
-                boxShadow: isColored ? `0 8px 15px ${iconColor}4D` : '0 2px 5px rgba(0, 0, 0, 0.1)', // Subtle colored shadow
+                cursor: 'pointer',
+                boxShadow: isColored ? `0 8px 15px ${iconColor}4D` : '0 2px 5px rgba(0, 0, 0, 0.1)',
                 transition: 'all 0.3s',
-                
-                // FONT SIZE ADJUSTMENT FOR TEXT FIT
-                fontSize: isEasyMode ? '32px' : '18px',
+                fontSize: `${labelFontSize}px`, 
             }}
         >
             <span role="img" aria-label={name} style={{fontSize: isEasyMode ? '85px' : '40px', display: 'block', marginBottom: '10px'}}>{emoji}</span>
@@ -86,12 +90,11 @@ const Icon = ({ name, emoji, isActive, onClick, isProminent, isEasyMode, color =
 
 
 function Dashboard({ isEasyMode, goToMedical, onMenuClick, goToEmergencyInfo }) { 
-    
-    const showAppointmentNotification = true; 
+    const { t } = useTranslation();
 
-    // NOTE: goToMedical handles navigation for both the active icon and the notification banner.
+    const showAppointmentNotification = true; 
     
-    // --- REVISED NOTIFICATION STYLE (Floating Card) ---
+    // 🛑 RESTORED STYLING: Define the notificationStyle object here 🛑
     const notificationStyle = {
         padding: '15px 25px', 
         margin: '15px', 
@@ -107,26 +110,22 @@ function Dashboard({ isEasyMode, goToMedical, onMenuClick, goToEmergencyInfo }) 
         position: 'relative', 
         zIndex: 10,
     };
+    // 🛑 END RESTORED STYLING 🛑
 
 
     return (
         <div style={{ position: 'relative' }}>
-            {/* RENDER THE MENU ICON AT THE TOP RIGHT */}
-            <DashboardHeader onMenuClick={onMenuClick} isEasyMode={isEasyMode} />
+            <DashboardHeader onMenuClick={onMenuClick} isEasyMode={isEasyMode} t={t} />
 
-            {/* RENDER THE NOTIFICATION BANNER */}
+            {/* RENDER THE NOTIFICATION BANNER (Now uses the restored notificationStyle) */}
             {showAppointmentNotification && (
-                <div 
-                    // Notification uses goToMedical, which App.js sets to 'medical-dashboard'
-                    onClick={goToMedical} 
-                    style={notificationStyle}
-                >
-                    <span role="img" aria-label="Alert" style={{marginRight: '10px'}}>🔔</span>
-                    APPOINTMENT SOON! Tap Here.
+                <div onClick={goToMedical} style={notificationStyle}>
+                    <span role="img" aria-label={t('general.alert')} style={{marginRight: '10px'}}>🔔</span>
+                    {t('dashboard.appointment_soon_alert')} {t('general.tap_here')}
                 </div>
             )}
 
-            {/* MAIN ICON GRID - FINAL SYMMETRICAL 2X2 ALIGNMENT */}
+            {/* MAIN ICON GRID (Rest of the component remains the same) */}
             <div style={{ 
                 display: 'flex', 
                 flexWrap: 'wrap', 
@@ -134,31 +133,37 @@ function Dashboard({ isEasyMode, goToMedical, onMenuClick, goToEmergencyInfo }) 
                 paddingTop: showAppointmentNotification ? '20px' : '40px', 
                 paddingBottom: '40px' 
             }}>
-                {/* 1. MEDICAL ACCESS (Active Feature) - Uses goToMedical (Menu route) */}
-                <Icon name="Medical Access" emoji="🏥" isActive={true} onClick={goToMedical} isEasyMode={isEasyMode}/>
                 
-                {/* 2. EMERGENCY INFO - Uses the dedicated goToEmergencyInfo prop (Page route) */}
+                {/* Icons... */}
                 <Icon 
-                    name="Emergency Info" 
+                    name={t('medical_menu.access_card_short')} 
+                    emoji="🏥" 
+                    isActive={true} 
+                    onClick={goToMedical} 
+                    isEasyMode={isEasyMode}
+                    keyName={'medical_menu.access_card_short'} 
+                />
+                
+                <Icon 
+                    name={t('dashboard.emergency_info_card')} 
                     emoji="🆘" 
                     isProminent={true} 
                     isActive={false} 
                     onClick={goToEmergencyInfo} 
                     isEasyMode={isEasyMode}
+                    keyName={'dashboard.emergency_info_card'} 
                 />
                 
-                {/* Row 2 */}
-                {/* 3. MEDICAL HISTORY - Not yet linked, will console log */}
                 <Icon 
-                    name="Medical History" 
+                    name={t('dashboard.medical_history_card')} 
                     emoji="📜" 
                     isProminent={true} 
                     isActive={false} 
                     onClick={() => console.log('Medical History page route needed.')}
                     isEasyMode={isEasyMode}
+                    keyName={'dashboard.medical_history_card'} 
                 />
                 
-                {/* HIDDEN SPACER ICON: Maintains the 2x2 centered structure */}
                 <div style={{ width: '40%', margin: '15px', visibility: 'hidden' }}></div>
             </div>
         </div>

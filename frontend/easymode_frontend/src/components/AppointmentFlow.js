@@ -1,84 +1,106 @@
 // /frontend-react/src/components/AppointmentFlow.js
 
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import HeaderBar from './HeaderBar';
-import OtherNeedInput from './OtherNeedInput'; // Import the new component
+import OtherNeedInput from './OtherNeedInput'; 
 
-const FlowButton = ({ label, emoji, isBlinking, onClick, isEasyMode, primaryColor = '#007bff' }) => (
-    <button 
-        onClick={onClick}
-        style={{
-            padding: '20px 10px', 
-            margin: '10px 5px', 
-            border: `4px solid ${isBlinking ? primaryColor : '#ccc'}`,
-            backgroundColor: isBlinking ? '#ffffcc' : 'white',
-            fontWeight: 'bold',
-            fontSize: isEasyMode ? '24px' : '18px',
-            animation: isBlinking ? 'pulse 1.5s infinite' : 'none',
-            cursor: 'pointer',
-            transition: 'all 0.3s',
-            borderRadius: '10px',
-            color: '#333',
-            width: '30%',
-            minWidth: '100px',
-            boxSizing: 'border-box',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-        }}
-    >
-        <span role="img" aria-label={label} style={{fontSize: isEasyMode ? '50px' : '30px', display: 'block', marginBottom: '5px'}}>{emoji}</span>
-        {label}
-    </button>
-);
+// --- FlowButton Component (Modified for dynamic font size) ---
+const FlowButton = ({ label, emoji, isBlinking, onClick, isEasyMode, primaryColor = '#007bff' }) => {
+    // ... (FlowButton logic remains the same) ...
+    const baseFontSize = isEasyMode ? 24 : 18;
+    let labelFontSize = baseFontSize;
 
-// <<< ADD onMenuClick PROP TO FUNCTION SIGNATURE >>>
-function AppointmentFlow({ isEasyMode, appointment, goToTransportStatus, goToMedicalDashboard, onMenuClick }) {
-    // Core flow state
+    if (label && label.length > 15) {
+        labelFontSize = isEasyMode ? 18 : 14; 
+    } else if (label && label.length > 10) {
+        labelFontSize = isEasyMode ? 20 : 16;
+    }
+    
+    return (
+        <button 
+            onClick={onClick}
+            style={{
+                padding: '20px 10px', 
+                margin: '10px 5px', 
+                border: `4px solid ${isBlinking ? primaryColor : '#ccc'}`,
+                backgroundColor: isBlinking ? '#ffffcc' : 'white',
+                fontWeight: 'bold',
+                fontSize: `${labelFontSize}px`, 
+                animation: isBlinking ? 'pulse 1.5s infinite' : 'none',
+                cursor: 'pointer',
+                transition: 'all 0.3s',
+                borderRadius: '10px',
+                color: '#333',
+                width: '30%',
+                minWidth: '100px',
+                boxSizing: 'border-box',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                overflowWrap: 'break-word',
+                wordBreak: 'break-word',
+            }}
+        >
+            <span role="img" aria-label={label} style={{fontSize: isEasyMode ? '50px' : '30px', display: 'block', marginBottom: '5px'}}>{emoji}</span>
+            {label}
+        </button>
+    );
+};
+
+// <<< APPOINTMENT FLOW MAIN COMPONENT >>>
+function AppointmentFlow({ isEasyMode, appointment, goToTransportStatus, goToMedicalDashboard, onMenuClick, onTransportBooked }) {
+    const { t } = useTranslation();
+
     const [step, setStep] = useState(0); 
     const [needsTransport, setNeedsTransport] = useState(null); 
     const [transportNeed, setTransportNeed] = useState(null); 
-
-    // State for Other Need Input
     const [showOtherInput, setShowOtherInput] = useState(false); 
     const [customNeedText, setCustomNeedText] = useState('');
 
-    // --- Core Logic Functions ---
-    const sendTransportData = () => {
+    // --- API INTEGRATION: SEND TRANSPORT DATA ---
+    const sendTransportData = async () => {
         const finalNeed = transportNeed === 'other' ? customNeedText : transportNeed;
-        console.log('--- Data Sent: TRANSPORT BOOKED ---', { finalNeed });
-        setStep(3); 
-        setTimeout(goToTransportStatus, 2000); // Redirect to status page
-    };
-    
-    const sendNoTransportData = () => {
-        console.log('--- Data Sent: NO TRANSPORT NEEDED, APPOINTMENT CONFIRMED ---');
-        setStep(3); 
-        setTimeout(goToMedicalDashboard, 2000); // Redirect back to Medical Menu after success
-    };
+        
+        try {
+            const response = await fetch('http://localhost:5000/api/set_transport', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ transport_need: finalNeed }),
+            });
 
-    // --- Other Input Handlers ---
-    const handleConfirmOtherNeed = (text) => {
-        setCustomNeedText(text); 
-        setTransportNeed('other'); 
-        setShowOtherInput(false); 
-    };
-
-    const handleCancelOtherNeed = () => {
-        setTransportNeed(null); 
-        setShowOtherInput(false); 
-    };
-    
-    // Handler for all button selections (redirects for 'other')
-    const handleNeedSelection = (key) => {
-        if (key === 'other') {
-            setShowOtherInput(true); 
-        } else {
-            setTransportNeed(key);
+            if (!response.ok) {
+                throw new Error('Failed to save transport need on backend.');
+            }
+            
+            // 1. Update local state in App.js immediately
+            onTransportBooked(finalNeed); 
+            
+            // 2. Proceed to next steps
+            setStep(3); 
+            setTimeout(goToTransportStatus, 2000); 
+            
+        } catch (error) {
+            console.error("Error booking transport:", error);
+            alert("Failed to book transport due to a network error.");
         }
     };
-    // ----------------------------
+    
+    // --- SEND NO TRANSPORT (local redirect, no transport saved) ---
+    const sendNoTransportData = () => {
+        // Clear transport state if user explicitly selects No
+        onTransportBooked(null); 
+        console.log('--- Data Sent: NO TRANSPORT NEEDED, APPOINTMENT CONFIRMED ---');
+        setStep(3); 
+        setTimeout(goToMedicalDashboard, 2000); 
+    };
+
+    // ... (rest of helper functions remain the same) ...
+
+    const handleConfirmOtherNeed = (text) => { setCustomNeedText(text); setTransportNeed('other'); setShowOtherInput(false); };
+    const handleCancelOtherNeed = () => { setTransportNeed(null); setShowOtherInput(false); };
+    const handleNeedSelection = (key) => { if (key === 'other') { setShowOtherInput(true); } else { setTransportNeed(key); } };
 
     const getBlinkingStyle = (currentStep) => ({
         border: `5px solid ${step === currentStep ? '#FFC107' : '#ddd'}`, 
@@ -88,14 +110,13 @@ function AppointmentFlow({ isEasyMode, appointment, goToTransportStatus, goToMed
     });
 
     const transportOptions = [
-        { key: 'bedridden', label: 'Bed', emoji: '🛏️' },
-        { key: 'wheelchair', label: 'Chair', emoji: '♿' },
-        { key: 'slow', label: 'Slow', emoji: '🚶' },
-        { key: 'general', label: 'General', emoji: '👤' },
-        { key: 'other', label: 'Other', emoji: '❓' },
+        { key: 'bedridden', label: t('transport_needs.bed'), emoji: '🛏️' },
+        { key: 'wheelchair', label: t('transport_needs.chair'), emoji: '♿' },
+        { key: 'slow', label: t('transport_needs.slow'), emoji: '🚶' },
+        { key: 'general', label: t('transport_needs.general'), emoji: '👤' },
+        { key: 'other', label: t('transport_needs.other'), emoji: '❓' },
     ];
 
-    // --- Conditional Rendering for Other Input Screen ---
     if (showOtherInput) {
         return (
             <OtherNeedInput 
@@ -105,23 +126,22 @@ function AppointmentFlow({ isEasyMode, appointment, goToTransportStatus, goToMed
             />
         );
     }
-    // ----------------------------------------------------
+    
 
     return (
         <div style={{ padding: '0 20px 20px 20px', textAlign: 'center' }}>
-            {/* <<< ADDED HEADER BAR WITH MENU CLICK HANDLER >>> */}
             <HeaderBar 
-                title="Appointment" 
+                title={t('header.title_appointment')} 
                 onBackClick={goToMedicalDashboard} 
-                onMenuClick={onMenuClick} // Pass the handler to open the menu
+                onMenuClick={onMenuClick} 
                 isEasyMode={isEasyMode}
             />
             
-            {/* 1. Date/Time Area - Blinks on Step 0 */}
+            {/* 1. Date/Time Area - Pushes content down 70px */}
             <div 
                 style={{
                     padding: '30px', 
-                    marginTop: '20px',
+                    marginTop: '70px',
                     marginBottom: '20px', 
                     borderRadius: '15px', 
                     ...getBlinkingStyle(0),
@@ -138,20 +158,20 @@ function AppointmentFlow({ isEasyMode, appointment, goToTransportStatus, goToMed
                 style={{...getBlinkingStyle(1), padding: '20px', borderRadius: '15px', marginBottom: '20px'}}
                 onClick={() => step === 1 && console.log("Audio: 'Do you need a ride?'")}
             >
-                 <span 
+                <span 
                     role="img" 
-                    aria-label="Transport Question" 
+                    aria-label={t('appointment_flow.transport_question_aria')} 
                     style={{fontSize: isEasyMode ? '60px' : '40px', display: 'block', margin: '0 0 10px 0'}}
                 >
                     🚗❓
                 </span>
                 <p style={{fontSize: isEasyMode ? '20px' : '16px', fontWeight: 'bold', margin: '0 0 15px 0', color: '#555'}}>
-                    (Tap YES or NO)
+                    {t('appointment_flow.tap_instruction')}
                 </p>
 
                 <div style={{ display: 'flex', justifyContent: 'space-around' }}>
-                    <FlowButton label="Yes" emoji="✅" isBlinking={step === 1} isEasyMode={isEasyMode} onClick={() => { setNeedsTransport(true); setStep(2); }} primaryColor="green"/>
-                    <FlowButton label="No" emoji="❌" isBlinking={step === 1} isEasyMode={isEasyMode} onClick={() => { setNeedsTransport(false); sendNoTransportData(); }} primaryColor="red"/>
+                    <FlowButton label={t('general.yes')} emoji="✅" isBlinking={step === 1} isEasyMode={isEasyMode} onClick={() => { setNeedsTransport(true); setStep(2); }} primaryColor="green"/>
+                    <FlowButton label={t('general.no')} emoji="❌" isBlinking={step === 1} isEasyMode={isEasyMode} onClick={() => { setNeedsTransport(false); sendNoTransportData(); }} primaryColor="red"/>
                 </div>
             </div>
             
@@ -159,7 +179,7 @@ function AppointmentFlow({ isEasyMode, appointment, goToTransportStatus, goToMed
             {step >= 2 && needsTransport && (
                 <div style={{...getBlinkingStyle(2), padding: '20px', borderRadius: '15px'}}>
                     <h3 style={{fontSize: isEasyMode ? '32px' : '20px', margin: '0 0 15px 0', color: '#555'}}>
-                        Select your need:
+                        {t('appointment_flow.select_need_prompt')}
                     </h3>
                     
                     <div style={{ 
@@ -175,7 +195,7 @@ function AppointmentFlow({ isEasyMode, appointment, goToTransportStatus, goToMed
                                 emoji={option.emoji}
                                 isBlinking={step === 2 && transportNeed !== option.key}
                                 isEasyMode={isEasyMode}
-                                onClick={() => handleNeedSelection(option.key)} // Use new handler
+                                onClick={() => handleNeedSelection(option.key)}
                                 primaryColor={option.key === 'other' ? 'purple' : '#1A73E8'}
                             />
                         ))}
@@ -185,7 +205,7 @@ function AppointmentFlow({ isEasyMode, appointment, goToTransportStatus, goToMed
                     {transportNeed === 'other' && customNeedText && (
                         <div style={{marginTop: '15px', padding: '10px', border: '1px dashed green', borderRadius: '5px'}}>
                              <p style={{fontSize: isEasyMode ? '20px' : '14px', margin: 0}}>
-                                **Confirmed Need:** {customNeedText}
+                                 **{t('appointment_flow.confirmed_need_label')}:** {customNeedText}
                              </p>
                         </div>
                     )}
@@ -193,9 +213,18 @@ function AppointmentFlow({ isEasyMode, appointment, goToTransportStatus, goToMed
                     {transportNeed && (
                         <button
                             onClick={sendTransportData}
-                            style={{ padding: '15px 40px', fontSize: isEasyMode ? '30px' : '18px', backgroundColor: 'green', color: 'white', border: 'none', borderRadius: '10px', marginTop: '20px', fontWeight: 'bold'}}
+                            style={{ 
+                                padding: '15px 40px', 
+                                fontSize: isEasyMode ? '24px' : '16px', // Reduced font size for multi-lang fit
+                                backgroundColor: 'green', 
+                                color: 'white', 
+                                border: 'none', 
+                                borderRadius: '10px', 
+                                marginTop: '20px', 
+                                fontWeight: 'bold'
+                            }}
                         >
-                            Confirm & Book ✅
+                            {t('appointment_flow.confirm_book_button')}
                         </button>
                     )}
                 </div>
@@ -204,7 +233,7 @@ function AppointmentFlow({ isEasyMode, appointment, goToTransportStatus, goToMed
             {/* 4. Final State */}
             {step === 3 && (
                 <div style={{ marginTop: '20px', color: 'green', fontWeight: 'bold', fontSize: isEasyMode ? '48px' : '24px' }}>
-                    ✅ {needsTransport ? 'Transport booked! Redirecting...' : 'Appointment Confirmed! Redirecting...'}
+                    ✅ {needsTransport ? t('appointment_flow.transport_booked_success') : t('appointment_flow.appointment_confirmed_success')}
                 </div>
             )}
             <style jsx>{`
