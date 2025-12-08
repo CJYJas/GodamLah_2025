@@ -106,7 +106,7 @@ class SecurityQuestions(BaseModel):
 
 class UserModeRequest(BaseModel):
     ic_number: str
-    mode: str      # normal, rural, easy, senior
+    mode: str      # normal, rural, easy
 
 # -------------------- ROUTES: SIGNUP --------------------
 

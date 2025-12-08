@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Container, Typography, TextField, Button, Box, Paper } from '@mui/material';
+import { Container, Typography, TextField, Button, Box, Card, CircularProgress } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import axios from 'axios';
-import { useLanguage } from '../context/LanguageContext'; // ✅ Import Translation Hook
+import { useLanguage } from '../context/LanguageContext';
+import HealthcareHeader from '../components/HealthcareHeader';
 
 const SignUpStep2: React.FC = () => {
     const location = useLocation();
@@ -76,50 +78,131 @@ const SignUpStep2: React.FC = () => {
     };
 
     return (
-        <Container maxWidth="sm" sx={{ mt: 5 }}>
-            <Paper elevation={3} sx={{ p: 4 }}>
-                <Typography variant="h4" align="center" gutterBottom>
-                    {t.confirmTitle} {/* "Confirm Your Info" */}
-                </Typography>
+        <Container 
+            maxWidth="xs" 
+            sx={{ 
+                minHeight: { xs: '100vh', sm: 'calc(100vh - 45px)' },
+                display: 'flex',
+                flexDirection: 'column',
+                py: { xs: 2, sm: 3 },
+                px: { xs: 1.5, sm: 2 },
+                width: '100%',
+                maxWidth: '100%',
+                backgroundColor: 'transparent',
+                margin: '0 auto',
+                boxSizing: 'border-box'
+            }}
+        >
+            <Button 
+                startIcon={<ArrowBackIcon />}
+                onClick={() => navigate(-1)}
+                sx={{ 
+                    mb: 2,
+                    color: '#B794F6',
+                    textTransform: 'none',
+                    alignSelf: 'flex-start',
+                    '&:hover': {
+                        backgroundColor: 'rgba(183, 148, 246, 0.1)',
+                    }
+                }}
+            >
+                {t.back}
+            </Button>
 
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 3 }}>
+            <Card sx={{ 
+                p: { xs: 2, sm: 2.5 }, 
+                boxShadow: '0 8px 24px rgba(0, 0, 0, 0.1)',
+                borderRadius: { xs: 2, sm: 3 },
+                backgroundColor: '#fff',
+                width: '100%',
+                maxWidth: '100%',
+                boxSizing: 'border-box'
+            }}>
+                <Box sx={{ mb: { xs: 2, sm: 2.5 } }}>
+                    <HealthcareHeader title={t.confirmTitle} />
+                </Box>
+
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 1.5, sm: 2 }, mt: 1.5, width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
                     <TextField
-                        label={t.fullName} // "Full Name"
+                        label={t.fullName}
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
                         fullWidth
                         InputLabelProps={{ shrink: true }}
+                        sx={{
+                            '& .MuiOutlinedInput-root': {
+                                borderRadius: 2,
+                                fontSize: { xs: '0.875rem', sm: '1rem' }
+                            },
+                            '& .MuiInputLabel-root': {
+                                fontSize: { xs: '0.875rem', sm: '1rem' }
+                            }
+                        }}
                     />
 
                     <TextField
-                        label={t.icLabel} // "IC Number"
+                        label={t.icLabel}
                         value={icNumber}
                         onChange={(e) => setIcNumber(e.target.value)}
                         fullWidth
                         InputLabelProps={{ shrink: true }}
+                        sx={{
+                            '& .MuiOutlinedInput-root': {
+                                borderRadius: 2,
+                                fontSize: { xs: '0.875rem', sm: '1rem' }
+                            },
+                            '& .MuiInputLabel-root': {
+                                fontSize: { xs: '0.875rem', sm: '1rem' }
+                            }
+                        }}
                     />
 
                     <TextField
-                        label={t.address} // "Address"
+                        label={t.address}
                         value={address}
                         onChange={(e) => setAddress(e.target.value)}
                         fullWidth
                         multiline
                         rows={3}
                         InputLabelProps={{ shrink: true }}
+                        sx={{
+                            '& .MuiOutlinedInput-root': {
+                                borderRadius: 2,
+                                fontSize: { xs: '0.875rem', sm: '1rem' }
+                            },
+                            '& .MuiInputLabel-root': {
+                                fontSize: { xs: '0.875rem', sm: '1rem' }
+                            }
+                        }}
                     />
 
                     <Button
                         variant="contained"
                         size="large"
                         onClick={handleSubmit}
-                        sx={{ mt: 3 }}
+                        sx={{ 
+                            mt: 2,
+                            backgroundColor: '#B794F6',
+                            color: '#1a1a1a',
+                            fontWeight: 'bold',
+                            py: { xs: 1.25, sm: 1.5 },
+                            fontSize: { xs: '0.875rem', sm: '1rem' },
+                            borderRadius: 2,
+                            textTransform: 'none',
+                            boxShadow: '0 4px 12px rgba(183, 148, 246, 0.3)',
+                            '&:hover': {
+                                backgroundColor: '#9F7AEA',
+                            },
+                            '&:disabled': {
+                                backgroundColor: '#E0E0E0',
+                            }
+                        }}
                         disabled={loading}
                     >
-                        {loading ? t.loading : t.next} {/* "Loading..." or "Next" */}
+                        {loading ? <CircularProgress size={20} sx={{ color: '#1a1a1a' }} /> : t.next}
                     </Button>
                 </Box>
-            </Paper>
+            </Card>
         </Container>
     );
 };

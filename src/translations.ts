@@ -32,8 +32,17 @@ export const translations = {
         no: "No",
         voiceVerify: "Voice Verification",
         sayName: "Please say your name clearly.",
+        voiceVerifyDesc: "Please say your name clearly. If voice recognition fails 3 times, you will be asked a security question.",
+        voiceVerified: "Voice verified successfully!",
+        voiceMismatch: "Voice mismatch. Similarity: {similarity}%. {remaining} attempt(s) remaining. Try again.",
+        tooManyAttempts: "Too many voice attempts. Please answer security question.",
+        noVoiceRegistered: "No voice registered. Using security questions...",
+        voiceError: "Error verifying voice. Using security questions...",
+        loginSuccessful: "Login Successful!",
         securityCheck: "Security Check",
         yourAnswer: "Your Answer",
+        incorrectAnswer: "Incorrect Answer. Please try again.",
+        enterAnswer: "Please enter your answer",
 
         // --- SignUp Step 1 (Scan) ---
         scanTitle: "Scan MyKad",
@@ -114,8 +123,17 @@ export const translations = {
         no: "Tidak",
         voiceVerify: "Pengesahan Suara",
         sayName: "Sila sebut nama anda dengan jelas.",
+        voiceVerifyDesc: "Sila sebut nama anda dengan jelas. Jika pengesahan suara gagal 3 kali, anda akan diminta menjawab soalan keselamatan.",
+        voiceVerified: "Suara disahkan dengan jayanya!",
+        voiceMismatch: "Suara tidak sepadan. Persamaan: {similarity}%. {remaining} percubaan lagi. Cuba lagi.",
+        tooManyAttempts: "Terlalu banyak percubaan suara. Sila jawab soalan keselamatan.",
+        noVoiceRegistered: "Tiada suara didaftarkan. Menggunakan soalan keselamatan...",
+        voiceError: "Ralat mengesahkan suara. Menggunakan soalan keselamatan...",
+        loginSuccessful: "Log Masuk Berjaya!",
         securityCheck: "Semakan Keselamatan",
         yourAnswer: "Jawapan Anda",
+        incorrectAnswer: "Jawapan tidak betul. Sila cuba lagi.",
+        enterAnswer: "Sila masukkan jawapan anda",
 
         // --- SignUp Step 1 (Scan) ---
         scanTitle: "Imbas MyKad",
@@ -154,7 +172,7 @@ export const translations = {
 
         // --- User Mode (Final Step) ---
         modeTitle: "Pilih Mod Pengguna",
-        modeSubtitle: "Pilih antaramuka yang sesuai, kemudian selesai pendaftaran.",
+        modeSubtitle: "Pilih mod yang sesuai, kemudian selesai pendaftaran.",
         normal: "Mod Biasa",
         rural: "Mod Luar Bandar",
         easy: "Mod Senang",
