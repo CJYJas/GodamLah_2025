@@ -2,9 +2,11 @@ import React, { useRef, useState } from 'react';
 import Webcam from 'react-webcam';
 import { Button, Container, Typography, Box, CircularProgress, Card, CardMedia } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-// import { extractICData } from '../services/api'; // Commented out for Bypass
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useLanguage } from '../context/LanguageContext'; // ✅ Import Translation Hook
 
 const SignUpStep1: React.FC = () => {
+    const { t } = useLanguage(); // ✅ Get Translations
     const webcamRef = useRef<Webcam>(null);
     const [frontImg, setFrontImg] = useState<string | null>(null);
     const [backImg, setBackImg] = useState<string | null>(null);
@@ -16,23 +18,18 @@ const SignUpStep1: React.FC = () => {
         if (imageSrc) setImg(imageSrc);
     };
 
-    // Reset images to allow retaking
     const handleRetake = () => {
         setFrontImg(null);
         setBackImg(null);
     };
 
-    const handleNext = async () => {
-        if (!frontImg || !backImg) return alert("Please capture both sides first.");
+    const handleNext = () => {
+        if (!frontImg || !backImg) return alert(t.captureError); // "Please capture both sides"
 
         setLoading(true);
 
-        // ---------------------------------------------------------
-        // 🚀 FRONTEND BYPASS MODE
-        // ---------------------------------------------------------
+        // Simulate backend processing
         setTimeout(() => {
-            console.log("⚠️ SKIPPING SERVER: Using Mock Data");
-
             const mockResult = {
                 fullName: "TAN SENG HONG",
                 icNumber: "990101-14-5678",
@@ -45,20 +42,23 @@ const SignUpStep1: React.FC = () => {
                 state: {
                     icNumber: mockResult.icNumber,
                     fullName: mockResult.fullName,
-                    address: mockResult.address, // Optional: Pass image to next step if needed
+                    address: mockResult.address,
+                    frontImage: frontImg,
+                    backImage: backImg
                 }
             });
-
         }, 1000);
     };
 
     return (
         <Container maxWidth="sm">
-            <Typography variant="h4" sx={{ my: 2, textAlign: 'center' }}>Scan MyKad</Typography>
+            <Typography variant="h4" sx={{ my: 2, textAlign: 'center' }}>
+                {t.scanTitle}
+            </Typography>
 
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
 
-                {/* 1. WEBCAM VIEW (Only shows if images are missing) */}
+                {/* Webcam view */}
                 {!frontImg || !backImg ? (
                     <Box sx={{ border: '2px solid #ccc', borderRadius: 2, overflow: 'hidden' }}>
                         <Webcam
@@ -66,65 +66,58 @@ const SignUpStep1: React.FC = () => {
                             ref={webcamRef}
                             screenshotFormat="image/jpeg"
                             width="100%"
-                            videoConstraints={{ facingMode: "environment" }} // Use back camera on mobile
+                            videoConstraints={{ facingMode: "environment" }}
                         />
                     </Box>
                 ) : null}
 
-                {/* 2. PREVIEW CAPTURED IMAGES */}
+                {/* Preview captured images */}
                 {frontImg && (
                     <Card sx={{ display: 'flex', p: 1, alignItems: 'center', gap: 2 }}>
                         <CardMedia component="img" image={frontImg} sx={{ width: 80, height: 50, borderRadius: 1 }} />
-                        <Typography variant="body2">Front IC Captured</Typography>
+                        <Typography variant="body2">{t.frontCaptured}</Typography>
                     </Card>
                 )}
                 {backImg && (
                     <Card sx={{ display: 'flex', p: 1, alignItems: 'center', gap: 2 }}>
                         <CardMedia component="img" image={backImg} sx={{ width: 80, height: 50, borderRadius: 1 }} />
-                        <Typography variant="body2">Back IC Captured</Typography>
+                        <Typography variant="body2">{t.backCaptured}</Typography>
                     </Card>
                 )}
 
-                {/* 3. BUTTONS AREA */}
-
-                {/* Capture Front */}
+                {/* Buttons */}
                 {!frontImg && (
                     <Button variant="contained" size="large" onClick={() => capture(setFrontImg)}>
-                        Capture Front
+                        {t.captureFront}
                     </Button>
                 )}
-
-                {/* Capture Back */}
                 {frontImg && !backImg && (
                     <Button variant="contained" size="large" onClick={() => capture(setBackImg)}>
-                        Capture Back
+                        {t.captureBack}
                     </Button>
                 )}
-
-                {/* Final Actions: Retake OR Process */}
                 {frontImg && backImg && (
                     <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
-                        <Button
-                            variant="outlined"
-                            color="error"
-                            fullWidth
-                            onClick={handleRetake}
-                            disabled={loading}
-                        >
-                            Retake
+                        <Button variant="outlined" color="error" fullWidth onClick={handleRetake} disabled={loading}>
+                            {t.retake}
                         </Button>
-
-                        <Button
-                            variant="contained"
-                            color="success"
-                            fullWidth
-                            onClick={handleNext}
-                            disabled={loading}
-                        >
-                            {loading ? <CircularProgress size={24} color="inherit" /> : "Process & Next"}
+                        <Button variant="contained" color="success" fullWidth onClick={handleNext} disabled={loading}>
+                            {loading ? <CircularProgress size={24} color="inherit" /> : t.next}
                         </Button>
                     </Box>
                 )}
+
+                {/* BACK TO HOME BUTTON */}
+                <Button
+                    variant="text"
+                    color="inherit"
+                    startIcon={<ArrowBackIcon />}
+                    onClick={() => navigate('/')}
+                    sx={{ mt: 2 }}
+                >
+                    {t.home}
+                </Button>
+
             </Box>
         </Container>
     );

@@ -8,6 +8,7 @@ import SignUpVoice from "./pages/SignUpVoice";
 import SignUpSecurity from "./pages/SignUpSecurity";
 import UserMode from "./pages/UserMode";
 import SignIn from "./pages/SignIn";
+import Emergency from './pages/Emergency';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="/signup-voice" element={<SignUpVoice />} />
           <Route path="/signup-security" element={<SignUpSecurity />} />
           <Route path="/user-mode" element={<UserMode />} />
+          <Route path="/emergency" element={<Emergency />} />
           <Route path="/signin" element={<SignIn />} />
         </Routes>
       </Router>

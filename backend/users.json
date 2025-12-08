@@ -1,0 +1,17 @@
+{
+    "990101145678": {
+        "full_name": "TAN SENG HONG",
+        "ic_number": "990101145678",
+        "address": "N277 JALAN PERKASA 1 TAMAN MALURI, 55100, KUALA LUMPUR",
+        "ic_front": "ic_images/990101145678_front.png",
+        "ic_back": "ic_images/990101145678_back.png",
+        "voice_path": "voices/990101145678.wav",
+        "mode": "normal",
+        "security": {
+            "question1": "What is your mother's maiden name?",
+            "answer1": "a",
+            "question2": "What is the name of your first pet?",
+            "answer2": "b"
+        }
+    }
+}
