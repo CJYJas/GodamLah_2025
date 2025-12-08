@@ -58,7 +58,7 @@ const SignIn: React.FC = () => {
         const cleanedIc = cleanIcNumber(icNumber);
         if (!cleanedIc) return alert("Please enter IC Number");
         if (cleanedIc.length < 12) return alert("Please enter a valid 12-digit IC Number");
-        
+
         setLoading(true);
         try {
             const formData = new FormData();
@@ -136,7 +136,7 @@ const SignIn: React.FC = () => {
                 // Voice mismatch - check attempts
                 const attempts = res.data.attempts || 0;
                 const similarity = res.data.similarity || 0;
-                
+
                 if (res.data.error === "TooManyAttempts" || attempts >= 3) {
                     // After 3 attempts, go to security questions
                     setVoiceStatus(t.tooManyAttempts);
@@ -192,17 +192,18 @@ const SignIn: React.FC = () => {
             });
 
             if (res.data && res.data.success && res.data.question) {
+                // Backend returns question - use it directly
                 setSecurityQuestion(res.data.question);
                 setStep(3);
             } else {
-                // Default question if backend doesn't return one (backend should have created user)
-                setSecurityQuestion("What is your mother's maiden name?");
+                // Default question if backend doesn't return one - use translation based on current language
+                setSecurityQuestion(t.questions[0]); // First question from translations
                 setStep(3);
             }
         } catch (err: any) {
             console.error("Security question fetch error:", err);
-            // Always proceed with default question (backend should have auto-created user)
-            setSecurityQuestion("Apakah nama ibu kandung anda?");
+            // Always proceed with default question - use translation based on current language
+            setSecurityQuestion(t.questions[0]); // First question from translations
             setStep(3);
         }
     };
@@ -257,9 +258,9 @@ const SignIn: React.FC = () => {
     };
 
     return (
-        <Container 
-            maxWidth="xs" 
-            sx={{ 
+        <Container
+            maxWidth="xs"
+            sx={{
                 minHeight: { xs: '100vh', sm: 'calc(100vh - 45px)' },
                 display: 'flex',
                 flexDirection: 'column',
@@ -272,10 +273,10 @@ const SignIn: React.FC = () => {
                 boxSizing: 'border-box'
             }}
         >
-            <Button 
-                startIcon={<ArrowBackIcon />} 
-                onClick={() => navigate('/')} 
-                sx={{ 
+            <Button
+                startIcon={<ArrowBackIcon />}
+                onClick={() => navigate('/')}
+                sx={{
                     mb: 2,
                     color: '#B794F6',
                     textTransform: 'none',
@@ -288,8 +289,8 @@ const SignIn: React.FC = () => {
                 {t.home}
             </Button>
 
-            <Card sx={{ 
-                p: { xs: 2, sm: 2.5 }, 
+            <Card sx={{
+                p: { xs: 2, sm: 2.5 },
                 boxShadow: '0 8px 24px rgba(0, 0, 0, 0.1)',
                 borderRadius: { xs: 2, sm: 3 },
                 backgroundColor: '#fff',
@@ -328,10 +329,10 @@ const SignIn: React.FC = () => {
                             }}
                         />
 
-                        <Button 
-                            variant="contained" 
-                            size="large" 
-                            onClick={handleCheckUser} 
+                        <Button
+                            variant="contained"
+                            size="large"
+                            onClick={handleCheckUser}
                             disabled={loading}
                             sx={{
                                 backgroundColor: '#B794F6',
@@ -357,7 +358,7 @@ const SignIn: React.FC = () => {
                             variant="outlined"
                             startIcon={<WarningIcon />}
                             onClick={() => setEmergencyPopup(true)}
-                            sx={{ 
+                            sx={{
                                 mt: 1,
                                 borderColor: '#EF4444',
                                 color: '#EF4444',
@@ -391,9 +392,9 @@ const SignIn: React.FC = () => {
 
                         <Fab
                             onClick={isRecording ? stopRecording : startRecording}
-                            sx={{ 
-                                width: { xs: 70, sm: 90 }, 
-                                height: { xs: 70, sm: 90 }, 
+                            sx={{
+                                width: { xs: 70, sm: 90 },
+                                height: { xs: 70, sm: 90 },
                                 backgroundColor: isRecording ? '#EF4444' : '#B794F6',
                                 color: '#fff',
                                 animation: isRecording ? `${pulse} 1.5s infinite` : 'none',
@@ -408,7 +409,7 @@ const SignIn: React.FC = () => {
                         <Typography sx={{ color: '#666', minHeight: 24 }}>
                             {voiceStatus}
                         </Typography>
-                        <Button 
+                        <Button
                             onClick={() => setStep(1)}
                             sx={{
                                 color: '#B794F6',
@@ -430,9 +431,9 @@ const SignIn: React.FC = () => {
                             {t.securityCheck}
                         </Typography>
 
-                        <Box sx={{ 
-                            bgcolor: '#F5F0FF', 
-                            p: { xs: 1.5, sm: 2 }, 
+                        <Box sx={{
+                            bgcolor: '#F5F0FF',
+                            p: { xs: 1.5, sm: 2 },
                             borderRadius: 2,
                             border: '1px solid #E8D5FF',
                             width: '100%',
@@ -443,8 +444,8 @@ const SignIn: React.FC = () => {
                                 {securityQuestion || t.loading}
                             </Typography>
                             {securityQuestion.includes("Error") && (
-                                <Button 
-                                    size="small" 
+                                <Button
+                                    size="small"
                                     onClick={fetchSecurityQuestion}
                                     sx={{
                                         color: '#B794F6',
@@ -475,8 +476,8 @@ const SignIn: React.FC = () => {
                             }}
                         />
 
-                        <Button 
-                            variant="contained" 
+                        <Button
+                            variant="contained"
                             onClick={handleSecurityLogin}
                             sx={{
                                 backgroundColor: '#B794F6',
@@ -494,7 +495,7 @@ const SignIn: React.FC = () => {
                         >
                             {t.loginBtn}
                         </Button>
-                        <Button 
+                        <Button
                             onClick={() => setStep(1)}
                             sx={{
                                 color: '#B794F6',
@@ -511,8 +512,8 @@ const SignIn: React.FC = () => {
             </Card>
 
             {/* User Not Found Popup */}
-            <Dialog 
-                open={errorPopup} 
+            <Dialog
+                open={errorPopup}
                 onClose={() => setErrorPopup(false)}
                 PaperProps={{
                     sx: {
@@ -528,7 +529,7 @@ const SignIn: React.FC = () => {
                     <Typography sx={{ color: '#666' }}>{t.userNotFoundDesc}</Typography>
                 </DialogContent>
                 <DialogActions sx={{ gap: 1, px: 3, pb: 2 }}>
-                    <Button 
+                    <Button
                         onClick={() => setErrorPopup(false)}
                         sx={{
                             color: '#666',
@@ -540,8 +541,8 @@ const SignIn: React.FC = () => {
                     >
                         Close
                     </Button>
-                    <Button 
-                        variant="contained" 
+                    <Button
+                        variant="contained"
                         onClick={() => navigate('/signup-step1')}
                         sx={{
                             backgroundColor: '#B794F6',
@@ -560,8 +561,8 @@ const SignIn: React.FC = () => {
             </Dialog>
 
             {/* Emergency Popup */}
-            <Dialog 
-                open={emergencyPopup} 
+            <Dialog
+                open={emergencyPopup}
                 onClose={() => setEmergencyPopup(false)}
                 PaperProps={{
                     sx: {
@@ -577,7 +578,7 @@ const SignIn: React.FC = () => {
                     <Typography sx={{ color: '#666' }}>{t.emergencyDesc}</Typography>
                 </DialogContent>
                 <DialogActions sx={{ gap: 1, px: 3, pb: 2 }}>
-                    <Button 
+                    <Button
                         onClick={() => setEmergencyPopup(false)}
                         sx={{
                             color: '#666',
@@ -589,8 +590,8 @@ const SignIn: React.FC = () => {
                     >
                         {t.no}
                     </Button>
-                    <Button 
-                        variant="contained" 
+                    <Button
+                        variant="contained"
                         onClick={() => navigate('/emergency')}
                         sx={{
                             backgroundColor: '#EF4444',
