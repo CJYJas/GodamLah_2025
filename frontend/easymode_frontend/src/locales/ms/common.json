@@ -5,18 +5,22 @@
     "tap_here": "Tekan Sini",
     "yes": "Ya",
     "no": "Tak",
-    "change_need": "Perubahan",
+    "change": "Ubah",
     "disclaimer_first_responders": "**Penafian:** Maklumat tidak sensitif ini dipaparkan untuk responden pertama sahaja.",
     "loading_transport_info": "Dapat Info Pengangkutan...",
     "edit": "Ubah",
-    "change_need": "Perlu Ubah"
+    "change_need": "Ubah Keperluan",
+    "confirm": "Pasti",
+    "cancel": "Batal"
   },
   "header": {
     "title_appointment": "TemuJanji",
     "title_emergency_info": "Info Kecemasan",
     "title_medical_menu": "Perkhidmatan",
     "title_medicine": "Ubat",
-    "title_ride_status": "Pengangkutan"
+    "title_ride_status": "Pengangkutan",
+    "title_unique_needs": "Keperluan Unik",
+    "title_history": "Histori"
   },
   "sidemenu": {
     "profile": "Profil",
@@ -58,13 +62,14 @@
     "conditions_example": "DIABETES JENIS 2, ASTHMA RINGAN"
   },
   "appointment_flow": {
+    "confirm_prompt": "Adakah tarikh dan masa ini betul?",
     "transport_question_aria": "Pengangkutan",
     "tap_instruction": "(Pilih)",
     "select_need_prompt": "Pilih Keperluan:",
     "confirmed_need_label": "Keperluan",
     "confirm_book_button": "Pasti & Tempah ✅",
     "transport_booked_success": "Tempahan Berjaya...",
-    "appointment_confirmed_success": "Tempahan Temu Janji Berjaya..."
+    "appointment_confirmed_success": "Temu Janji Dipastikan..."
   },
   "medicine": {
     "pill_aria_label": "Ubat",
@@ -107,5 +112,31 @@
     "contact_placeholder": "Nama (No Telefon)",
     "cancel_button": "BATAL",
     "save_button": "SIMPAN"
+  },
+  "modal": {
+    "change_appointment_title": "Ubah Temu Janji",
+    "change_appointment_prompt": "Pilih tarikh dan masa baharu di bawah.",
+    "cancel_button": "BATAL",
+    "confirm_button": "Pasti"
+  },
+  "medical_history": {
+    "title": "Rekod Perubatan Anda",
+    "medication_title": "Ubat-ubatan",
+    "medication_subtitle": "Lihat semua preskripsi semasa dan lalu.",
+    "hospitalized_title": "Kemudahan Hospital",
+    "hospitalized_subtitle": "Semak tarikh dan butiran prosedur.",
+    "vaccination_title": "Vaksinasi",
+    "vaccination_subtitle": "Semak rekod suntikan terkini anda.",
+    "loading_doc": "Memuatkan Maklumat Ringkas untuk {documentType}...",
+    "disclaimer": "Maklumat diringkaskan untuk bacaan mudah. Laporan tepat tersedia untuk kakitangan perubatan."
+  },
+  "history_details": {
+    "simple_summary": "Ringkasan Mudah",
+    "precise_access_prompt": "Untuk Penjaga & Kakitangan Perubatan:",
+    "view_precise_report": "Lihat Laporan Tepat (PDF)",
+    "precise_report_note": "Laporan terperinci ini tidak dioptimumkan untuk Bacaan Mod Mudah.",
+    "medication_tap_prompt": "Tekan mana-mana ubat di bawah untuk melihat dos dan arahan.",
+    "hospitalized_tap_prompt": "Tekan mana-mana acara kemasukan hospital untuk butiran ringkas.",
+    "last_updated_label": "Terakhir Dikemaskini"
   }
 }

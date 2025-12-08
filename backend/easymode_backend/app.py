@@ -9,12 +9,11 @@ app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
 
 # --- In-Memory Data Store ---
-# This dictionary simulates a database or session store for one user.
 app_data_store = {
     "user_id": 12345,
 
     "appointment": {
-        "date": "10/12/2025",
+        "date": "Tuesday, 10 Dec 2025", # Updated to match frontend mock
         "time": "10:00 AM"
     },
     
@@ -59,10 +58,7 @@ app_data_store = {
 
 @app.route('/api/get_all_data', methods=['GET'])
 def get_all_data():
-    """
-    Simulates fetching all initial user and medical data from the centralized government base.
-    """
-    # Ensure Emergency contact is synced with current Profile data before returning
+    """Simulates fetching all initial user and medical data."""
     app_data_store['emergency']['primaryContact'] = app_data_store['profile']['emergency_contact']
     
     return jsonify({
@@ -71,7 +67,32 @@ def get_all_data():
     }), 200
 
 # -----------------
-# 1. Profile Endpoints
+# 1. Appointment Endpoints
+# -----------------
+
+@app.route('/api/set_appointment', methods=['POST'])
+def set_appointment():
+    """Updates the user's appointment date and time."""
+    try:
+        data = request.json
+        new_date = data.get('date')
+        new_time = data.get('time')
+        
+        if new_date and new_time:
+            app_data_store['appointment']['date'] = new_date
+            app_data_store['appointment']['time'] = new_time
+            print(f"Backend updated appointment to: {new_date} at {new_time}")
+            
+            return jsonify({"status": "success", "message": "Appointment date updated."}), 200
+        else:
+            return jsonify({"status": "error", "message": "Missing date or time fields."}), 400
+            
+    except Exception as e:
+        print(f"Error updating appointment: {e}")
+        return jsonify({"status": "error", "message": "Internal server error."}), 500
+
+# -----------------
+# 2. Profile Endpoints
 # -----------------
 
 @app.route('/api/update_emergency_contact', methods=['POST'])
@@ -101,12 +122,12 @@ def update_emergency_contact():
         return jsonify({"status": "error", "message": "Internal server error."}), 500
 
 # -----------------
-# 2. Transport Endpoints
+# 3. Transport Endpoints
 # -----------------
 
 @app.route('/api/set_transport', methods=['POST'])
 def set_transport():
-    """Receives and stores the transport need from the AppointmentFlow page (simulating sending data to central base)."""
+    """Receives and stores the transport need."""
     try:
         data = request.json
         transport_need = data.get('transport_need')
@@ -125,7 +146,7 @@ def set_transport():
 
 @app.route('/api/get_transport', methods=['GET'])
 def get_transport():
-    """Returns the current transport status and mock driver details for the TransportStatus page."""
+    """Returns the current transport status and mock driver details."""
     current_need = app_data_store['transport_need']
     
     if current_need:
@@ -160,7 +181,7 @@ def clear_transport():
     return jsonify({"status": "cleared", "message": "Transport booking has been cleared."}), 200
 
 # -----------------
-# 3. Medicine Endpoints
+# 4. Medicine Endpoints
 # -----------------
 
 @app.route('/api/confirm_medicine_taken', methods=['POST'])

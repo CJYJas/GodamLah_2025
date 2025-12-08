@@ -1,11 +1,13 @@
 {
   "general": {
     "back": "返回",
-    "menu": "页面",
+    "menu": "菜单",
     "tap_here": "点击",
-    "yes": "需要",
-    "no": "不需要",
-    "change_need": "修改",
+    "yes": "是",
+    "no": "否",
+    "change": "更改",
+    "confirm": "确认",
+    "cancel": "取消",
     "disclaimer_first_responders": "**免责声明：**此非敏感信息仅供急救人员查看。",
     "loading_transport_info": "正在获取交通信息...",
     "edit": "编辑",
@@ -16,7 +18,9 @@
     "title_emergency_info": "紧急信息",
     "title_medical_menu": "医疗服务",
     "title_medicine": "用药",
-    "title_ride_status": "交通状态"
+    "title_ride_status": "交通状态",
+    "title_unique_needs": "独特需求",
+    "title_history": "病史记录"
   },
   "sidemenu": {
     "profile": "个人资料",
@@ -58,6 +62,8 @@
     "conditions_example": "II 型糖尿病, 轻度哮喘"
   },
   "appointment_flow": {
+    "confirm_prompt": "此日期和时间正确吗？",
+    "confirmed_message": "您的预约已确认！",
     "transport_question_aria": "交通",
     "tap_instruction": "(请选择)",
     "select_need_prompt": "请选择需求：",
@@ -107,5 +113,31 @@
     "contact_placeholder": "姓名（电话号码）",
     "cancel_button": "取消",
     "save_button": "保存"
+  },
+  "modal": {
+    "change_appointment_title": "更改预约",
+    "change_appointment_prompt": "请在下方选择新的日期和时间。",
+    "cancel_button": "取消",
+    "confirm_button": "确认"
+  },
+  "medical_history": {
+    "title": "您的病史记录",
+    "medication_title": "用药记录",
+    "medication_subtitle": "查看所有当前和过去的处方。",
+    "hospitalized_title": "住院记录",
+    "hospitalized_subtitle": "查看手术日期和详细信息。",
+    "vaccination_title": "疫苗接种",
+    "vaccination_subtitle": "查看您的最新疫苗接种记录。",
+    "loading_doc": "正在加载 {documentType} 的简洁信息...",
+    "disclaimer": "信息已简化以方便阅读。详细报告可供医护人员查阅。"
+  },
+  "history_details": {
+    "simple_summary": "简洁摘要",
+    "precise_access_prompt": "供护理人员和医护人员查阅：",
+    "view_precise_report": "查看详细报告 (PDF)",
+    "precise_report_note": "此详细报告未针对简易模式阅读进行优化。",
+    "medication_tap_prompt": "点击下方任一药物以查看剂量和说明。",
+    "hospitalized_tap_prompt": "点击下方任一住院事件以查看简洁信息。",
+    "last_updated_label": "最后更新时间"
   }
 }

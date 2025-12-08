@@ -1,5 +1,3 @@
-// /frontend-react/src/App.js
-
 import React, { useState, useEffect, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -13,6 +11,11 @@ import SideMenu from './components/SideMenu';
 import ProfilePage from './components/ProfilePage';
 import LanguagePage from './components/LanguagePage';
 import EmergencyInfoPage from './components/EmergencyInfoPage';
+import MedicalHistory from './components/MedicalHistory'; 
+import MedicationHistoryPage from './components/MedicationHistoryPage'; 
+import HospitalizedHistoryPage from './components/Hospitalised_DetailsPage';
+import VaccinationHistoryPage from './components/Vaccination_DetailsPage';
+
 
 // --- INITIAL MOCK DATA STATE (Will be overwritten by API) ---
 const initialDataState = {
@@ -40,21 +43,21 @@ function App() {
                 if (result.status === 'success') {
                     const userData = result.user_data;
                     setAppData({
-                        appointment: { date: 'Dec 10', time: '10:00 AM' }, // Mock appointment date
+                        appointment: { date: 'Dec 10', time: '10:00 AM' }, // Mock
                         profile: userData.profile,
                         emergency: userData.emergency,
-                        medicine: userData.medicine, // Assumed to contain needed mock data
+                        medicine: userData.medicine,
                         transport_need: userData.transport_need
                     });
                 }
             } catch (error) {
-                console.error("Failed to fetch data from central base:", error);
-                // Keep showing initial loading state or error message
+                console.error("Failed to fetch data:", error);
             }
         };
         fetchAppointmentData();
     }, []);
-    
+
+    // --- Handlers for updating local data ---
     const handleUpdateContact = (newContact) => {
         setAppData(prev => ({
             ...prev,
@@ -67,103 +70,134 @@ function App() {
         setAppData(prev => ({ ...prev, transport_need: newNeed }));
     };
 
-    // PAGE ROUTING
+    // --- PAGE ROUTING ---
     const renderPage = () => {
-        if (currentPage === 'dashboard') {
-            return (
-                <Dashboard
-                    isEasyMode={isEasyMode}
-                    goToMedical={() => setCurrentPage('medical-dashboard')}
-                    goToEmergencyInfo={() => setCurrentPage('emergency-info')}
-                    onMenuClick={() => setIsMenuOpen(true)}
-                />
-            );
-        }
+        switch(currentPage) {
+            case 'dashboard':
+                return (
+                    <Dashboard
+                        isEasyMode={isEasyMode}
+                        goToMedical={() => setCurrentPage('medical-dashboard')}
+                        goToEmergencyInfo={() => setCurrentPage('emergency-info')}
+                        goToHistory={() => setCurrentPage('medical-history')}
+                        onMenuClick={() => setIsMenuOpen(true)}
+                        goToPage={setCurrentPage}
+                    />
+                );
 
-        if (currentPage === 'medical-dashboard') {
-            return (
-                <MedicalDashboard
-                    isEasyMode={isEasyMode}
-                    goToPage={setCurrentPage}
-                    onMenuClick={() => setIsMenuOpen(true)}
-                />
-            );
-        }
+            case 'medical-dashboard':
+                return (
+                    <MedicalDashboard
+                        isEasyMode={isEasyMode}
+                        goToPage={setCurrentPage}
+                        onMenuClick={() => setIsMenuOpen(true)}
+                    />
+                );
 
-        if (currentPage === 'appointment') {
-            return (
-                <AppointmentFlow
-                    isEasyMode={isEasyMode}
-                    appointment={appData.appointment}
-                    goToTransportStatus={() => setCurrentPage('transport')}
-                    goToMedicalDashboard={() => setCurrentPage('medical-dashboard')}
-                    onMenuClick={() => setIsMenuOpen(true)}
-                    onTransportBooked={handleUpdateTransport} // Pass handler for transport update
-                />
-            );
-        }
+            case 'medical-history': 
+                return (
+                    <MedicalHistory
+                        isEasyMode={isEasyMode}
+                        goToPage={setCurrentPage}
+                        onMenuClick={() => setIsMenuOpen(true)}
+                    />
+                );
+            
+            case 'history-medication':
+                return (
+                    <MedicationHistoryPage
+                        isEasyMode={isEasyMode}
+                        goToPage={setCurrentPage}
+                        onMenuClick={() => setIsMenuOpen(true)}
+                    />
+                );
+            case 'history-hospitalized':
+                return (
+                    <HospitalizedHistoryPage
+                        isEasyMode={isEasyMode}
+                        goToPage={setCurrentPage}
+                        onMenuClick={() => setIsMenuOpen(true)}
+                    />
+                );
+            case 'history-vaccination':
+                return (
+                    <VaccinationHistoryPage
+                        isEasyMode={isEasyMode}
+                        goToPage={setCurrentPage}
+                        onMenuClick={() => setIsMenuOpen(true)}
+                    />
+                );
 
-        if (currentPage === 'transport') {
-            return (
-                <TransportStatus
-                    isEasyMode={isEasyMode}
-                    goToAppointmentFlow={() => setCurrentPage('appointment')}
-                    goToMedicalDashboard={() => setCurrentPage('medical-dashboard')}
-                    onMenuClick={() => setIsMenuOpen(true)}
-                    onTransportCleared={handleUpdateTransport} // Pass handler to clear transport locally
-                    transportNeed={appData.transport_need}
-                />
-            );
-        }
+            case 'appointment':
+                return (
+                    <AppointmentFlow
+                        isEasyMode={isEasyMode}
+                        appointment={appData.appointment}
+                        goToTransportStatus={() => setCurrentPage('transport')}
+                        goToMedicalDashboard={() => setCurrentPage('medical-dashboard')}
+                        onMenuClick={() => setIsMenuOpen(true)}
+                        onTransportBooked={handleUpdateTransport}
+                    />
+                );
 
-        if (currentPage === 'medicine') {
-            return (
-                <MedicineReminder
-                    isEasyMode={isEasyMode}
-                    goToPage={setCurrentPage}
-                    onMenuClick={() => setIsMenuOpen(true)}
-                    medicineData={appData.medicine}
-                />
-            );
-        }
+            case 'transport':
+                return (
+                    <TransportStatus
+                        isEasyMode={isEasyMode}
+                        goToAppointmentFlow={() => setCurrentPage('appointment')}
+                        goToMedicalDashboard={() => setCurrentPage('medical-dashboard')}
+                        onMenuClick={() => setIsMenuOpen(true)}
+                        onTransportCleared={handleUpdateTransport}
+                        transportNeed={appData.transport_need}
+                    />
+                );
 
-        if (currentPage === 'profile') {
-            return (
-                <ProfilePage
-                    isEasyMode={isEasyMode}
-                    goToPage={setCurrentPage}
-                    onMenuClick={() => setIsMenuOpen(true)}
-                    profileData={appData.profile}
-                    onContactSaved={handleUpdateContact} // Pass handler for local profile update
-                />
-            );
-        }
+            case 'medicine':
+                return (
+                    <MedicineReminder
+                        isEasyMode={isEasyMode}
+                        goToPage={setCurrentPage}
+                        onMenuClick={() => setIsMenuOpen(true)}
+                        medicineData={appData.medicine}
+                    />
+                );
 
-        if (currentPage === 'language') {
-            return (
-                <LanguagePage
-                    isEasyMode={isEasyMode}
-                    goToPage={setCurrentPage}
-                    onMenuClick={() => setIsMenuOpen(true)}
-                />
-            );
-        }
+            case 'profile':
+                return (
+                    <ProfilePage
+                        isEasyMode={isEasyMode}
+                        goToPage={setCurrentPage}
+                        onMenuClick={() => setIsMenuOpen(true)}
+                        profileData={appData.profile}
+                        onContactSaved={handleUpdateContact}
+                    />
+                );
 
-        if (currentPage === 'emergency-info') {
-            return (
-                <EmergencyInfoPage
-                    isEasyMode={isEasyMode}
-                    goToPage={setCurrentPage}
-                    onMenuClick={() => setIsMenuOpen(true)}
-                    emergencyData={appData.emergency} // Pass fetched data
-                />
-            );
-        }
+            case 'language':
+                return (
+                    <LanguagePage
+                        isEasyMode={isEasyMode}
+                        goToPage={setCurrentPage}
+                        onMenuClick={() => setIsMenuOpen(true)}
+                    />
+                );
 
-        return null;
+            case 'emergency-info':
+                return (
+                    <EmergencyInfoPage
+                        isEasyMode={isEasyMode}
+                        goToPage={setCurrentPage}
+                        onMenuClick={() => setIsMenuOpen(true)}
+                        emergencyData={appData.emergency}
+                    />
+                );
+
+            default:
+                return null;
+        }
     };
 
-    // ... (rest of App component styling and structure) ...
+    // --- Styling ---
     const scrollbarHiddenStyle = {
         overflowY: 'auto',
         msOverflowStyle: 'none',
@@ -174,7 +208,7 @@ function App() {
         <Suspense fallback={<div>{t('app.loading_application')}</div>}>
             <div
                 style={{
-                    padding: '20px',
+                    // Removed surrounding padding from this outer div
                     backgroundColor: '#f0f0f0',
                     minHeight: '100vh',
                     display: 'flex',
@@ -182,8 +216,7 @@ function App() {
                     alignItems: 'center',
                 }}
             >
-
-                {/* Phone Frame */}
+                {/* Phone Frame - RETAINS THE BLACK BORDER AND ROUNDED CORNERS */}
                 <div
                     style={{
                         maxWidth: '400px',
@@ -196,18 +229,17 @@ function App() {
                         backgroundColor: '#000',
                         position: 'relative',
                         flexShrink: 0,
+                        // REMOVED THE backgroundColor: '#000' AND MOVED IT TO THE BORDER
                     }}
                 >
-                    {/* Speaker / Notch (empty div) */}
-                    <div></div>
-
-                    {/* App Screen */}
+                    {/* App Screen - NOW COVERS 100% OF THE INNER SPACE */}
                     <div
                         style={{
                             height: '100%',
                             width: '100%',
                             backgroundColor: '#ffffff',
-                            borderRadius: '25px',
+                            // MATCH borderRadius TO THE FRAME'S INNER CORNER
+                            borderRadius: '25px', 
                             boxSizing: 'border-box',
                             ...scrollbarHiddenStyle,
                             opacity: isMenuOpen ? 0.3 : 1,
@@ -219,16 +251,19 @@ function App() {
                         {renderPage()}
                     </div>
 
-                    {/* Menu Overlay */}
+                    {/* Menu Overlay - NEEDS TO BE ABSOLUTELY POSITIONED RELATIVE TO THE PHONE FRAME */}
                     {isMenuOpen && (
                         <div
                             onClick={() => setIsMenuOpen(false)}
                             style={{
+                                // This overlay MUST be positioned relative to the parent frame
                                 position: 'absolute',
                                 top: 0,
                                 left: 0,
                                 right: 0,
                                 bottom: 0,
+                                // Give it the same inner rounded corners as the app screen
+                                borderRadius: '25px', 
                                 backgroundColor: 'rgba(0, 0, 0, 0.4)',
                                 zIndex: 100,
                                 display: 'flex',

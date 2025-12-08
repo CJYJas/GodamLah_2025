@@ -1,28 +1,20 @@
-// /frontend-react/src/components/Dashboard.js (Styling Restored)
-
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-// --- DashboardHeader (Rest of component uses t() and works correctly) ---
-const DashboardHeader = ({ onMenuClick, isEasyMode, t }) => ( 
+// --- DashboardMenuButton ---
+const DashboardMenuButton = ({ onMenuClick, isEasyMode, t }) => ( 
     <div style={{ 
-        display: 'flex', 
-        justifyContent: 'flex-end', 
-        padding: '15px 20px', 
-        backgroundColor: 'transparent', 
-        position: 'absolute', 
-        top: 0,
-        right: 0,
-        width: '100%',
-        zIndex: 15,
+        position: 'absolute',
+        top: '15px',
+        right: '15px',
+        zIndex: 110,
     }}>
         <button
             onClick={onMenuClick}
             style={{ 
-                padding: '8px',
+                padding: '0', 
                 backgroundColor: 'transparent', 
                 border: 'none', 
-                borderRadius: '0', 
                 cursor: 'pointer',
                 fontSize: isEasyMode ? '36px' : '28px', 
                 color: '#333',
@@ -35,20 +27,20 @@ const DashboardHeader = ({ onMenuClick, isEasyMode, t }) => (
         </button>
     </div>
 );
-// --- END DashboardHeader ---
+// --- END DashboardMenuButton ---
 
-
-// --- Icon Component Modification (Rest of component works correctly) ---
+// --- Icon Component ---
 const Icon = ({ name, emoji, isActive, onClick, isProminent, isEasyMode, keyName, color = '#1A73E8', bgColor = '#E8F0FE' }) => {
-    
-    // ... Icon logic and styling remain the same ...
     const isColored = isActive || isProminent; 
     let iconColor = color;
-    let iconBgColor = bgColor;
+    let iconBgColor = '#E8F0FE'; 
     
     if (keyName === "dashboard.emergency_info_card") {
         iconColor = '#DC3545';
         iconBgColor = '#FDE9E9';
+    } else if (keyName === "medical_menu.access_card_short") {
+        iconColor = '#1A73E8';
+        iconBgColor = '#E8F0FE';
     } else if (keyName === "dashboard.medical_history_card") {
         iconColor = '#17A2B8';
         iconBgColor = '#E8F7F9';
@@ -56,11 +48,7 @@ const Icon = ({ name, emoji, isActive, onClick, isProminent, isEasyMode, keyName
     
     const baseFontSize = isEasyMode ? 32 : 18;
     let labelFontSize = baseFontSize;
-
-    if (name && name.length > 12) {
-        labelFontSize = isEasyMode ? 24 : 16;
-    }
-
+    if (name && name.length > 12) labelFontSize = isEasyMode ? 24 : 16;
 
     return (
         <div 
@@ -86,86 +74,103 @@ const Icon = ({ name, emoji, isActive, onClick, isProminent, isEasyMode, keyName
         </div>
     );
 };
-// --- END Icon Component Modification ---
+// --- END Icon ---
 
-
-function Dashboard({ isEasyMode, goToMedical, onMenuClick, goToEmergencyInfo }) { 
+function Dashboard({ isEasyMode, goToMedical, onMenuClick, goToEmergencyInfo, goToPage }) { 
     const { t } = useTranslation();
-
     const showAppointmentNotification = true; 
     
-    // 🛑 RESTORED STYLING: Define the notificationStyle object here 🛑
     const notificationStyle = {
-        padding: '15px 25px', 
-        margin: '15px', 
-        backgroundColor: '#FFF3CD', // Soft yellow/orange alert background
+        padding: '10px 15px', 
+        margin: '0 15px 25px 15px',
+        backgroundColor: '#FFF3CD', 
         color: '#856404', 
-        textAlign: 'center',
         cursor: 'pointer',
-        fontSize: isEasyMode ? '24px' : '16px',
         fontWeight: 'bold',
-        borderRadius: '10px',
-        borderLeft: '5px solid #FFC107', 
-        boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
-        position: 'relative', 
-        zIndex: 10,
+        borderRadius: '10px', 
+        border: '2px solid #FFC107', 
+        boxShadow: '0 8px 15px rgba(255, 193, 7, 0.3)',
+        zIndex: 10, 
+        display: 'flex', 
+        alignItems: 'center',
+        width: 'auto', 
+        boxSizing: 'border-box',
+        animation: 'blink-alert 1.8s infinite alternate', 
     };
-    // 🛑 END RESTORED STYLING 🛑
 
+    const textContainerStyle = {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        marginLeft: '15px', 
+        flexGrow: 1, 
+    };
+
+    const bellStyle = {
+        fontSize: isEasyMode ? '30px' : '22px', 
+        color: '#FFC107',
+        textShadow: '0 0 5px rgba(255, 193, 7, 0.8)',
+    };
+
+    const headingStyle = { fontSize: isEasyMode ? '24px' : '16px', margin: '0', lineHeight: '1.2', fontWeight: 'bold' };
+    const tapHereStyle = { fontSize: isEasyMode ? '32px' : '22px', margin: '0', lineHeight: '1.2', fontWeight: '900' };
 
     return (
         <div style={{ position: 'relative' }}>
-            <DashboardHeader onMenuClick={onMenuClick} isEasyMode={isEasyMode} t={t} />
+            <DashboardMenuButton onMenuClick={onMenuClick} isEasyMode={isEasyMode} t={t} />
 
-            {/* RENDER THE NOTIFICATION BANNER (Now uses the restored notificationStyle) */}
-            {showAppointmentNotification && (
-                <div onClick={goToMedical} style={notificationStyle}>
-                    <span role="img" aria-label={t('general.alert')} style={{marginRight: '10px'}}>🔔</span>
-                    {t('dashboard.appointment_soon_alert')} {t('general.tap_here')}
+            <div style={{ paddingTop: '60px' }}>
+                {showAppointmentNotification && (
+                    <div onClick={goToMedical} style={notificationStyle}>
+                        <span role="img" aria-label={t('general.alert')} style={bellStyle}>🔔</span>
+                        <div style={textContainerStyle}>
+                            <p style={headingStyle}>{t('dashboard.appointment_soon_alert')}</p>
+                            <p style={tapHereStyle}>{t('general.tap_here')}</p>
+                        </div>
+                    </div>
+                )}
+
+                <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', paddingTop: '15px', paddingBottom: '40px' }}>
+                    <Icon 
+                        name={t('medical_menu.access_card_short')} 
+                        emoji="🏥" 
+                        isActive={true} 
+                        onClick={goToMedical} 
+                        isEasyMode={isEasyMode}
+                        keyName={'medical_menu.access_card_short'} 
+                    />
+
+                    <Icon 
+                        name={t('dashboard.emergency_info_card')} 
+                        emoji="🆘" 
+                        isProminent={true} 
+                        isActive={false} 
+                        onClick={goToEmergencyInfo} 
+                        isEasyMode={isEasyMode}
+                        keyName={'dashboard.emergency_info_card'} 
+                    />
+
+                    <Icon 
+                        name={t('dashboard.medical_history_card')} 
+                        emoji="📜" 
+                        isProminent={true} 
+                        isActive={false} 
+                        onClick={() => goToPage('medical-history')} // <-- navigates
+                        isEasyMode={isEasyMode}
+                        keyName={'dashboard.medical_history_card'} 
+                    />
+
+                    <div style={{ width: '40%', margin: '15px', visibility: 'hidden' }}></div>
                 </div>
-            )}
-
-            {/* MAIN ICON GRID (Rest of the component remains the same) */}
-            <div style={{ 
-                display: 'flex', 
-                flexWrap: 'wrap', 
-                justifyContent: 'center', 
-                paddingTop: showAppointmentNotification ? '20px' : '40px', 
-                paddingBottom: '40px' 
-            }}>
-                
-                {/* Icons... */}
-                <Icon 
-                    name={t('medical_menu.access_card_short')} 
-                    emoji="🏥" 
-                    isActive={true} 
-                    onClick={goToMedical} 
-                    isEasyMode={isEasyMode}
-                    keyName={'medical_menu.access_card_short'} 
-                />
-                
-                <Icon 
-                    name={t('dashboard.emergency_info_card')} 
-                    emoji="🆘" 
-                    isProminent={true} 
-                    isActive={false} 
-                    onClick={goToEmergencyInfo} 
-                    isEasyMode={isEasyMode}
-                    keyName={'dashboard.emergency_info_card'} 
-                />
-                
-                <Icon 
-                    name={t('dashboard.medical_history_card')} 
-                    emoji="📜" 
-                    isProminent={true} 
-                    isActive={false} 
-                    onClick={() => console.log('Medical History page route needed.')}
-                    isEasyMode={isEasyMode}
-                    keyName={'dashboard.medical_history_card'} 
-                />
-                
-                <div style={{ width: '40%', margin: '15px', visibility: 'hidden' }}></div>
             </div>
+
+            <style jsx>{`
+                @keyframes blink-alert {
+                    0% { box-shadow: 0 8px 15px rgba(255, 193, 7, 0.4); transform: scale(1); }
+                    50% { box-shadow: 0 8px 25px rgba(255, 193, 7, 0.8); transform: scale(1.005); }
+                    100% { box-shadow: 0 8px 15px rgba(255, 193, 7, 0.4); transform: scale(1); }
+                }
+            `}</style>
         </div>
     );
 }

@@ -5,18 +5,28 @@
     "tap_here": "Tap Here.",
     "yes": "Yes",
     "no": "No",
-    "alert" : "ALERT",
+    "alert": "ALERT",
     "disclaimer_first_responders": "**Disclaimer:** This non-sensitive info is displayed for first responders only.",
     "loading_transport_info": "Loading Transport Info...",
     "edit": "Edit",
-    "change_need": "Change Need"
+    "change_need": "Change Need",
+    "confirm": "Confirm",
+    "change": "Change",
+    "cancel": "Cancel",
+    "retry": "Retry",
+    "retry_aria": "Retry",
+    "confirm_aria": "Confirm",
+    "start_speaking": "Start Speaking",
+    "stop_speaking": "Stop Speaking"
   },
   "header": {
     "title_appointment": "Appointment",
     "title_emergency_info": "Emergency Info",
     "title_medical_menu": "Service",
     "title_medicine": "Medicine",
-    "title_ride_status": "Ride Status"
+    "title_ride_status": "Ride Status",
+    "title_unique_needs": "Unique Needs",
+    "title_history": "Medical History"
   },
   "sidemenu": {
     "profile": "Profile",
@@ -46,6 +56,8 @@
     "other": "Other"
   },
   "appointment_flow": {
+    "confirm_prompt": "Is this date and time correct?",
+    "confirmed_message": "Appointment confirmed. Proceed to transport.",
     "transport_question_aria": "Transport Question",
     "tap_instruction": "(Tap YES or NO)",
     "select_need_prompt": "Select your need:",
@@ -53,6 +65,19 @@
     "confirm_book_button": "Confirm & Book ✅",
     "transport_booked_success": "Transport booked! Redirecting...",
     "appointment_confirmed_success": "Appointment Confirmed! Redirecting..."
+  },
+  "modal": {
+    "change_appointment_title": "Change Appointment Time",
+    "change_appointment_prompt": "Please select a new available time slot:"
+  },
+  "unique_needs": {
+    "main_prompt": "State Your Need",
+    "tap_to_speak_prompt": "Tap the mic to start speaking.",
+    "listening_prompt": "LISTENING... Please state your requirement clearly.",
+    "transcription_ready_prompt": "Transcription Ready. Confirm or Retry.",
+    "recording_stopped_prompt": "Recording Stopped. Tap Confirm or Retry.",
+    "record_first_error": "Please record your need first.",
+    "we_heard_label": "We heard"
   },
   "emergency": {
     "act_immediately": "ACT IMMEDIATELY",
@@ -107,5 +132,25 @@
     "contact_placeholder": "Name (Phone Number)",
     "cancel_button": "CANCEL",
     "save_button": "SAVE"
+  },
+  "medical_history": {
+    "title": "Your Medical Records",
+    "medication_title": "Medications",
+    "medication_subtitle": "View all current and past prescriptions.",
+    "hospitalized_title": "Hospitalized",
+    "hospitalized_subtitle": "Review procedure dates and details.",
+    "vaccination_title": "Vaccinations",
+    "vaccination_subtitle": "Check your latest shot records.",
+    "loading_doc": "Loading Simple Information for {documentType}...",
+    "disclaimer": "Information is summarized for easy reading. Precise reports are available for medical staff."
+  },
+  "history_details": {
+    "simple_summary": "Simple Summary",
+    "precise_access_prompt": "For Caregivers & Medical Staff:",
+    "view_precise_report": "View Precise Report (PDF)",
+    "precise_report_note": "This detailed report is not optimized for Easy Mode reading.",
+    "medication_tap_prompt": "Tap any medicine below to see dosage and instructions.",
+    "hospitalized_tap_prompt": "Tap any hospitalization event below for simple details.",
+    "last_updated_label": "Last Updated"
   }
 }

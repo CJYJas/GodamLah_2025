@@ -1,38 +1,45 @@
 // /frontend-react/src/components/OtherNeedInput.js
 
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next'; 
 import HeaderBar from './HeaderBar';
 
 function OtherNeedInput({ isEasyMode, onConfirmNeed, onCancel }) {
+    const { t } = useTranslation(); 
+    
     const [isRecording, setIsRecording] = useState(false);
     const [transcribedText, setTranscribedText] = useState('');
-    const [statusMessage, setStatusMessage] = useState('Tap the mic to start speaking.');
+    
+    // Initial status message from translations
+    const [statusMessage, setStatusMessage] = useState(t('unique_needs.tap_to_speak_prompt')); 
 
     // Mock Transcription Data
+    // NOTE: This sentence will appear when the user clicks 'Stop'
     const MOCK_TRANSCRIPTION = "I require space for my oxygen tank and a helper.";
     
-    // --- Step 1 & 2: Start Recording and Mock Transcription ---
+    // --- Step 1 & 2: Start/Stop Recording Toggle ---
     const handleRecordToggle = () => {
         if (!isRecording) {
-            // Start recording (Visual state change)
+            // --- START RECORDING ACTION (Tapping 1st time) ---
             setIsRecording(true);
             setTranscribedText('');
-            setStatusMessage('LISTENING... Please state your requirement clearly.');
+            
+            // Set status to listening
+            setStatusMessage(t('unique_needs.listening_prompt'));
             console.log("Audio: 'Please state your requirement clearly.'");
 
-            // Mock AI processing delay (3 seconds)
-            setTimeout(() => {
-                // Stop recording and show result
-                setIsRecording(false);
-                setTranscribedText(MOCK_TRANSCRIPTION);
-                setStatusMessage('Transcription Ready. Confirm or Retry.');
-                console.log(`Audio: 'We recorded: ${MOCK_TRANSCRIPTION}. Is this correct?'`);
-            }, 3000);
-
         } else {
-            // If user taps mic while recording (manual stop)
+            // --- STOP RECORDING ACTION (Tapping 2nd time) ---
+            
+            // Immediately stop recording state
             setIsRecording(false);
-            setStatusMessage('Recording Stopped. Tap Confirm or Retry.');
+            
+            // Show the mock result instantly
+            setTranscribedText(MOCK_TRANSCRIPTION);
+            
+            // Set status to ready
+            setStatusMessage(t('unique_needs.transcription_ready_prompt'));
+            console.log(`Mock Transcription Ready: ${MOCK_TRANSCRIPTION}`);
         }
     };
 
@@ -43,27 +50,29 @@ function OtherNeedInput({ isEasyMode, onConfirmNeed, onCancel }) {
             onConfirmNeed(transcribedText);
             console.log("Confirmed and sending text to backend:", transcribedText);
         } else {
-            setStatusMessage('Please record your need first.');
+            setStatusMessage(t('unique_needs.record_first_error'));
         }
     };
 
     // --- Step 4: Retry/Cancel ---
     const handleRetry = () => {
         setTranscribedText('');
-        setStatusMessage('Tap the mic to start speaking.');
+        setStatusMessage(t('unique_needs.tap_to_speak_prompt'));
         setIsRecording(false);
     };
 
     const micButtonColor = isRecording ? 'red' : (transcribedText ? 'green' : '#1A73E8');
-    const micEmoji = isRecording ? '🔴' : '🎙️';
+    // Change emoji and label based on state for better clarity
+    const micEmoji = isRecording ? '🛑' : '🎙️';
+    const micLabel = isRecording ? t('general.stop_speaking') : t('general.start_speaking');
 
 
     return (
         <div style={{ padding: '0 20px 20px 20px', textAlign: 'center' }}>
-            <HeaderBar title="Unique Needs" onBackClick={onCancel} isEasyMode={isEasyMode} />
+            <HeaderBar title={t('header.title_unique_needs')} onBackClick={onCancel} isEasyMode={isEasyMode} />
 
             <h3 style={{ fontSize: isEasyMode ? '32px' : '20px', margin: '20px 0 10px 0', color: '#333' }}>
-                State Your Need
+                {t('unique_needs.main_prompt')}
             </h3>
 
             {/* Status Message */}
@@ -75,10 +84,10 @@ function OtherNeedInput({ isEasyMode, onConfirmNeed, onCancel }) {
                 {statusMessage}
             </p>
 
-            {/* 1. Microphone Button (Record/Stop) */}
+            {/* 1. Microphone Button (Start/Stop Toggle) */}
             <button 
                 onClick={handleRecordToggle}
-                disabled={isRecording && transcribedText} // Disable if recording and already have text
+                disabled={transcribedText && !isRecording} // Disable if text is ready and not recording
                 style={{
                     padding: '30px', 
                     borderRadius: '50%',
@@ -90,9 +99,20 @@ function OtherNeedInput({ isEasyMode, onConfirmNeed, onCancel }) {
                     animation: isRecording ? 'pulse-record 1s infinite' : 'none',
                     cursor: 'pointer',
                     fontSize: isEasyMode ? '80px' : '50px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: isEasyMode ? '150px' : '100px',
+                    height: isEasyMode ? '150px' : '100px',
+                    margin: '20px auto 10px auto'
                 }}
             >
-                {micEmoji}
+                <span style={{ fontSize: isEasyMode ? '60px' : '40px' }}>{micEmoji}</span>
+                {/* Optional: Add label below mic for clarity in mocking */}
+                <span style={{ fontSize: isEasyMode ? '14px' : '10px', marginTop: '5px' }}>
+                    {micLabel}
+                </span>
             </button>
             
             {/* 2. Transcribed Text Display */}
@@ -105,7 +125,7 @@ function OtherNeedInput({ isEasyMode, onConfirmNeed, onCancel }) {
                     marginTop: '20px'
                 }}>
                     <p style={{fontSize: isEasyMode ? '28px' : '18px', fontWeight: 'bold', margin: '0 0 5px 0'}}>
-                        We heard:
+                        {t('unique_needs.we_heard_label')}:
                     </p>
                     <p style={{fontSize: isEasyMode ? '22px' : '16px', margin: 0, fontStyle: 'italic'}}>
                         "{transcribedText}"
@@ -121,7 +141,7 @@ function OtherNeedInput({ isEasyMode, onConfirmNeed, onCancel }) {
                     disabled={isRecording}
                     style={{ padding: '15px 30px', fontSize: isEasyMode ? '24px' : '16px', backgroundColor: '#6c757d', color: 'white', border: 'none', borderRadius: '8px' }}
                 >
-                    <span role="img" aria-label="Retry">🔄</span> Retry
+                    <span role="img" aria-label={t('general.retry_aria')}>🔄</span> {t('general.retry')}
                 </button>
                 
                 <button 
@@ -129,7 +149,7 @@ function OtherNeedInput({ isEasyMode, onConfirmNeed, onCancel }) {
                     disabled={!transcribedText || isRecording}
                     style={{ padding: '15px 30px', fontSize: isEasyMode ? '24px' : '16px', backgroundColor: 'green', color: 'white', border: 'none', borderRadius: '8px' }}
                 >
-                    <span role="img" aria-label="Confirm">✅</span> Confirm
+                    <span role="img" aria-label={t('general.confirm_aria')}>✅</span> {t('general.confirm')}
                 </button>
             </div>
             
