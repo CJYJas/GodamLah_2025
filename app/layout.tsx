@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next"
 import { Inter, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { LanguageProvider } from "@/contexts/language-context"
+import { RuralModeProvider } from "@/contexts/rural-mode-context"
 import "./globals.css"
 
 const _inter = Inter({ subsets: ["latin"] })
@@ -49,7 +50,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-sans antialiased">
-        <LanguageProvider>{children}</LanguageProvider>
+        <LanguageProvider>
+          <RuralModeProvider>{children}</RuralModeProvider>
+        </LanguageProvider>
         <Analytics />
       </body>
     </html>

@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card } from "@/components/ui/card"
 import { useLanguage, type Language } from "@/contexts/language-context"
+import { useRuralMode } from "@/contexts/rural-mode-context"
+import { useEffect } from "react"
 import {
   User,
   Globe,
@@ -27,6 +29,8 @@ import {
   AlertTriangle,
   Activity,
   Pill,
+  Mountain,
+  Switch,
 } from "lucide-react"
 
 type SidebarView =
@@ -37,6 +41,7 @@ type SidebarView =
   | "changePassword"
   | "emergencyInfo"
   | "editEmergencyInfo"
+  | "ruralMode"
 
 interface SidebarProps {
   isOpen: boolean
@@ -46,6 +51,7 @@ interface SidebarProps {
 
 export function Sidebar({ isOpen, onClose, onLogout }: SidebarProps) {
   const { t, language, setLanguage } = useLanguage()
+  const { isRuralMode, setIsRuralMode, location, setLocation, detectRuralFromAddress, gpsLocation, classificationResult } = useRuralMode()
   const [currentView, setCurrentView] = useState<SidebarView>("main")
   const [showCurrentPassword, setShowCurrentPassword] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
@@ -81,8 +87,31 @@ export function Sidebar({ isOpen, onClose, onLogout }: SidebarProps) {
 
   const [editedEmergencyInfo, setEditedEmergencyInfo] = useState(emergencyInfo)
 
+  // Auto-detect rural mode from address on mount and when address changes
+  useEffect(() => {
+    if (profileData.address) {
+      const isRural = detectRuralFromAddress(profileData.address)
+      // Always auto-enable if address is rural, regardless of current state
+      if (isRural) {
+        setIsRuralMode(true)
+        // Auto-populate location from address if it's rural
+        if (!location || location === profileData.address) {
+          setLocation(profileData.address)
+        }
+      }
+    }
+  }, [profileData.address, detectRuralFromAddress, setIsRuralMode, setLocation])
+
   const handleSaveProfile = () => {
     setProfileData(editedProfile)
+    // Check if new address is rural
+    const isRural = detectRuralFromAddress(editedProfile.address)
+    if (isRural) {
+      setIsRuralMode(true)
+      if (!location || location === profileData.address) {
+        setLocation(editedProfile.address)
+      }
+    }
     setCurrentView("profile")
   }
 
@@ -173,6 +202,24 @@ export function Sidebar({ isOpen, onClose, onLogout }: SidebarProps) {
               <span className="font-medium text-foreground block">{t("language")}</span>
               <span className="text-xs text-muted-foreground">
                 {languageOptions.find((l) => l.code === language)?.nativeName}
+              </span>
+            </div>
+          </div>
+          <ChevronRight className="w-5 h-5 text-muted-foreground" />
+        </button>
+
+        <button
+          onClick={() => setCurrentView("ruralMode")}
+          className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-secondary transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center">
+              <Mountain className="w-5 h-5 text-accent" />
+            </div>
+            <div className="text-left">
+              <span className="font-medium text-foreground block">Rural Mode</span>
+              <span className="text-xs text-muted-foreground">
+                {isRuralMode ? "Enabled" : "Disabled"}
               </span>
             </div>
           </div>
@@ -535,6 +582,130 @@ export function Sidebar({ isOpen, onClose, onLogout }: SidebarProps) {
     </div>
   )
 
+  const renderRuralModeView = () => (
+    <div className="flex flex-col h-full">
+      {/* Header */}
+      <div className="p-4 border-b border-border">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setCurrentView("main")}
+            className="p-2 rounded-full hover:bg-secondary transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5 text-foreground" />
+          </button>
+          <h2 className="text-lg font-semibold text-foreground">Rural Mode</h2>
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {/* Info Banner */}
+        <div className="bg-accent/10 border border-accent/20 rounded-lg p-4 flex items-start gap-3">
+          <Mountain className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm font-medium text-foreground">Rural Healthcare Access</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Enable this mode if you live in rural areas (e.g., Sarawak, Sabah) to access specialized transport options like boats and helicopters, and book home visits from doctors.
+            </p>
+          </div>
+        </div>
+
+        {/* Rural Mode Toggle */}
+        <Card className="p-4">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="font-medium text-foreground">Enable Rural Mode</h3>
+              <p className="text-xs text-muted-foreground mt-1">
+                Access specialized transport and home visit services
+              </p>
+            </div>
+            <div
+              className={`relative w-12 h-6 rounded-full transition-colors cursor-pointer ${
+                isRuralMode ? "bg-accent" : "bg-secondary"
+              }`}
+              onClick={() => setIsRuralMode(!isRuralMode)}
+            >
+              <div
+                className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${
+                  isRuralMode ? "translate-x-6" : "translate-x-0"
+                }`}
+              />
+            </div>
+          </div>
+        </Card>
+
+        {/* Location Input */}
+        {isRuralMode && (
+          <Card className="p-4">
+            <h3 className="font-medium text-foreground mb-3">Your Location</h3>
+            <div className="space-y-2">
+              <Label htmlFor="ruralLocation" className="text-sm text-muted-foreground">
+                Enter your location (e.g., Long Semadoh, Sarawak)
+              </Label>
+              <Input
+                id="ruralLocation"
+                placeholder="Enter your rural location"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                className="mt-1"
+              />
+              {profileData.address && (
+                <Button
+                  variant="link"
+                  size="sm"
+                  className="text-xs px-0 h-auto mt-1"
+                  onClick={() => {
+                    setLocation(profileData.address)
+                  }}
+                >
+                  <MapPin className="w-3 h-3 mr-1" /> Use profile address: {profileData.address}
+                </Button>
+              )}
+              {detectRuralFromAddress(profileData.address) && (
+                <div className="bg-accent/10 border border-accent/20 rounded-lg p-2 mt-2">
+                  <p className="text-xs text-foreground">
+                    <strong>Auto-detected:</strong> Your address appears to be in a rural area. Rural mode has been enabled.
+                  </p>
+                </div>
+              )}
+              <p className="text-xs text-muted-foreground">
+                This helps us allocate the right transport and services for your area.
+              </p>
+            </div>
+          </Card>
+        )}
+
+        {/* GPS Detection Info */}
+        {gpsLocation && classificationResult && (
+              <Card className="p-4 bg-primary/5 border-primary/20">
+                <h3 className="font-medium text-foreground mb-2 text-sm">GPS Detection</h3>
+                <div className="space-y-1 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Status:</span>
+                    <span className="font-medium capitalize">{classificationResult.status}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Method:</span>
+                    <span className="font-medium capitalize">{classificationResult.method}</span>
+                  </div>
+                  {classificationResult.confidence && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Confidence:</span>
+                      <span className="font-medium capitalize">{classificationResult.confidence}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Coordinates:</span>
+                    <span className="font-medium text-right">
+                      {gpsLocation.lat.toFixed(4)}, {gpsLocation.lon.toFixed(4)}
+                    </span>
+                  </div>
+                </div>
+              </Card>
+        )}
+      </div>
+    </div>
+  )
+
   const renderEditEmergencyInfoView = () => (
     <div className="flex flex-col h-full">
       {/* Header */}
@@ -664,6 +835,7 @@ export function Sidebar({ isOpen, onClose, onLogout }: SidebarProps) {
         {currentView === "language" && renderLanguageView()}
         {currentView === "emergencyInfo" && renderEmergencyInfoView()}
         {currentView === "editEmergencyInfo" && renderEditEmergencyInfoView()}
+        {currentView === "ruralMode" && renderRuralModeView()}
       </div>
     </>
   )

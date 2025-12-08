@@ -1,12 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Car, MapPin, Clock, Phone, Calendar, Navigation, Ambulance, Bus, ChevronLeft, Check, User } from "lucide-react"
+import { Car, MapPin, Clock, Phone, Calendar, Navigation, Ambulance, Bus, ChevronLeft, Check, User, Ship, Plane, Stethoscope } from "lucide-react"
+import { useRuralMode } from "@/contexts/rural-mode-context"
 
 const appointmentsWithoutTransport = [
   { id: 1, type: "General Checkup", date: "Dec 15, 2025", time: "9:00 AM", location: "HUKM" },
@@ -31,16 +32,30 @@ const initialBookings = [
 ]
 
 export function TransportScreen() {
+  const { isRuralMode, location } = useRuralMode()
   const [showBooking, setShowBooking] = useState(false)
-  const [transportType, setTransportType] = useState<"regular" | "ambulance" | "public">("regular")
+  const [showDoctorBooking, setShowDoctorBooking] = useState(false)
+  const [transportType, setTransportType] = useState<"regular" | "ambulance" | "public" | "boat" | "helicopter">("regular")
   const [bookings, setBookings] = useState(initialBookings)
   const [selectedAppointment, setSelectedAppointment] = useState<(typeof appointmentsWithoutTransport)[0] | null>(null)
   const [selectedRequirements, setSelectedRequirements] = useState<string[]>([])
   const [specialNotes, setSpecialNotes] = useState("")
-  const [pickupAddress, setPickupAddress] = useState("No. 123, Jalan Ampang, KL")
+  const [pickupAddress, setPickupAddress] = useState(isRuralMode ? location || "" : "No. 123, Jalan Ampang, KL")
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [trackingId, setTrackingId] = useState<number | null>(null)
   const [showEmergencyConfirm, setShowEmergencyConfirm] = useState(false)
+  const [cannotReachByVan, setCannotReachByVan] = useState(false)
+  const [doctorBookingDate, setDoctorBookingDate] = useState("")
+  const [doctorBookingTime, setDoctorBookingTime] = useState("")
+  const [doctorBookingReason, setDoctorBookingReason] = useState("")
+  const [showDoctorConfirmation, setShowDoctorConfirmation] = useState(false)
+
+  // Sync pickup address with location when location changes in rural mode
+  useEffect(() => {
+    if (isRuralMode && location && !showBooking && !showDoctorBooking) {
+      setPickupAddress(location)
+    }
+  }, [location, isRuralMode, showBooking, showDoctorBooking])
 
   const toggleRequirement = (req: string) => {
     setSelectedRequirements((prev) => (prev.includes(req) ? prev.filter((r) => r !== req) : [...prev, req]))
@@ -175,7 +190,9 @@ export function TransportScreen() {
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Type</span>
-                <span className="font-medium capitalize">{transportType}</span>
+                <span className="font-medium capitalize">
+                  {transportType === "boat" ? "Boat" : transportType === "helicopter" ? "Helicopter" : transportType}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Pickup</span>
@@ -189,6 +206,13 @@ export function TransportScreen() {
                 <span className="text-muted-foreground">Date</span>
                 <span className="font-medium">{selectedAppointment?.date}</span>
               </div>
+              {cannotReachByVan && (
+                <div className="bg-accent/10 border border-accent/20 rounded-lg p-3 mt-2">
+                  <p className="text-xs text-foreground">
+                    <strong>Special Allocation:</strong> We've allocated {transportType === "boat" ? "a boat" : "a helicopter"} for your transport as your location cannot be reached by car/van.
+                  </p>
+                </div>
+              )}
               {selectedRequirements.length > 0 && (
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Requirements</span>
@@ -201,11 +225,37 @@ export function TransportScreen() {
           <Button
             className="w-full"
             onClick={() => {
+              // Add transport booking to bookings
+              const transportTypeLabel = 
+                transportType === "boat" ? "Boat" :
+                transportType === "helicopter" ? "Helicopter" :
+                transportType === "ambulance" ? "Ambulance" :
+                transportType === "public" ? "Public Transport" :
+                "Regular Transport"
+              
+              const newBooking = {
+                id: Date.now(),
+                type: transportTypeLabel,
+                pickup: pickupAddress,
+                destination: selectedAppointment?.location || "Hospital",
+                date: selectedAppointment?.date || "",
+                time: selectedAppointment?.time || "",
+                status: "confirmed",
+                driver: "Hafizul Azhar",
+                phone: "+60 12-588 6760",
+                vehicle: transportType === "boat" ? "SKW 5678 C" :
+                         transportType === "helicopter" ? "Medical Helicopter" :
+                         transportType === "ambulance" ? "Ambulance" :
+                         "Transport Vehicle",
+                trackingStatus: "requested" as const,
+              }
+              setBookings((prev) => [newBooking, ...prev])
               setShowConfirmation(false)
               setShowBooking(false)
               setSelectedAppointment(null)
               setSelectedRequirements([])
               setSpecialNotes("")
+              setCannotReachByVan(false)
             }}
           >
             Done
@@ -234,7 +284,7 @@ export function TransportScreen() {
         {/* Transport Type Selection */}
         <section>
           <h2 className="text-sm font-medium text-muted-foreground mb-3">Transport Type</h2>
-          <div className="grid grid-cols-3 gap-2">
+          <div className={`grid gap-2 ${isRuralMode ? "grid-cols-2" : "grid-cols-3"}`}>
             <Card
               className={`p-3 cursor-pointer text-center transition-all ${
                 transportType === "regular" ? "border-primary bg-primary/5" : ""
@@ -242,7 +292,7 @@ export function TransportScreen() {
               onClick={() => setTransportType("regular")}
             >
               <Car className="w-6 h-6 mx-auto mb-2 text-primary" />
-              <span className="text-xs font-medium">Regular</span>
+              <span className="text-xs font-medium">Car/Van</span>
             </Card>
             <Card
               className={`p-3 cursor-pointer text-center transition-all ${
@@ -253,15 +303,39 @@ export function TransportScreen() {
               <Ambulance className="w-6 h-6 mx-auto mb-2 text-destructive" />
               <span className="text-xs font-medium">Ambulance</span>
             </Card>
-            <Card
-              className={`p-3 cursor-pointer text-center transition-all ${
-                transportType === "public" ? "border-primary bg-primary/5" : ""
-              }`}
-              onClick={() => setTransportType("public")}
-            >
-              <Bus className="w-6 h-6 mx-auto mb-2 text-accent" />
-              <span className="text-xs font-medium">Public</span>
-            </Card>
+            {!isRuralMode && (
+              <Card
+                className={`p-3 cursor-pointer text-center transition-all ${
+                  transportType === "public" ? "border-primary bg-primary/5" : ""
+                }`}
+                onClick={() => setTransportType("public")}
+              >
+                <Bus className="w-6 h-6 mx-auto mb-2 text-accent" />
+                <span className="text-xs font-medium">Public</span>
+              </Card>
+            )}
+            {isRuralMode && (
+              <>
+                <Card
+                  className={`p-3 cursor-pointer text-center transition-all ${
+                    transportType === "boat" ? "border-primary bg-primary/5" : ""
+                  }`}
+                  onClick={() => setTransportType("boat")}
+                >
+                  <Ship className="w-6 h-6 mx-auto mb-2 text-accent" />
+                  <span className="text-xs font-medium">Boat</span>
+                </Card>
+                <Card
+                  className={`p-3 cursor-pointer text-center transition-all ${
+                    transportType === "helicopter" ? "border-primary bg-primary/5" : ""
+                  }`}
+                  onClick={() => setTransportType("helicopter")}
+                >
+                  <Plane className="w-6 h-6 mx-auto mb-2 text-accent" />
+                  <span className="text-xs font-medium">Helicopter</span>
+                </Card>
+              </>
+            )}
           </div>
         </section>
 
@@ -271,15 +345,58 @@ export function TransportScreen() {
           <div className="relative">
             <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
-              placeholder="Enter pickup address"
+              placeholder={isRuralMode ? "Enter your rural location (e.g., Long Semadoh, Sarawak)" : "Enter pickup address"}
               className="pl-10"
               value={pickupAddress}
               onChange={(e) => setPickupAddress(e.target.value)}
             />
           </div>
-          <Button variant="link" size="sm" className="text-xs px-0 h-auto mt-1">
-            <Navigation className="w-3 h-3 mr-1" /> Use current location
-          </Button>
+          {isRuralMode && location && (
+            <Button
+              variant="link"
+              size="sm"
+              className="text-xs px-0 h-auto mt-1"
+              onClick={() => setPickupAddress(location)}
+            >
+              <MapPin className="w-3 h-3 mr-1" /> Use saved location: {location}
+            </Button>
+          )}
+          {!isRuralMode && (
+            <Button variant="link" size="sm" className="text-xs px-0 h-auto mt-1">
+              <Navigation className="w-3 h-3 mr-1" /> Use current location
+            </Button>
+          )}
+          {isRuralMode && (
+            <div className="mt-3 space-y-2">
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="cannotReachByVan"
+                  checked={cannotReachByVan}
+                  onChange={(e) => {
+                    setCannotReachByVan(e.target.checked)
+                    if (e.target.checked) {
+                      // Auto-select boat or helicopter if cannot reach by van
+                      if (transportType === "regular") {
+                        setTransportType("boat")
+                      }
+                    }
+                  }}
+                  className="w-4 h-4 rounded border-border"
+                />
+                <label htmlFor="cannotReachByVan" className="text-sm text-muted-foreground cursor-pointer">
+                  Cannot reach any hospital by car/van from my location
+                </label>
+              </div>
+              {cannotReachByVan && (
+                <div className="bg-accent/10 border border-accent/20 rounded-lg p-3">
+                  <p className="text-xs text-foreground">
+                    We'll allocate a boat or helicopter to transport you. Please describe your location access in the notes below.
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
         </section>
 
         <section>
@@ -334,8 +451,202 @@ export function TransportScreen() {
           <Button className="w-full" disabled={!selectedAppointment} onClick={() => setShowConfirmation(true)}>
             Confirm Booking
           </Button>
-          <Button variant="outline" className="w-full bg-transparent" onClick={() => setShowBooking(false)}>
+          <Button
+            variant="outline"
+            className="w-full bg-transparent"
+            onClick={() => {
+              setShowBooking(false)
+              setCannotReachByVan(false)
+            }}
+          >
             Cancel
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
+  if (showDoctorBooking) {
+    const availableDates = [16, 17, 18, 19, 20, 22, 23]
+    const timeSlots = ["9:00 AM", "10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"]
+
+    return (
+      <div className="p-4 space-y-5">
+        <header className="flex items-center gap-3">
+          <button
+            onClick={() => setShowDoctorBooking(false)}
+            className="p-2 -ml-2 rounded-full hover:bg-secondary transition-colors"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <div>
+            <h1 className="text-lg font-semibold">Book Home Visit</h1>
+            <p className="text-sm text-muted-foreground">Request a doctor to visit your location</p>
+          </div>
+        </header>
+
+        <div className="bg-accent/10 border border-accent/20 rounded-lg p-4">
+          <div className="flex items-start gap-3">
+            <Stethoscope className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-medium text-foreground">Rural Home Visit Service</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                A doctor will visit your location. This service is available for rural areas where hospital access is limited.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <section>
+          <h2 className="text-sm font-medium text-muted-foreground mb-3">Your Location</h2>
+          <div className="relative">
+            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Enter your location (e.g., Long Semadoh, Sarawak)"
+              className="pl-10"
+              value={pickupAddress}
+              onChange={(e) => setPickupAddress(e.target.value)}
+            />
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-sm font-medium text-muted-foreground mb-3">Select Date</h2>
+          <div className="grid grid-cols-4 gap-2">
+            {availableDates.map((date) => (
+              <Button
+                key={date}
+                variant={doctorBookingDate === `Dec ${date}` ? "default" : "outline"}
+                size="sm"
+                className={doctorBookingDate === `Dec ${date}` ? "" : "bg-transparent"}
+                onClick={() => setDoctorBookingDate(`Dec ${date}`)}
+              >
+                Dec {date}
+              </Button>
+            ))}
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-sm font-medium text-muted-foreground mb-3">Select Time</h2>
+          <div className="grid grid-cols-3 gap-2">
+            {timeSlots.map((time) => (
+              <Button
+                key={time}
+                variant={doctorBookingTime === time ? "default" : "outline"}
+                size="sm"
+                className={doctorBookingTime === time ? "" : "bg-transparent"}
+                onClick={() => setDoctorBookingTime(time)}
+              >
+                {time}
+              </Button>
+            ))}
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-sm font-medium text-muted-foreground mb-3">Reason for Visit</h2>
+          <Textarea
+            placeholder="Describe your medical concern or reason for the home visit..."
+            value={doctorBookingReason}
+            onChange={(e) => setDoctorBookingReason(e.target.value)}
+            rows={4}
+          />
+        </section>
+
+        <div className="space-y-2 pt-2">
+          <Button
+            className="w-full"
+            disabled={!doctorBookingDate || !doctorBookingTime || !pickupAddress.trim() || !doctorBookingReason.trim()}
+            onClick={(e) => {
+              e.preventDefault()
+              if (doctorBookingDate && doctorBookingTime && pickupAddress.trim() && doctorBookingReason.trim()) {
+                setShowDoctorBooking(false)
+                setShowDoctorConfirmation(true)
+              }
+            }}
+          >
+            Confirm Booking
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full bg-transparent"
+            onClick={(e) => {
+              e.preventDefault()
+              setShowDoctorBooking(false)
+              setDoctorBookingDate("")
+              setDoctorBookingTime("")
+              setDoctorBookingReason("")
+            }}
+          >
+            Cancel
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
+  if (showDoctorConfirmation) {
+    return (
+      <div className="p-4 space-y-5">
+        <div className="flex flex-col items-center justify-center py-8">
+          <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mb-4">
+            <Check className="w-8 h-8 text-accent" />
+          </div>
+          <h1 className="text-xl font-semibold mb-2">Home Visit Booked!</h1>
+          <p className="text-sm text-muted-foreground text-center mb-6">
+            Your home visit request has been submitted. A doctor will visit your location.
+          </p>
+
+          <Card className="p-4 w-full mb-6">
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Location</span>
+                <span className="font-medium">{pickupAddress}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Date</span>
+                <span className="font-medium">{doctorBookingDate}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Time</span>
+                <span className="font-medium">{doctorBookingTime}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Reason</span>
+                <span className="font-medium text-right max-w-[60%]">{doctorBookingReason}</span>
+              </div>
+            </div>
+          </Card>
+
+          <Button
+            className="w-full"
+            onClick={() => {
+              // Add home visit to bookings
+              const newBooking = {
+                id: Date.now(),
+                type: "Home Visit",
+                pickup: pickupAddress,
+                destination: "Home Visit",
+                date: doctorBookingDate,
+                time: doctorBookingTime,
+                status: "confirmed",
+                driver: "Dr. Ong Pei Ling",
+                phone: "+60 12-456 4307",
+                vehicle: "Home Visit Service",
+                trackingStatus: "requested" as const,
+                reason: doctorBookingReason,
+              }
+              setBookings((prev) => [newBooking, ...prev])
+              setShowDoctorConfirmation(false)
+              setShowDoctorBooking(false)
+              setDoctorBookingDate("")
+              setDoctorBookingTime("")
+              setDoctorBookingReason("")
+            }}
+          >
+            Done
           </Button>
         </div>
       </div>
@@ -346,8 +657,23 @@ export function TransportScreen() {
     <div className="p-4 space-y-5">
       {/* Header */}
       <header>
-        <h1 className="text-lg font-semibold">Transport</h1>
-        <p className="text-sm text-muted-foreground">Medical transportation services</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-lg font-semibold">Transport</h1>
+            <p className="text-sm text-muted-foreground">Medical transportation services</p>
+          </div>
+          {isRuralMode && (
+            <Badge className="bg-accent text-accent-foreground">
+              <MapPin className="w-3 h-3 mr-1" /> Rural Mode
+            </Badge>
+          )}
+        </div>
+        {isRuralMode && location && (
+          <div className="mt-2 flex items-center justify-between text-xs">
+            <span className="text-muted-foreground">Location:</span>
+            <span className="text-foreground font-medium text-right">{location}</span>
+          </div>
+        )}
       </header>
 
       {/* Quick Book */}
@@ -360,6 +686,30 @@ export function TransportScreen() {
           <Car className="w-4 h-4 mr-2" /> Book Transport
         </Button>
       </Card>
+
+      {/* Rural Mode - Doctor Booking */}
+      {isRuralMode && (
+        <Card className="p-4 bg-accent/10 border-accent/20">
+          <div className="flex items-start gap-3 mb-4">
+            <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0">
+              <Stethoscope className="w-5 h-5 text-accent" />
+            </div>
+            <div className="flex-1">
+              <h2 className="font-medium mb-1">Need a Doctor Home Visit?</h2>
+              <p className="text-xs text-muted-foreground">
+                Book a doctor to visit your rural location. Available for areas with limited hospital access.
+              </p>
+            </div>
+          </div>
+          <Button
+            variant="outline"
+            className="w-full bg-background hover:bg-accent/20"
+            onClick={() => setShowDoctorBooking(true)}
+          >
+            <Stethoscope className="w-4 h-4 mr-2" /> Book Home Visit
+          </Button>
+        </Card>
+      )}
 
       {/* Upcoming Bookings */}
       <section>
@@ -380,16 +730,34 @@ export function TransportScreen() {
             </div>
 
             <div className="space-y-2 mb-4">
-              <div className="flex items-center gap-2 text-sm">
-                <MapPin className="w-4 h-4 text-muted-foreground" />
-                <span className="text-muted-foreground">From:</span>
-                <span>{booking.pickup}</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <MapPin className="w-4 h-4 text-primary" />
-                <span className="text-muted-foreground">To:</span>
-                <span>{booking.destination}</span>
-              </div>
+              {booking.type === "Home Visit" ? (
+                <>
+                  <div className="flex items-center gap-2 text-sm">
+                    <MapPin className="w-4 h-4 text-primary" />
+                    <span className="text-muted-foreground">Location:</span>
+                    <span>{booking.pickup}</span>
+                  </div>
+                  {(booking as any).reason && (
+                    <div className="text-sm">
+                      <span className="text-muted-foreground">Reason: </span>
+                      <span>{(booking as any).reason}</span>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center gap-2 text-sm">
+                    <MapPin className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-muted-foreground">From:</span>
+                    <span>{booking.pickup}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <MapPin className="w-4 h-4 text-primary" />
+                    <span className="text-muted-foreground">To:</span>
+                    <span>{booking.destination}</span>
+                  </div>
+                </>
+              )}
               <div className="flex items-center gap-4 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1">
                   <Calendar className="w-3 h-3" /> {booking.date}
