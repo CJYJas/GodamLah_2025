@@ -2,6 +2,7 @@ import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom/client'; // Import the correct client method for React 18+
 import App from './App'; // Import your main component
 import './i18n';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 
 // --- Main Render Function ---
 

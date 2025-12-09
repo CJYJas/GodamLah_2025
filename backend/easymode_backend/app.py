@@ -1,4 +1,5 @@
-# app_backend.py
+# flask_data.py (Run this on port 5000)
+
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import time
@@ -8,80 +9,100 @@ app = Flask(__name__)
 # Enable CORS to allow your React app (default: localhost:3000) to communicate with Flask (localhost:5000)
 CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
 
-# --- In-Memory Data Store ---
-app_data_store = {
-    "user_id": 12345,
+# --- Configuration for the Test User IC ---
+USER_IC_KEY = "990101145678" # Use the test IC from the FastAPI app
 
-    "appointment": {
-        "date": "Tuesday, 10 Dec 2025", # Updated to match frontend mock
-        "time": "10:00 AM"
-    },
-    
-    # 1. Profile Data (Editable)
-    "profile": {
-        "name": "LIM CHIN WEI",
-        "ic_number": "851020-07-5XXX",
-        "dob": "20 / OCTOBER / 1985",
-        "address": "NO. 12, JALAN SAGA, KUALA LUMPUR",
-        "emergency_contact": "CHIN YEE (012-3456789)"
-    },
-    
-    # 2. Emergency/Medical Data (Read-Only fields, updated from government base)
-    "emergency": {
-        "bloodType": "O POSITIVE",
-        "allergies": "PENICILLIN, LATEX",
-        "conditions": "TYPE 2 DIABETES, MILD ASTHMA",
-        "medications": "METFORMIN (500mg, Daily)",
-        # Primary contact is copied from profile for consistency
-        "primaryContact": "CHIN YEE (012-3456789)", 
-    },
-    
-    # 3. Medicine Data (Simulating a persistent record)
-    "medicine": {
-        # Full mock data for the MedicineReminder page
-        "medicineName": "Blood Pressure Pill",
-        "dosage": "5mg",
-        "pillsRemaining": 10,
-        "isRefillLow": True, 
-        "courier": {
-            "name": "Alex C.",
-            "deliveryVehicle": "Bike Courier",
-            "eta": "3 hours",
+# --- In-Memory Data Store (Stores data per IC) ---
+app_data_store = {
+    USER_IC_KEY: {
+        "user_id": 12345, 
+        "ic_number": USER_IC_KEY, 
+
+        "appointment": {
+            "date": "Tuesday, 10 Dec 2025",
+            "time": "10:00 AM"
         },
-    },
-    
-    # 4. Transport State (Editable/Session-based)
-    "transport_need": None, # Stores 'wheelchair', 'bedridden', or custom text
-    "transport_booked_time": None,
+        
+        # 1. Profile Data (Editable)
+        "profile": {
+            "name": "LIM CHIN WEI",
+            "ic_number": "851020-07-5XXX",
+            "dob": "20 / OCTOBER / 1985",
+            "address": "NO. 12, JALAN SAGA, KUALA LUMPUR",
+            "emergency_contact": "CHIN YEE (012-3456789)"
+        },
+        
+        # 2. Emergency/Medical Data (Read-Only fields, updated from government base)
+        "emergency": {
+            "bloodType": "O POSITIVE",
+            "allergies": "PENICILLIN, LATEX",
+            "conditions": "TYPE 2 DIABETES, MILD ASTHMA",
+            "medications": "METFORMIN (500mg, Daily)",
+            "primaryContact": "CHIN YEE (012-3456789)", 
+        },
+        
+        # 3. Medicine Data (Simulating a persistent record)
+        "medicine": {
+            "medicineName": "Blood Pressure Pill",
+            "dosage": "5mg",
+            "pillsRemaining": 10,
+            "isRefillLow": True, 
+            "courier": {
+                "name": "Alex C.",
+                "deliveryVehicle": "Bike Courier",
+                "eta": "3 hours",
+            },
+        },
+        
+        # 4. Transport State (Editable/Session-based)
+        "transport_need": None, 
+        "transport_booked_time": None,
+    }
 }
 # -----------------------------
 
-@app.route('/api/get_all_data', methods=['GET'])
-def get_all_data():
-    """Simulates fetching all initial user and medical data."""
-    app_data_store['emergency']['primaryContact'] = app_data_store['profile']['emergency_contact']
+def get_user_data(ic_number):
+    """Helper to retrieve user data by clean IC number."""
+    clean_ic = str(ic_number).replace("-", "").replace(" ", "").strip()
+    return app_data_store.get(clean_ic)
+
+
+@app.route('/api/get_all_data/<ic_number>', methods=['GET']) # <<< MODIFIED ROUTE
+def get_all_data(ic_number):
+    """Fetches all initial user and medical data for a specific IC."""
+    user_data = get_user_data(ic_number)
+    
+    if not user_data:
+        return jsonify({"status": "error", "message": f"User data not found for IC: {ic_number}"}), 404
+
+    # Ensure emergency contact is synced
+    user_data['emergency']['primaryContact'] = user_data['profile']['emergency_contact']
     
     return jsonify({
         "status": "success",
-        "user_data": app_data_store
+        "user_data": user_data
     }), 200
 
 # -----------------
-# 1. Appointment Endpoints
+# 1. Appointment Endpoints (Updated to accept IC)
 # -----------------
 
-@app.route('/api/set_appointment', methods=['POST'])
-def set_appointment():
+@app.route('/api/set_appointment/<ic_number>', methods=['POST'])
+def set_appointment(ic_number):
     """Updates the user's appointment date and time."""
     try:
+        user_data = get_user_data(ic_number)
+        if not user_data:
+            return jsonify({"status": "error", "message": "User not found."}), 404
+
         data = request.json
         new_date = data.get('date')
         new_time = data.get('time')
         
         if new_date and new_time:
-            app_data_store['appointment']['date'] = new_date
-            app_data_store['appointment']['time'] = new_time
-            print(f"Backend updated appointment to: {new_date} at {new_time}")
+            user_data['appointment']['date'] = new_date
+            user_data['appointment']['time'] = new_time
+            print(f"Backend updated appointment for {ic_number} to: {new_date} at {new_time}")
             
             return jsonify({"status": "success", "message": "Appointment date updated."}), 200
         else:
@@ -92,20 +113,24 @@ def set_appointment():
         return jsonify({"status": "error", "message": "Internal server error."}), 500
 
 # -----------------
-# 2. Profile Endpoints
+# 2. Profile Endpoints (Original logic is maintained for single user data for now)
+# NOTE: For a real multi-user app, this should also be updated to accept <ic_number>
 # -----------------
 
 @app.route('/api/update_emergency_contact', methods=['POST'])
 def update_emergency_contact():
     """Updates the user's emergency contact in the store."""
     try:
+        # Assuming the request body must contain the IC number for multi-user, 
+        # but maintaining original logic by updating the single test user's data.
+        user_data = app_data_store.get(USER_IC_KEY)
+        
         data = request.json
         new_contact = data.get('new_contact')
         
         if new_contact:
-            # Update the profile and emergency data fields
-            app_data_store['profile']['emergency_contact'] = new_contact
-            app_data_store['emergency']['primaryContact'] = new_contact
+            user_data['profile']['emergency_contact'] = new_contact
+            user_data['emergency']['primaryContact'] = new_contact
             
             print(f"Backend updated emergency contact: {new_contact}")
             
@@ -122,19 +147,22 @@ def update_emergency_contact():
         return jsonify({"status": "error", "message": "Internal server error."}), 500
 
 # -----------------
-# 3. Transport Endpoints
+# 3. Transport Endpoints (Using the test user's data)
 # -----------------
 
+# NOTE: These endpoints should ideally also be updated with /<ic_number> if they are critical.
 @app.route('/api/set_transport', methods=['POST'])
 def set_transport():
     """Receives and stores the transport need."""
+    # This logic still updates the hardcoded test user (USER_IC_KEY)
+    user_data = app_data_store.get(USER_IC_KEY)
     try:
         data = request.json
         transport_need = data.get('transport_need')
         
         if transport_need:
-            app_data_store['transport_need'] = transport_need
-            app_data_store['transport_booked_time'] = time.time()
+            user_data['transport_need'] = transport_need
+            user_data['transport_booked_time'] = time.time()
             print(f"Backend stored transport need: {transport_need}")
             
             return jsonify({"status": "success", "message": "Transport need updated."}), 200
@@ -147,10 +175,11 @@ def set_transport():
 @app.route('/api/get_transport', methods=['GET'])
 def get_transport():
     """Returns the current transport status and mock driver details."""
-    current_need = app_data_store['transport_need']
+    user_data = app_data_store.get(USER_IC_KEY)
+    current_need = user_data['transport_need']
     
     if current_need:
-        # Mock Driver Data (Simulates service response)
+        # Mock Driver Data 
         mock_ride_data = {
             "driver_name": "Sarah K.",
             "vehicle_type": "Blue Minivan",
@@ -174,8 +203,9 @@ def get_transport():
 @app.route('/api/clear_transport', methods=['POST'])
 def clear_transport():
     """Resets the stored transport need when user clicks 'Change Need'."""
-    app_data_store['transport_need'] = None
-    app_data_store['transport_booked_time'] = None
+    user_data = app_data_store.get(USER_IC_KEY)
+    user_data['transport_need'] = None
+    user_data['transport_booked_time'] = None
     print("Backend cleared current transport booking.")
     
     return jsonify({"status": "cleared", "message": "Transport booking has been cleared."}), 200
@@ -187,12 +217,15 @@ def clear_transport():
 @app.route('/api/confirm_medicine_taken', methods=['POST'])
 def confirm_medicine_taken():
     """Updates the timestamp of the last medicine taken."""
-    app_data_store['last_taken_medicine'] = time.time()
-    print(f"Backend updated last taken medicine time: {app_data_store['last_taken_medicine']}")
+    # This logic still updates the hardcoded test user (USER_IC_KEY)
+    user_data = app_data_store.get(USER_IC_KEY)
+    user_data['last_taken_medicine'] = time.time()
+    print(f"Backend updated last taken medicine time: {user_data['last_taken_medicine']}")
     
     return jsonify({"status": "success", "message": "Medicine taken confirmed."}), 200
 
 
 if __name__ == '__main__':
-    print("Starting Flask API server on http://localhost:5000")
-    app.run(port=5000, debug=True)
+    print("Starting Flask API server on http://localhost:5000 (Debug off)")
+    # 🛑 CHANGE debug=True to debug=False to prevent watchdog issues 🛑
+    app.run(port=5000, debug=False)

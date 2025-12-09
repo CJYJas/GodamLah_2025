@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx"
+  },
+  "include": [
+    // CORRECTED PATH: This tells TypeScript to look inside the 'src' folder
+    // and include all files/folders in 'signin_signup' and the root 'src' files (like App.tsx).
+    "src/**/*" 
+  ],
+  "exclude": [
+    // It's generally good practice to explicitly exclude node_modules
+    "node_modules" 
+  ]
+}

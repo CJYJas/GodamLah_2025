@@ -4,10 +4,10 @@ import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector'; // Added for convenience
 
 // 1. Ensure you are importing ALL language files:
-import enTranslation from './locales/en/common.json'; 
-import msTranslation from './locales/ms/common.json'; 
-import zhTranslation from './locales/zh/common.json'; 
-import taTranslation from './locales/ta/common.json';
+import enTranslation from './easymode/locales/en/common.json'; 
+import msTranslation from './easymode/locales/ms/common.json'; 
+import zhTranslation from './easymode/locales/zh/common.json'; 
+import taTranslation from './easymode/locales/ta/common.json';
 
 const resources = {
     // 2. ENSURE ALL IMPORTED FILES ARE ADDED TO THE RESOURCES OBJECT:

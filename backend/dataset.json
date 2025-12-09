@@ -1,0 +1,12 @@
+{
+  "MOCK_IC_123": {
+    "full_name": "",
+    "ic_number": "MOCK_IC_123",
+    "address": "",
+    "ic_front": "ic_images/MOCK_IC_123_front_a05ce79f-7654-4193-850c-2671799330ac.png",
+    "ic_back": "ic_images/MOCK_IC_123_back_935295ec-cdd2-4343-81a9-7e9c805fed23.png",
+    "voice_path": null,
+    "security": null,
+    "mode": null
+  }
+}
