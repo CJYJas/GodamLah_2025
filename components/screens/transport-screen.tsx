@@ -6,41 +6,88 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Car, MapPin, Clock, Phone, Calendar, Navigation, Ambulance, Bus, ChevronLeft, Check, User, Ship, Plane, Stethoscope } from "lucide-react"
+import { Car, MapPin, Clock, Phone, Calendar, Navigation, Ambulance, Bus, ChevronLeft, Check, User, Ship, Plane, Stethoscope, BriefcaseMedical } from "lucide-react"
 import { useRuralMode } from "@/contexts/rural-mode-context"
 
+// --- Helper Data and Types ---
+
+const transportTypeMap: { [key: string]: string } = {
+  regular: "Regular Transport",
+  ambulance: "Ambulance",
+  public: "Public Transport",
+  boat: "Boat Transport",
+  helicopter: "Helicopter Transport",
+}
+
 const appointmentsWithoutTransport = [
-  { id: 1, type: "General Checkup", date: "Dec 15, 2025", time: "9:00 AM", location: "HUKM" },
-  { id: 2, type: "Blood Test", date: "Dec 18, 2025", time: "7:30 AM", location: "Hospital Kuala Lumpur" },
-  { id: 3, type: "Follow-up", date: "Dec 22, 2025", time: "2:00 PM", location: "PPUM" },
+  { id: 1, type: "General Checkup", date: "Dec 15, 2025", time: "9:00 AM", location: "Serian Hospital" },
+  { id: 2, type: "Blood Test", date: "Dec 18, 2025", time: "7:30 AM", location: "Sarawak General Hospital (SGH)" },
+  { id: 3, type: "Follow-up", date: "Dec 22, 2025", time: "2:00 PM", location: "Sibu Hospital" },
 ]
 
-const initialBookings = [
+// Extended Booking type to handle Doctor/Driver and different vehicle/service names
+type Booking = {
+  id: number
+  type: string
+  pickup: string
+  destination: string
+  date: string
+  time: string
+  status: "confirmed"
+  driverOrDoctor: string // Renamed for clarity
+  phone: string
+  vehicleOrService: string // Renamed for clarity
+  trackingStatus: "requested" | "assigned" | "arrived" // requested, assigned, arrived
+  reason?: string // For Home Visit
+}
+
+const initialBookings: Booking[] = [
   {
     id: 1,
-    type: "Scheduled Pickup",
-    pickup: "No. 123, Jalan Ampang, KL",
-    destination: "HUKM",
+    type: "Boat Transport", // Changed type to match the vehicle better
+    pickup: "No. 12, Rumah Panjang Meranti Kampung Meranti, Siburan 94200, Serian Sarawak",
+    destination: "Serian Hospital",
     date: "Dec 15, 2025",
     time: "8:00 AM",
     status: "confirmed",
-    driver: "Encik Razak",
+    driverOrDoctor: "Encik Razak",
     phone: "+60 12-345 6789",
-    vehicle: "Toyota Vios - WXY 1234",
-    trackingStatus: "requested", // requested, assigned, arrived
+    vehicleOrService: "Boat - WXY 1234",
+    trackingStatus: "requested",
   },
 ]
+
+// Helper function to determine the icon based on booking type
+const getBookingIcon = (type: string) => {
+  switch (type) {
+    case "Home Visit":
+      return <Stethoscope className="w-5 h-5 text-accent" />
+    case "Boat Transport":
+      return <Ship className="w-5 h-5 text-accent" />
+    case "Helicopter Transport":
+      return <Plane className="w-5 h-5 text-accent" />
+    case "Ambulance":
+      return <Ambulance className="w-5 h-5 text-accent" />
+    case "Public Transport":
+      return <Bus className="w-5 h-5 text-accent" />
+    default:
+      // Covers "Regular Transport" and other fallbacks
+      return <Car className="w-5 h-5 text-accent" />
+  }
+}
+
+// --- Component ---
 
 export function TransportScreen() {
   const { isRuralMode, location } = useRuralMode()
   const [showBooking, setShowBooking] = useState(false)
   const [showDoctorBooking, setShowDoctorBooking] = useState(false)
   const [transportType, setTransportType] = useState<"regular" | "ambulance" | "public" | "boat" | "helicopter">("regular")
-  const [bookings, setBookings] = useState(initialBookings)
+  const [bookings, setBookings] = useState<Booking[]>(initialBookings)
   const [selectedAppointment, setSelectedAppointment] = useState<(typeof appointmentsWithoutTransport)[0] | null>(null)
   const [selectedRequirements, setSelectedRequirements] = useState<string[]>([])
   const [specialNotes, setSpecialNotes] = useState("")
-  const [pickupAddress, setPickupAddress] = useState(isRuralMode ? location || "" : "No. 123, Jalan Ampang, KL")
+  const [pickupAddress, setPickupAddress] = useState(isRuralMode ? location || "" : "No. 12, Rumah Panjang Meranti Kampung Meranti, Siburan 94200, Serian Sarawak")
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [trackingId, setTrackingId] = useState<number | null>(null)
   const [showEmergencyConfirm, setShowEmergencyConfirm] = useState(false)
@@ -76,11 +123,24 @@ export function TransportScreen() {
     const booking = bookings.find((b) => b.id === trackingId)
     if (!booking) return null
 
-    const steps = [
-      { key: "requested", label: "Requested", desc: "Waiting for driver assignment" },
-      { key: "assigned", label: "Driver Assigned", desc: "Driver is on the way" },
-      { key: "arrived", label: "Driver Arrived", desc: "Driver has arrived at pickup" },
-    ]
+    const isHomeVisit = booking.type === "Home Visit"
+
+    let steps = []
+    if (isHomeVisit) {
+        // Corrected steps for Home Visit: removed the ambiguous "Arrived at Pickup"
+        steps = [
+            { key: "requested", label: "Requested", desc: "Waiting for specialist assignment" },
+            { key: "assigned", label: "Specialist Assigned", desc: "Specialist is traveling to your location" },
+            { key: "arrived", label: "Visit Started", desc: "Consultation in progress" }, // Key change here
+        ]
+    } else {
+        // Transport steps
+        steps = [
+            { key: "requested", label: "Requested", desc: "Waiting for driver assignment" },
+            { key: "assigned", label: "Driver Assigned", desc: "Driver is on the way" },
+            { key: "arrived", label: "Driver Arrived", desc: "Driver has arrived at pickup" },
+        ]
+    }
     const currentStep = steps.findIndex((s) => s.key === booking.trackingStatus)
 
     return (
@@ -92,7 +152,7 @@ export function TransportScreen() {
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-lg font-semibold">Track Transport</h1>
+          <h1 className="text-lg font-semibold">Track {isHomeVisit ? "Home Visit" : "Transport"}</h1>
         </header>
 
         {/* Status Timeline */}
@@ -125,17 +185,17 @@ export function TransportScreen() {
           </div>
         </Card>
 
-        {/* Driver Info - Show when assigned */}
+        {/* Info - Show when assigned */}
         {booking.trackingStatus !== "requested" && (
           <Card className="p-4">
-            <h2 className="text-sm font-medium text-muted-foreground mb-3">Driver Information</h2>
+            <h2 className="text-sm font-medium text-muted-foreground mb-3">{isHomeVisit ? "Specialist" : "Driver"} Information</h2>
             <div className="flex items-center gap-3 mb-3">
               <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                <User className="w-6 h-6 text-primary" />
+                {isHomeVisit ? <Stethoscope className="w-6 h-6 text-primary" /> : <User className="w-6 h-6 text-primary" />}
               </div>
               <div>
-                <p className="font-medium">{booking.driver}</p>
-                <p className="text-sm text-muted-foreground">{booking.vehicle}</p>
+                <p className="font-medium">{booking.driverOrDoctor}</p>
+                <p className="text-sm text-muted-foreground">{booking.vehicleOrService}</p>
               </div>
             </div>
             <Button
@@ -143,25 +203,33 @@ export function TransportScreen() {
               className="w-full bg-transparent"
               onClick={() => window.open(`tel:${booking.phone}`)}
             >
-              <Phone className="w-4 h-4 mr-2" /> Call Driver ({booking.phone})
+              <Phone className="w-4 h-4 mr-2" /> Call {isHomeVisit ? "Specialist" : "Driver"} ({booking.phone})
             </Button>
           </Card>
         )}
 
-        {/* Trip Details */}
+        {/* Trip/Visit Details */}
         <Card className="p-4">
-          <h2 className="text-sm font-medium text-muted-foreground mb-3">Trip Details</h2>
+          <h2 className="text-sm font-medium text-muted-foreground mb-3">{isHomeVisit ? "Visit" : "Trip"} Details</h2>
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-sm">
               <MapPin className="w-4 h-4 text-muted-foreground" />
-              <span className="text-muted-foreground">From:</span>
+              <span className="text-muted-foreground">{isHomeVisit ? "Location:" : "From:"}</span>
               <span>{booking.pickup}</span>
             </div>
-            <div className="flex items-center gap-2 text-sm">
-              <MapPin className="w-4 h-4 text-primary" />
-              <span className="text-muted-foreground">To:</span>
-              <span>{booking.destination}</span>
-            </div>
+            {!isHomeVisit && (
+              <div className="flex items-center gap-2 text-sm">
+                <MapPin className="w-4 h-4 text-primary" />
+                <span className="text-muted-foreground">To:</span>
+                <span>{booking.destination}</span>
+              </div>
+            )}
+            {isHomeVisit && booking.reason && (
+              <div className="text-sm">
+                <span className="text-muted-foreground">Reason: </span>
+                <span className="font-medium">{booking.reason}</span>
+              </div>
+            )}
             <div className="flex items-center gap-4 text-xs text-muted-foreground mt-2">
               <span className="flex items-center gap-1">
                 <Calendar className="w-3 h-3" /> {booking.date}
@@ -190,33 +258,41 @@ export function TransportScreen() {
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Type</span>
-                <span className="font-medium capitalize">
-                  {transportType === "boat" ? "Boat" : transportType === "helicopter" ? "Helicopter" : transportType}
-                </span>
+                <span className="font-medium">{transportTypeMap[transportType] || "Transport"}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Pickup</span>
-                <span className="font-medium">{pickupAddress}</span>
+                <span className="font-medium text-right max-w-[60%]">{pickupAddress}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Destination</span>
-                <span className="font-medium">{selectedAppointment?.location}</span>
+                <span className="font-medium text-right max-w-[60%]">{selectedAppointment?.location}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Date</span>
                 <span className="font-medium">{selectedAppointment?.date}</span>
               </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Time</span>
+                <span className="font-medium">{selectedAppointment?.time}</span>
+              </div>
               {cannotReachByVan && (
                 <div className="bg-accent/10 border border-accent/20 rounded-lg p-3 mt-2">
                   <p className="text-xs text-foreground">
-                    <strong>Special Allocation:</strong> We've allocated {transportType === "boat" ? "a boat" : "a helicopter"} for your transport as your location cannot be reached by car/van.
+                    <strong>Special Allocation:</strong> We've allocated {transportTypeMap[transportType]} for your transport as your location cannot be reached by car/van.
                   </p>
                 </div>
               )}
               {selectedRequirements.length > 0 && (
-                <div className="flex justify-between">
+                <div className="flex justify-between pt-2">
                   <span className="text-muted-foreground">Requirements</span>
-                  <span className="font-medium">{selectedRequirements.join(", ")}</span>
+                  <span className="font-medium text-right max-w-[60%]">{selectedRequirements.join(", ")}</span>
+                </div>
+              )}
+              {specialNotes.trim() && (
+                <div className="pt-2">
+                    <span className="text-muted-foreground">Notes: </span>
+                    <span className="font-medium text-right max-w-[60%]">{specialNotes}</span>
                 </div>
               )}
             </div>
@@ -225,15 +301,9 @@ export function TransportScreen() {
           <Button
             className="w-full"
             onClick={() => {
-              // Add transport booking to bookings
-              const transportTypeLabel = 
-                transportType === "boat" ? "Boat" :
-                transportType === "helicopter" ? "Helicopter" :
-                transportType === "ambulance" ? "Ambulance" :
-                transportType === "public" ? "Public Transport" :
-                "Regular Transport"
+              const transportTypeLabel = transportTypeMap[transportType] || "Transport"
               
-              const newBooking = {
+              const newBooking: Booking = {
                 id: Date.now(),
                 type: transportTypeLabel,
                 pickup: pickupAddress,
@@ -241,13 +311,13 @@ export function TransportScreen() {
                 date: selectedAppointment?.date || "",
                 time: selectedAppointment?.time || "",
                 status: "confirmed",
-                driver: "Hafizul Azhar",
+                driverOrDoctor: transportType === "ambulance" ? "Paramedic Team" : "Hafizul Azhar",
                 phone: "+60 12-588 6760",
-                vehicle: transportType === "boat" ? "SKW 5678 C" :
+                vehicleOrService: transportType === "boat" ? "SKW 5678 C" :
                          transportType === "helicopter" ? "Medical Helicopter" :
                          transportType === "ambulance" ? "Ambulance" :
-                         "Transport Vehicle",
-                trackingStatus: "requested" as const,
+                         "Transport Van",
+                trackingStatus: "requested",
               }
               setBookings((prev) => [newBooking, ...prev])
               setShowConfirmation(false)
@@ -284,7 +354,7 @@ export function TransportScreen() {
         {/* Transport Type Selection */}
         <section>
           <h2 className="text-sm font-medium text-muted-foreground mb-3">Transport Type</h2>
-          <div className={`grid gap-2 ${isRuralMode ? "grid-cols-2" : "grid-cols-3"}`}>
+          <div className={`grid gap-2 ${isRuralMode ? "grid-cols-3" : "grid-cols-3"}`}>
             <Card
               className={`p-3 cursor-pointer text-center transition-all ${
                 transportType === "regular" ? "border-primary bg-primary/5" : ""
@@ -375,11 +445,9 @@ export function TransportScreen() {
                   checked={cannotReachByVan}
                   onChange={(e) => {
                     setCannotReachByVan(e.target.checked)
-                    if (e.target.checked) {
-                      // Auto-select boat or helicopter if cannot reach by van
-                      if (transportType === "regular") {
+                    if (e.target.checked && transportType === "regular") {
+                        // Auto-select boat or helicopter if cannot reach by van
                         setTransportType("boat")
-                      }
                     }
                   }}
                   className="w-4 h-4 rounded border-border"
@@ -416,7 +484,9 @@ export function TransportScreen() {
                     <p className="text-xs text-muted-foreground">
                       {apt.date} at {apt.time}
                     </p>
-                    <p className="text-xs text-muted-foreground">{apt.location}</p>
+                    <p className="text-xs text-muted-foreground flex items-center gap-1">
+                        <BriefcaseMedical className="w-3 h-3" /> {apt.location}
+                    </p>
                   </div>
                   {selectedAppointment?.id === apt.id && <Check className="w-4 h-4 text-primary" />}
                 </div>
@@ -516,10 +586,10 @@ export function TransportScreen() {
             {availableDates.map((date) => (
               <Button
                 key={date}
-                variant={doctorBookingDate === `Dec ${date}` ? "default" : "outline"}
+                variant={doctorBookingDate === `Dec ${date}, 2025` ? "default" : "outline"}
                 size="sm"
-                className={doctorBookingDate === `Dec ${date}` ? "" : "bg-transparent"}
-                onClick={() => setDoctorBookingDate(`Dec ${date}`)}
+                className={doctorBookingDate === `Dec ${date}, 2025` ? "" : "bg-transparent"}
+                onClick={() => setDoctorBookingDate(`Dec ${date}, 2025`)}
               >
                 Dec {date}
               </Button>
@@ -603,7 +673,7 @@ export function TransportScreen() {
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Location</span>
-                <span className="font-medium">{pickupAddress}</span>
+                <span className="font-medium text-right max-w-[60%]">{pickupAddress}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Date</span>
@@ -613,7 +683,7 @@ export function TransportScreen() {
                 <span className="text-muted-foreground">Time</span>
                 <span className="font-medium">{doctorBookingTime}</span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between items-start">
                 <span className="text-muted-foreground">Reason</span>
                 <span className="font-medium text-right max-w-[60%]">{doctorBookingReason}</span>
               </div>
@@ -624,18 +694,18 @@ export function TransportScreen() {
             className="w-full"
             onClick={() => {
               // Add home visit to bookings
-              const newBooking = {
+              const newBooking: Booking = {
                 id: Date.now(),
                 type: "Home Visit",
                 pickup: pickupAddress,
-                destination: "Home Visit",
+                destination: pickupAddress, // Logical consistency: destination is the pickup
                 date: doctorBookingDate,
                 time: doctorBookingTime,
                 status: "confirmed",
-                driver: "Dr. Ong Pei Ling",
+                driverOrDoctor: "Dr. Ong Pei Ling", // Changed to Doctor/Specialist
                 phone: "+60 12-456 4307",
-                vehicle: "Home Visit Service",
-                trackingStatus: "requested" as const,
+                vehicleOrService: "Home Visit Service", // Changed to Service
+                trackingStatus: "requested",
                 reason: doctorBookingReason,
               }
               setBookings((prev) => [newBooking, ...prev])
@@ -714,80 +784,88 @@ export function TransportScreen() {
       {/* Upcoming Bookings */}
       <section>
         <h2 className="text-sm font-medium text-muted-foreground mb-3">Upcoming Bookings</h2>
-        {bookings.map((booking) => (
-          <Card key={booking.id} className="p-4">
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center">
-                  <Car className="w-5 h-5 text-accent" />
-                </div>
-                <div>
-                  <h3 className="font-medium">{booking.type}</h3>
-                  <p className="text-xs text-muted-foreground">{booking.vehicle}</p>
-                </div>
-              </div>
-              <Badge className="bg-accent text-accent-foreground">Confirmed</Badge>
-            </div>
+        {bookings.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-4">You have no upcoming bookings.</p>
+        ) : (
+            bookings.map((booking) => {
+                const isHomeVisit = booking.type === "Home Visit"
+                return (
+                    <Card key={booking.id} className="p-4 mb-3">
+                        <div className="flex items-start justify-between mb-3">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center">
+                                    {/* --- CORRECTED ICON LOGIC --- */}
+                                    {getBookingIcon(booking.type)}
+                                </div>
+                                <div>
+                                    <h3 className="font-medium">{booking.type}</h3>
+                                    <p className="text-xs text-muted-foreground">{booking.vehicleOrService}</p>
+                                </div>
+                            </div>
+                            <Badge className="bg-accent text-accent-foreground">Confirmed</Badge>
+                        </div>
 
-            <div className="space-y-2 mb-4">
-              {booking.type === "Home Visit" ? (
-                <>
-                  <div className="flex items-center gap-2 text-sm">
-                    <MapPin className="w-4 h-4 text-primary" />
-                    <span className="text-muted-foreground">Location:</span>
-                    <span>{booking.pickup}</span>
-                  </div>
-                  {(booking as any).reason && (
-                    <div className="text-sm">
-                      <span className="text-muted-foreground">Reason: </span>
-                      <span>{(booking as any).reason}</span>
-                    </div>
-                  )}
-                </>
-              ) : (
-                <>
-                  <div className="flex items-center gap-2 text-sm">
-                    <MapPin className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-muted-foreground">From:</span>
-                    <span>{booking.pickup}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <MapPin className="w-4 h-4 text-primary" />
-                    <span className="text-muted-foreground">To:</span>
-                    <span>{booking.destination}</span>
-                  </div>
-                </>
-              )}
-              <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                <span className="flex items-center gap-1">
-                  <Calendar className="w-3 h-3" /> {booking.date}
-                </span>
-                <span className="flex items-center gap-1">
-                  <Clock className="w-3 h-3" /> {booking.time}
-                </span>
-              </div>
-            </div>
+                        <div className="space-y-2 mb-4">
+                            {isHomeVisit ? (
+                                <>
+                                    <div className="flex items-center gap-2 text-sm">
+                                        <MapPin className="w-4 h-4 text-primary" />
+                                        <span className="text-muted-foreground">Visit Location:</span>
+                                        <span className="text-right max-w-[60%]">{booking.pickup}</span>
+                                    </div>
+                                    {booking.reason && (
+                                        <div className="text-sm">
+                                            <span className="text-muted-foreground">Reason: </span>
+                                            <span className="text-right max-w-[60%]">{booking.reason}</span>
+                                        </div>
+                                    )}
+                                </>
+                            ) : (
+                                <>
+                                    <div className="flex items-center gap-2 text-sm">
+                                        <MapPin className="w-4 h-4 text-muted-foreground" />
+                                        <span className="text-muted-foreground">From:</span>
+                                        <span className="text-right max-w-[60%]">{booking.pickup}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-sm">
+                                        <MapPin className="w-4 h-4 text-primary" />
+                                        <span className="text-muted-foreground">To:</span>
+                                        <span className="text-right max-w-[60%]">{booking.destination}</span>
+                                    </div>
+                                </>
+                            )}
+                            <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                                <span className="flex items-center gap-1">
+                                    <Calendar className="w-3 h-3" /> {booking.date}
+                                </span>
+                                <span className="flex items-center gap-1">
+                                    <Clock className="w-3 h-3" /> {booking.time}
+                                </span>
+                            </div>
+                        </div>
 
-            <div className="flex gap-2">
-              <Button
-                size="sm"
-                variant="outline"
-                className="flex-1 text-xs h-8 bg-transparent"
-                onClick={() => window.open(`tel:${booking.phone}`)}
-              >
-                <Phone className="w-3 h-3 mr-1" /> Call Driver
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                className="flex-1 text-xs h-8 bg-transparent"
-                onClick={() => handleTrack(booking.id)}
-              >
-                Track
-              </Button>
-            </div>
-          </Card>
-        ))}
+                        <div className="flex gap-2">
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                className="flex-1 text-xs h-8 bg-transparent"
+                                onClick={() => window.open(`tel:${booking.phone}`)}
+                            >
+                                <Phone className="w-3 h-3 mr-1" /> Call {isHomeVisit ? "Specialist" : "Driver"}
+                            </Button>
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                className="flex-1 text-xs h-8 bg-transparent"
+                                onClick={() => handleTrack(booking.id)}
+                            >
+                                Track
+                            </Button>
+                        </div>
+                    </Card>
+                )
+            })
+        )}
       </section>
 
       <Card className="p-4 border-destructive/30 bg-destructive/5">
