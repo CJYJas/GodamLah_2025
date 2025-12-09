@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MyHealth | Inclusive Government Healthcare Super-App</title>
+
+  <!-- Tailwind CDN for zero-g-slateuild deploys (Vercel/GitHub Pages ready) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui'] },
+          colors: {
+            primary: '#8799E0',
+            secondary: '#EBEEF7',
+            accent: '#594F81',
+            brand: {
+              50: '#EBEEF7',
+              200: '#d5dcf3',
+              500: '#8799E0',
+              600: '#748cd8',
+              700: '#677bcc',
+              800: '#594F81',
+            },
+          },
+        },
+      },
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+  <script src="https://kit.fontawesome.com/a6a5b0f888.js" crossorigin="anonymous"></script>
+</head>
+<body class="bg-secondary text-slate-900 font-sans">
+  <div class="relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-secondary via-white to-primary/30 pointer-events-none"></div>
+
+    <!-- Navbar -->
+    <header class="sticky top-0 z-40 backdrop-blur bg-white/70 border-b border-white/60">
+      <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-brand-600 text-white grid place-items-center font-bold">MH</div>
+          <div>
+            <p class="text-lg font-semibold text-brand-800">MyHealth</p>
+            <p class="text-xs text-slate-500">Inclusive Digital Health Spine</p>
+          </div>
+        </div>
+        <nav class="hidden md:flex items-center gap-6 text-sm font-semibold text-slate-700">
+          <a class="hover:text-brand-600" href="#problem">Problem</a>
+          <a class="hover:text-brand-600" href="#solution">Solution</a>
+          <a class="hover:text-brand-600" href="#modes">Modes</a>
+          <a class="hover:text-brand-600" href="#features">Features</a>
+          <a class="hover:text-brand-600" href="#tech">Tech</a>
+          <a class="hover:text-brand-600" href="#comparison">Innovation</a>
+        </nav>
+        <a href="#cta" class="hidden md:inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-600 text-white font-semibold shadow-lg shadow-brand-500/20 hover:bg-brand-500 transition">
+          Pitch Demo <i class="fa-solid fa-arrow-right"></i>
+        </a>
+      </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="relative max-w-6xl mx-auto px-6 py-16 md:py-24 grid md:grid-cols-2 gap-12 items-center">
+      <div data-aos="fade-right">
+        <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm font-semibold">
+          Inclusivity First · Elderly · Rural · Disabled
+        </span>
+        <h1 class="mt-6 text-4xl md:text-5xl font-extrabold leading-tight text-brand-800">
+          MyHealth: Malaysia’s all-in-one, inclusive government healthcare app.
+        </h1>
+        <p class="mt-4 text-lg text-slate-600">
+          We merge MySejahtera + MyUbat into a single super-app with adaptive modes, offline resilience, and future-ready IC-linked health records.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a href="#solution" class="px-5 py-3 rounded-full bg-brand-600 text-white font-semibold shadow-lg shadow-brand-500/25 hover:bg-brand-500 transition">
+            See the Solution
+          </a>
+          <a href="#tech" class="px-5 py-3 rounded-full bg-white text-brand-700 font-semibold border border-brand-100 hover:border-brand-300 transition">
+            Architecture
+          </a>
+        </div>
+        <div class="mt-6 flex items-center gap-4 text-sm text-slate-500">
+          <span class="flex items-center gap-2"><i class="fa-solid fa-universal-access text-brand-500"></i> WCAG-friendly</span>
+          <span class="flex items-center gap-2"><i class="fa-solid fa-wifi text-brand-500"></i> Low bandwidth</span>
+          <span class="flex items-center gap-2"><i class="fa-solid fa-shield-heart text-brand-500"></i> Secure by design</span>
+        </div>
+      </div>
+      <div class="relative" data-aos="fade-left">
+        <div class="absolute -inset-8 bg-gradient-to-br from-primary/25 via-white to-accent/15 blur-3xl rounded-full"></div>
+        <div class="relative bg-white border border-white shadow-2xl rounded-3xl p-6 space-y-4">
+          <div class="flex justify-between items-center">
+            <div>
+              <p class="text-xs uppercase text-slate-500">Live Preview</p>
+              <p class="text-lg font-semibold text-brand-700">Inclusive Modes</p>
+            </div>
+            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-brand-50 text-brand-700">Adaptive</span>
+          </div>
+          <div class="grid grid-cols-3 gap-3">
+            <div class="p-4 rounded-2xl border border-brand-100 bg-brand-50 text-brand-800">
+              <p class="text-sm font-semibold">Elderly Mode</p>
+              <p class="text-xs text-brand-700 mt-1">VoiceOver + large UI</p>
+            </div>
+            <div class="p-4 rounded-2xl border border-slate-100 bg-white">
+              <p class="text-sm font-semibold">Normal</p>
+              <p class="text-xs text-slate-500 mt-1">Fast, centralized</p>
+            </div>
+            <div class="p-4 rounded-2xl border border-green-100 bg-green-50 text-green-800">
+              <p class="text-sm font-semibold">Rural Mode</p>
+              <p class="text-xs text-green-700 mt-1">Offline + SMS</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3 text-sm text-slate-700">
+            <div class="flex items-center gap-2"><i class="fa-solid fa-calendar-check text-brand-500"></i> Appointments</div>
+            <div class="flex items-center gap-2"><i class="fa-solid fa-pills text-brand-500"></i> Med & Refill</div>
+            <div class="flex items-center gap-2"><i class="fa-solid fa-notes-medical text-brand-500"></i> Health Records</div>
+            <div class="flex items-center gap-2"><i class="fa-solid fa-taxi text-brand-500"></i> Transport</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Problem -->
+    <section id="problem" class="py-16 bg-white/80">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 rounded-full bg-red-100 text-red-600 grid place-items-center"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          <h2 class="text-3xl font-bold text-slate-900">The Problem: 4 Pillars of Exclusion</h2>
+        </div>
+        <div class="grid md:grid-cols-4 gap-6">
+          <div class="p-5 rounded-2xl bg-gradient-to-br from-red-50 to-white border border-red-100 shadow-sm" data-aos="fade-up" data-aos-delay="50">
+            <p class="text-sm font-semibold text-red-600 mb-2">Digital Complexity</p>
+            <p class="text-slate-600 text-sm">Too many separate government apps; onboarding is confusing.</p>
+          </div>
+          <div class="p-5 rounded-2xl bg-gradient-to-br from-yellow-50 to-white border border-yellow-100 shadow-sm" data-aos="fade-up" data-aos-delay="100">
+            <p class="text-sm font-semibold text-yellow-600 mb-2">Sensory Exclusion</p>
+            <p class="text-slate-600 text-sm">Weak support for visually/hearing-impaired; limited VoiceOver.</p>
+          </div>
+          <div class="p-5 rounded-2xl bg-gradient-to-br from-blue-50 to-white border border-blue-100 shadow-sm" data-aos="fade-up" data-aos-delay="150">
+            <p class="text-sm font-semibold text-blue-600 mb-2">Geographic Divide</p>
+            <p class="text-slate-600 text-sm">Low-bandwidth areas struggle; offline access is missing.</p>
+          </div>
+          <div class="p-5 rounded-2xl bg-gradient-to-br from-slate-50 to-white border border-slate-200 shadow-sm" data-aos="fade-up" data-aos-delay="200">
+            <p class="text-sm font-semibold text-slate-700 mb-2">Data Fragmentation</p>
+            <p class="text-slate-600 text-sm">ICs cannot sync health data nationwide across clinics/hospitals.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Solution -->
+    <section id="solution" class="py-16">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 rounded-full bg-green-100 text-green-600 grid place-items-center"><i class="fa-solid fa-lightbulb"></i></div>
+          <h2 class="text-3xl font-bold text-slate-900">Solution: MyHealth Super-App</h2>
+        </div>
+        <div class="grid md:grid-cols-3 gap-6">
+          <div class="p-6 rounded-2xl bg-white shadow-lg border border-white/60" data-aos="zoom-in" data-aos-delay="50">
+            <p class="text-brand-700 font-semibold">Unified App</p>
+            <p class="mt-2 text-sm text-slate-600">Combine MySejahtera + MyUbat; single login, single dashboard.</p>
+          </div>
+          <div class="p-6 rounded-2xl bg-white shadow-lg border border-white/60" data-aos="zoom-in" data-aos-delay="100">
+            <p class="text-brand-700 font-semibold">Adaptive Modes</p>
+            <p class="mt-2 text-sm text-slate-600">Elderly (VoiceOver, large text), Normal, Rural (offline + SMS).</p>
+          </div>
+          <div class="p-6 rounded-2xl bg-white shadow-lg border border-white/60" data-aos="zoom-in" data-aos-delay="150">
+            <p class="text-brand-700 font-semibold">Future IC Sync</p>
+            <p class="mt-2 text-sm text-slate-600">Nationwide health record spine linked to IC for verified data.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Modes -->
+    <section id="modes" class="py-16 bg-gradient-to-b from-secondary via-white to-primary/25">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 rounded-full bg-brand-100 text-brand-600 grid place-items-center"><i class="fa-solid fa-sliders"></i></div>
+          <h2 class="text-3xl font-bold text-slate-900">Adaptive Modes</h2>
+        </div>
+        <div class="grid md:grid-cols-3 gap-6">
+          <div class="p-6 rounded-2xl bg-white shadow-lg border border-brand-100" data-aos="fade-up" data-aos-delay="50">
+            <p class="text-lg font-semibold text-brand-700">Elderly / Easy Mode</p>
+            <ul class="mt-3 space-y-2 text-sm text-slate-600">
+              <li>• Full VoiceOver & screen-reader support</li>
+              <li>• Large tap targets and simplified flows</li>
+              <li>• High-contrast, dyslexia-friendly palette</li>
+            </ul>
+          </div>
+          <div class="p-6 rounded-2xl bg-white shadow-lg border border-slate-100" data-aos="fade-up" data-aos-delay="100">
+            <p class="text-lg font-semibold text-slate-800">Normal Mode</p>
+            <ul class="mt-3 space-y-2 text-sm text-slate-600">
+              <li>• Fast navigation, unified records</li>
+              <li>• Appointment + refill flows in 2 taps</li>
+              <li>• Personalized reminders and alerts</li>
+            </ul>
+          </div>
+          <div class="p-6 rounded-2xl bg-white shadow-lg border border-brand-200" data-aos="fade-up" data-aos-delay="150">
+            <p class="text-lg font-semibold text-brand-800">Rural Mode</p>
+            <ul class="mt-3 space-y-2 text-sm text-slate-600">
+              <li>• Offline caching + low-bandwidth assets</li>
+              <li>• SMS fallback for critical reminders</li>
+              <li>• Optimized for intermittent connectivity</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section id="features" class="py-16">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 rounded-full bg-purple-100 text-purple-600 grid place-items-center"><i class="fa-solid fa-star"></i></div>
+          <h2 class="text-3xl font-bold text-slate-900">Core Features</h2>
+        </div>
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="p-6 rounded-2xl bg-white shadow-md border border-white/60" data-aos="fade-right">
+            <p class="text-brand-700 font-semibold">Appointment Manager</p>
+            <p class="mt-2 text-sm text-slate-600">Book, reschedule, and manage government clinic/hospital visits.</p>
+          </div>
+          <div class="p-6 rounded-2xl bg-white shadow-md border border-white/60" data-aos="fade-left">
+            <p class="text-brand-700 font-semibold">Medication & Refill</p>
+            <p class="mt-2 text-sm text-slate-600">Automated reminders and one-tap refill requests.</p>
+          </div>
+          <div class="p-6 rounded-2xl bg-white shadow-md border border-white/60" data-aos="fade-right">
+            <p class="text-brand-700 font-semibold">Health Record Hub</p>
+            <p class="mt-2 text-sm text-slate-600">Centralized access to labs, visits, and immunizations.</p>
+          </div>
+          <div class="p-6 rounded-2xl bg-white shadow-md border border-white/60" data-aos="fade-left">
+            <p class="text-brand-700 font-semibold">Integrated Transport</p>
+            <p class="mt-2 text-sm text-slate-600">Book non-emergency medical transport directly.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Target Users -->
+    <section id="target" class="py-16 bg-white/70">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 rounded-full bg-orange-100 text-orange-600 grid place-items-center"><i class="fa-solid fa-users"></i></div>
+          <h2 class="text-3xl font-bold text-slate-900">Target Users</h2>
+        </div>
+        <div class="grid md:grid-cols-4 gap-6 text-center">
+          <div class="p-6 rounded-2xl bg-white shadow border border-white/70" data-aos="zoom-in">
+            <i class="fa-solid fa-universal-access text-3xl text-brand-600 mb-3"></i>
+            <p class="font-semibold text-slate-800">Disabled Persons</p>
+            <p class="text-sm text-slate-600">Full accessibility + screen readers.</p>
+          </div>
+          <div class="p-6 rounded-2xl bg-white shadow border border-white/70" data-aos="zoom-in" data-aos-delay="50">
+            <i class="fa-solid fa-blind text-3xl text-brand-600 mb-3"></i>
+            <p class="font-semibold text-slate-800">Elderly</p>
+            <p class="text-sm text-slate-600">VoiceOver, large text, minimal taps.</p>
+          </div>
+          <div class="p-6 rounded-2xl bg-white shadow border border-white/70" data-aos="zoom-in" data-aos-delay="100">
+            <i class="fa-solid fa-tractor text-3xl text-brand-600 mb-3"></i>
+            <p class="font-semibold text-slate-800">Rural Communities</p>
+            <p class="text-sm text-slate-600">Low bandwidth + offline + SMS.</p>
+          </div>
+          <div class="p-6 rounded-2xl bg-white shadow border border-white/70" data-aos="zoom-in" data-aos-delay="150">
+            <i class="fa-solid fa-user text-3xl text-brand-600 mb-3"></i>
+            <p class="font-semibold text-slate-800">Normal Users</p>
+            <p class="text-sm text-slate-600">Efficiency and a single source of truth.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tech Stack / Architecture -->
+    <section id="tech" class="py-16">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 grid place-items-center"><i class="fa-solid fa-diagram-project"></i></div>
+          <h2 class="text-3xl font-bold text-slate-900">Tech Stack & Architecture</h2>
+        </div>
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="p-6 rounded-2xl bg-white shadow border border-white/70" data-aos="fade-right">
+            <p class="text-brand-700 font-semibold mb-2">Frontend & Deployment</p>
+            <ul class="space-y-2 text-sm text-slate-600">
+              <li>• React (component-based, accessible UI)</li>
+              <li>• Tailwind CSS + AOS for rapid animations</li>
+              <li>• Vercel (fast static/SSR deploy) or GitHub Pages (static)</li>
+            </ul>
+          </div>
+          <div class="p-6 rounded-2xl bg-white shadow border border-white/70" data-aos="fade-left">
+            <p class="text-brand-700 font-semibold mb-2">Backend & Data</p>
+            <ul class="space-y-2 text-sm text-slate-600">
+              <li>• Python FastAPI for secure, high-perf APIs</li>
+              <li>• PostgreSQL for health records & audit trails</li>
+              <li>• API Gateway for future IC-to-cloud sync</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Innovation / Comparison -->
+    <section id="comparison" class="py-16 bg-gradient-to-r from-brand-800 via-brand-700 to-brand-800 text-white">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 rounded-full bg-white/10 grid place-items-center"><i class="fa-solid fa-bolt"></i></div>
+          <h2 class="text-3xl font-bold">Innovation vs Current Apps</h2>
+        </div>
+        <div class="grid md:grid-cols-3 gap-6">
+          <div class="p-5 rounded-2xl bg-white/10 border border-white/15" data-aos="fade-up" data-aos-delay="50">
+            <p class="text-white font-semibold mb-2">VoiceOver everywhere</p>
+            <p class="text-sm text-white/80">WCAG-friendly; full screen-reader coverage vs partial support today.</p>
+          </div>
+          <div class="p-5 rounded-2xl bg-white/10 border border-white/15" data-aos="fade-up" data-aos-delay="100">
+            <p class="text-white font-semibold mb-2">Offline & SMS</p>
+            <p class="text-sm text-white/80">Critical reminders and bookings even with spotty connectivity.</p>
+          </div>
+          <div class="p-5 rounded-2xl bg-white/10 border border-white/15" data-aos="fade-up" data-aos-delay="150">
+            <p class="text-white font-semibold mb-2">IC-linked health spine</p>
+            <p class="text-sm text-white/80">Future-proof sync across clinics/hospitals with verified identity.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section id="cta" class="py-16">
+      <div class="max-w-5xl mx-auto px-6 text-center bg-white rounded-3xl shadow-2xl border border-white/70" data-aos="zoom-in">
+        <p class="text-sm font-semibold text-brand-600 uppercase tracking-wide">Hackathon Pitch Ready</p>
+        <h3 class="mt-3 text-3xl font-bold text-slate-900">Let’s launch Malaysia’s inclusive health super-app.</h3>
+        <p class="mt-3 text-slate-600">
+          Built for elderly, rural communities, and persons with disabilities—without leaving anyone behind.
+        </p>
+        <div class="mt-6 flex flex-wrap justify-center gap-3">
+          <a href="#solution" class="px-5 py-3 rounded-full bg-brand-600 text-white font-semibold shadow-lg shadow-brand-500/20 hover:bg-brand-500 transition">View Solution</a>
+          <a href="mailto:team@myhealth.gov" class="px-5 py-3 rounded-full bg-white text-brand-700 font-semibold border border-brand-100 hover:border-brand-300 transition">Contact Team</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-10 text-center text-sm text-slate-500 bg-white/80 border-t border-white/60">
+      <p>&copy; 2025 MyHealth | Inclusive Digital Health Spine</p>
+    </footer>
+  </div>
+
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    AOS.init({ duration: 900, once: true, offset: 80 });
+  </script>
+</body>
+</html>
+
