@@ -33,7 +33,7 @@ const SignUpStep1: React.FC = () => {
         setTimeout(() => {
             const mockResult = {
                 fullName: "TAN SENG HONG",
-                icNumber: "990101-14-5678",
+                icNumber: "060101-14-5678",
                 address: "N277 JALAN PERKASA 1 TAMAN MALURI, 55100, KUALA LUMPUR"
             };
 

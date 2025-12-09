@@ -310,7 +310,7 @@ const SignIn: React.FC = () => {
                             label={t.icLabel}
                             value={icNumber}
                             onChange={handleIcNumberChange}
-                            placeholder="990101145678"
+                            placeholder="060101145678"
                             fullWidth
                             inputProps={{
                                 maxLength: 12,

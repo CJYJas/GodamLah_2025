@@ -72,7 +72,7 @@ load_db()
 def initialize_test_user():
     """Create a test user if database is empty"""
     if len(users_db) == 0:
-        test_user_id = "990101145678"
+        test_user_id = "060101145678"
         test_user = {
             "full_name": "TAN SENG HONG",
             "ic_number": test_user_id,
@@ -108,7 +108,7 @@ def debug_users():
 @app.post("/debug/create-test-user")
 def create_test_user():
     """Create a test user for login testing"""
-    test_user_id = "990101145678"
+    test_user_id = "060101145678"
     test_user = {
         "full_name": "TAN SENG HONG",
         "ic_number": test_user_id,
