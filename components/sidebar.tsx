@@ -30,7 +30,7 @@ import {
   Activity,
   Pill,
   Mountain,
-  Switch,
+  Twitch,
 } from "lucide-react"
 
 type SidebarView =
@@ -64,7 +64,7 @@ export function Sidebar({ isOpen, onClose, onLogout }: SidebarProps) {
     phoneNumber: "+60 12-345 6789",
     email: "ahmad.hassan@email.com",
     dateOfBirth: "12 June 1985",
-    address: "123 Jalan Bukit Bintang, 55100 Kuala Lumpur",
+    address: "No. 12, Rumah Panjang Meranti Kampung Meranti, Siburan 94200, Serian Sarawak",
     emergencyContact: "+60 12-987 6543",
   })
 

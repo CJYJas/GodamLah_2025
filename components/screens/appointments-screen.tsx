@@ -1,110 +1,144 @@
 "use client"
 
+import type React from "react"
+
 import { useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Calendar, Clock, MapPin, Plus, ChevronLeft, ChevronRight, Building2, Check } from "lucide-react"
+import {
+  Calendar,
+  Clock,
+  MapPin,
+  ChevronRight,
+  Plus,
+  Check,
+  X,
+  ChevronLeft,
+  Building2,
+  Stethoscope,
+  FlaskConical,
+  ScanLine,
+  Syringe,
+  PersonStanding,
+  Cross,
+  Bell,
+} from "lucide-react"
+import {
+  useAppointments,
+  availableDates,
+  availableTimeSlotsPerDate,
+  allTimeSlots,
+  appointmentCategories,
+} from "@/contexts/appointments-context"
 
-const initialAppointments = [
-  {
-    id: 1,
-    type: "General Checkup",
-    doctor: "Dr. Tan Wei Ming",
-    specialty: "General Practitioner",
-    date: "Dec 15, 2025",
-    time: "9:00 AM",
-    location: "HUKM",
-    status: "confirmed",
-  },
-  {
-    id: 2,
-    type: "Blood Test",
-    doctor: "Lab Services",
-    specialty: "Pathology",
-    date: "Dec 18, 2025",
-    time: "7:30 AM",
-    location: "Hospital Kuala Lumpur",
-    status: "pending",
-  },
-  {
-    id: 3,
-    type: "Follow-up",
-    doctor: "Dr. Nur Aisyah",
-    specialty: "Endocrinologist",
-    date: "Dec 22, 2025",
-    time: "2:00 PM",
-    location: "PPUM",
-    status: "confirmed",
-  },
-]
+const hospitals = ["HUKM", "Hospital Kuala Lumpur", "PPUM", "Hospital Selayang", "Klinik Kesihatan Ampang"]
 
-const pastAppointments = [
-  {
-    id: 4,
-    type: "Eye Checkup",
-    doctor: "Dr. Lim Mei Ling",
-    specialty: "Ophthalmologist",
-    date: "Nov 20, 2025",
-    time: "10:00 AM",
-    location: "HUKM",
-    status: "completed",
-  },
-  {
-    id: 5,
-    type: "Diabetes Review",
-    doctor: "Dr. Nur Aisyah",
-    specialty: "Endocrinologist",
-    date: "Oct 15, 2025",
-    time: "2:30 PM",
-    location: "PPUM",
-    status: "completed",
-  },
-]
-
-const cancelledAppointments = [
-  {
-    id: 6,
-    type: "Dental Checkup",
-    doctor: "Dr. Ahmad Faiz",
-    specialty: "Dentist",
-    date: "Nov 5, 2025",
-    time: "3:00 PM",
-    location: "Klinik Kesihatan Ampang",
-    status: "cancelled",
-  },
-]
-
-const hospitals = ["Hospital Kuala Lumpur", "HUKM", "PPUM", "Hospital Putrajaya", "Hospital Selayang"]
+const categoryIcons: { [key: string]: React.ComponentType<{ className?: string }> } = {
+  general: Stethoscope,
+  specialist: Cross,
+  laboratory: FlaskConical,
+  imaging: ScanLine,
+  dental: Cross,
+  physiotherapy: PersonStanding,
+  vaccination: Syringe,
+}
 
 export function AppointmentsScreen() {
+  const {
+    appointments,
+    cancelledAppointments,
+    pastAppointments,
+    addAppointment,
+    cancelAppointment,
+    rescheduleAppointment,
+  } = useAppointments()
+
   const [showBooking, setShowBooking] = useState(false)
   const [selectedHospital, setSelectedHospital] = useState("")
   const [selectedDate, setSelectedDate] = useState("")
   const [selectedTime, setSelectedTime] = useState("")
-  const [currentMonth, setCurrentMonth] = useState(0) // 0 = Dec 2025, 1 = Jan 2026
+  const [selectedCategory, setSelectedCategory] = useState("")
+  const [currentMonth, setCurrentMonth] = useState(0)
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [activeTab, setActiveTab] = useState<"upcoming" | "past" | "cancelled">("upcoming")
-  const [appointments, setAppointments] = useState(initialAppointments)
-  const [rescheduleId, setRescheduleId] = useState<number | null>(null)
   const [showCancelConfirm, setShowCancelConfirm] = useState<number | null>(null)
-  const [showReschedule, setShowReschedule] = useState(false) 
-  const [appointmentToReschedule, setAppointmentToReschedule] = useState<Appointment | null>(null)
-  const [showRescheduleConfirmation, setShowRescheduleConfirmation] = useState(false)
+  const [showReschedule, setShowReschedule] = useState(false)
+  const [appointmentToReschedule, setAppointmentToReschedule] = useState<(typeof appointments)[0] | null>(null)
+  const [showRescheduleSuccess, setShowRescheduleSuccess] = useState(false)
+  const [rescheduledDetails, setRescheduledDetails] = useState({ date: "", time: "", type: "" })
 
   const months = [
-    { name: "December 2025", days: 31, startDay: 1, availableDates: [9, 10, 11, 15, 16, 17, 18, 22, 23, 24, 29, 30] },
-    { name: "January 2026", days: 31, startDay: 4, availableDates: [6, 7, 8, 13, 14, 15, 20, 21, 22, 27, 28, 29] },
+    { name: "December 2025", key: "Dec 2025", days: 31, startDay: 1 },
+    { name: "January 2026", key: "Jan 2026", days: 31, startDay: 4 },
   ]
 
-  const timeSlots = ["8:00 AM", "9:00 AM", "10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"]
+  const currentMonthData = months[currentMonth]
+  const monthAvailableDates = availableDates[currentMonthData.key] || []
 
-  const handleCancel = (id: number) => {
-    setAppointments(appointments.filter((apt) => apt.id !== id))
+  const handleCancelAppointment = (id: number) => {
+    cancelAppointment(id)
     setShowCancelConfirm(null)
   }
 
+  const handleOpenReschedule = (apt: (typeof appointments)[0]) => {
+    setAppointmentToReschedule(apt)
+    setSelectedDate("")
+    setSelectedTime("")
+    setShowReschedule(true)
+  }
+
+  const handleDateSelect = (dateStr: string) => {
+    setSelectedDate(dateStr)
+    setSelectedTime("") // Reset time when date changes
+  }
+
+  if (showRescheduleSuccess) {
+    return (
+      <div className="p-4 space-y-6 flex flex-col items-center text-center h-full">
+        <div className="mt-16 space-y-3">
+          <div className="w-18 h-18 rounded-full bg-accent text-accent-foreground flex items-center justify-center mx-auto shadow-lg">
+            <Bell className="w-8 h-8" />
+          </div>
+          <h1 className="text-2xl font-extrabold text-foreground tracking-tight">Reschedule Request Sent</h1>
+          <p className="text-base text-muted-foreground max-w-sm mx-auto">
+            Your request has been submitted. We will notify you once the doctor confirms the new slot.
+          </p>
+        </div>
+
+        <Card className="p-4 w-full max-w-md text-left border-2 border-primary/20 shadow-md">
+          <h3 className="text-lg font-bold mb-3 text-primary">Request Details</h3>
+          <div className="text-sm space-y-2">
+            <div className="flex justify-between items-center pb-2 border-b border-border/70">
+              <span className="font-medium text-foreground">Appointment:</span>
+              <span className="text-muted-foreground text-right">{rescheduledDetails.type}</span>
+            </div>
+            <div className="flex justify-between items-center py-1">
+              <span className="font-medium text-foreground">New Date:</span>
+              <span className="font-semibold text-primary">{rescheduledDetails.date}</span>
+            </div>
+            <div className="flex justify-between items-center pt-1">
+              <span className="font-medium text-foreground">New Time:</span>
+              <span className="font-semibold text-primary">{rescheduledDetails.time}</span>
+            </div>
+          </div>
+        </Card>
+
+        <Button
+          className="w-full max-w-md mt-10"
+          onClick={() => {
+            setShowRescheduleSuccess(false)
+            setRescheduledDetails({ date: "", time: "", type: "" })
+          }}
+        >
+          Back to Appointments
+        </Button>
+      </div>
+    )
+  }
+
   if (showConfirmation) {
+    const categoryName = appointmentCategories.find((c) => c.id === selectedCategory)?.name || "General"
     return (
       <div className="p-4 space-y-5">
         <div className="flex flex-col items-center justify-center py-8">
@@ -118,6 +152,10 @@ export function AppointmentsScreen() {
 
           <Card className="p-4 w-full mb-6">
             <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Category</span>
+                <span className="font-medium">{categoryName}</span>
+              </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Hospital</span>
                 <span className="font-medium">{selectedHospital}</span>
@@ -136,11 +174,24 @@ export function AppointmentsScreen() {
           <Button
             className="w-full"
             onClick={() => {
+              addAppointment({
+                id: Date.now(),
+                type: categoryName,
+                category: selectedCategory,
+                doctor: "To be assigned",
+                specialty: categoryName,
+                date: selectedDate,
+                time: selectedTime,
+                location: selectedHospital,
+                status: "pending",
+                hasTransport: false,
+              })
               setShowConfirmation(false)
               setShowBooking(false)
               setSelectedHospital("")
               setSelectedDate("")
               setSelectedTime("")
+              setSelectedCategory("")
             }}
           >
             Done
@@ -150,190 +201,203 @@ export function AppointmentsScreen() {
     )
   }
 
-  if (showReschedule) {
-    if (!appointmentToReschedule) {
-         // Fallback if state is missing
-         return <div className="p-4">Error: Appointment details missing for rescheduling.</div>
-    }
-
-    const availableDates = [16, 17, 18, 19, 20, 22, 23]
-    const timeSlots = ["8:00 AM", "9:00 AM", "10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM"]
-
-    return (
-        <div className="p-4 space-y-5">
-            <header className="flex items-center gap-3">
-                <button
-                    onClick={() => setShowReschedule(false)} // Go back to the appointment list
-                    className="p-2 -ml-2 rounded-full hover:bg-secondary transition-colors"
-                >
-                    <ChevronLeft className="w-5 h-5" /> 
-                </button>
-                <h1 className="text-lg font-semibold">
-                    Reschedule: {appointmentToReschedule.type}
-                </h1>
-            </header>
-
-            {/* Current Appointment Details Card */}
-            <Card className="p-3 bg-secondary/50">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                        <Calendar className="w-5 h-5 text-primary" />
-                    </div>
-                    <div>
-                        <p className="font-medium text-sm">{appointmentToReschedule.type}</p>
-                        <p className="text-xs text-muted-foreground">
-                            Currently: {appointmentToReschedule.date}, {appointmentToReschedule.time} at {appointmentToReschedule.location}
-                        </p>
-                    </div>
-                </div>
-            </Card>
-
-            <section>
-                <h2 className="text-sm font-medium text-muted-foreground mb-3">Select New Date</h2>
-                <div className="grid grid-cols-4 gap-2">
-                    {availableDates.map((date) => (
-                        <Button
-                            key={date}
-                            variant={selectedDate === `Dec ${date}` ? "default" : "outline"}
-                            size="sm"
-                            className={selectedDate === `Dec ${date}` ? "" : "bg-transparent"}
-                            onClick={() => setSelectedDate(`Dec ${date}`)}
-                        >
-                            Dec {date}
-                        </Button>
-                    ))}
-                </div>
-            </section>
-
-            <section>
-                <h2 className="text-sm font-medium text-muted-foreground mb-3">Select New Time</h2>
-                <div className="grid grid-cols-3 gap-2">
-                    {timeSlots.map((time) => (
-                        <Button
-                            key={time}
-                            variant={selectedTime === time ? "default" : "outline"}
-                            size="sm"
-                            className={selectedTime === time ? "" : "bg-transparent"}
-                            onClick={() => setSelectedTime(time)}
-                        >
-                            {time}
-                        </Button>
-                    ))}
-                </div>
-            </section>
-
-            <Button
-                className="w-full"
-                disabled={!selectedDate || !selectedTime}
-                onClick={() => {
-                    // Update the main appointments list with the new date/time (Simulated API call)
-                    const updatedAppointments = appointments.map(apt => 
-                        apt.id === appointmentToReschedule.id 
-                        ? { ...apt, date: selectedDate, time: selectedTime, status: 'pending' } // Set status to pending confirmation
-                        : apt
-                    );
-                    setAppointments(updatedAppointments);
-
-                    // Clear state and return to list view
-                    setShowReschedule(false)
-                    setAppointmentToReschedule(null)
-                    setSelectedDate("")
-                    setSelectedTime("")
-                    setShowConfirmation(true);
-                    
-                    // You might want a dedicated Reschedule Confirmation screen here, 
-                    // but for now, we'll just show the main list.
-                }}
-            >
-                Confirm Reschedule
-            </Button>
-        </div>
-    )
-  }
-
-  if (showConfirmation) {
-    return (
-      <div className="p-4 space-y-6 flex flex-col items-center text-center h-full">
-      
-        {/* 🚀 VISUAL SUCCESS HEADER */}
-        <div className="mt-16 space-y-3">
-          {/* Animated Icon Container (Use accent color for a success feel) */}
-          <div className="w-18 h-18 rounded-full bg-accent text-accent-foreground flex items-center justify-center mx-auto shadow-lg">
-            {/* Using Bell icon to represent notification/confirmation, or Calendar for appointment */}
-            <Bell className="w-8 h-8" /> 
-          </div>
-        
-          {/* Title: Stronger Font Weight */}
-          <h1 className="text-2xl font-extrabold text-foreground tracking-tight">
-            Reschedule Request Sent
-          </h1>
-          {/* Message: Slightly larger and centered */}
-          <p className="text-base text-muted-foreground max-w-sm mx-auto">
-            Your request has been submitted. We will notify you once the doctor confirms the new slot.
-          </p>
-        </div>
-
-        {/* 📝 CONFIRMATION DETAILS CARD */}
-        <Card className="p-4 w-full max-w-md text-left border-2 border-primary/20 shadow-md">
-          <h3 className="text-lg font-bold mb-3 text-primary">Request Details</h3> 
-        
-          <div className="text-sm space-y-2">
-          
-            {/* Appointment Type & Doctor */}
-            <div className="flex justify-between items-center pb-2 border-b border-border/70">
-              <span className="font-medium text-foreground">Appointment:</span>
-              <span className="text-muted-foreground text-right"> Dr. Tan Wei Ming</span>
-            </div>
-
-            {/* New Date */}
-            <div className="flex justify-between items-center py-1">
-              <span className="font-medium text-foreground">New Date:</span>
-              <span className="font-semibold text-primary">{selectedDate}</span>
-            </div>
-          
-            {/* New Time */}
-            <div className="flex justify-between items-center pt-1">
-              <span className="font-medium text-foreground">New Time:</span>
-              <span className="font-semibold text-primary">{selectedTime}</span>
-            </div>
-          
-          </div>
-        </Card>
-
-        {/* 🏠 BUTTON */}
-        <Button
-          className="w-full max-w-md mt-10" // Added margin top for spacing
-          onClick={() => {
-            setShowConfirmation(false)
-            setSelectedDate("") 
-            setSelectedTime("")
-            onNavigate("home")
-          }}
-        >
-          Back to Home
-        </Button>
-      </div>
-    )
-  }
-
-  if (showBooking) {
-    const isRescheduling = rescheduleId !== null
+  if (showReschedule && appointmentToReschedule) {
     const currentMonthData = months[currentMonth]
+    const monthAvailableDates = availableDates[currentMonthData.key] || []
+    const availableTimesForDate = selectedDate ? availableTimeSlotsPerDate[selectedDate] || [] : []
 
     return (
       <div className="p-4 space-y-5">
         <header className="flex items-center gap-3">
           <button
             onClick={() => {
-              setShowBooking(false)
-              setRescheduleId(null)
+              setShowReschedule(false)
+              setAppointmentToReschedule(null)
+              setSelectedDate("")
+              setSelectedTime("")
             }}
             className="p-2 -ml-2 rounded-full hover:bg-secondary transition-colors"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-lg font-semibold">{isRescheduling ? "Reschedule Appointment" : "Book Appointment"}</h1>
+          <h1 className="text-lg font-semibold">Reschedule: {appointmentToReschedule.type}</h1>
         </header>
+
+        <Card className="p-3 bg-secondary/50">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+              <Calendar className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <p className="font-medium text-sm">{appointmentToReschedule.type}</p>
+              <p className="text-xs text-muted-foreground">
+                Currently: {appointmentToReschedule.date}, {appointmentToReschedule.time} at{" "}
+                {appointmentToReschedule.location}
+              </p>
+            </div>
+          </div>
+        </Card>
+
+        {/* Calendar with only available dates */}
+        <section>
+          <h2 className="text-sm font-medium text-muted-foreground mb-3">Select New Date</h2>
+          <Card className="p-4">
+            <div className="flex items-center justify-between mb-4">
+              <button
+                className="p-1 rounded hover:bg-secondary disabled:opacity-50"
+                onClick={() => setCurrentMonth(0)}
+                disabled={currentMonth === 0}
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <span className="font-medium">{currentMonthData.name}</span>
+              <button
+                className="p-1 rounded hover:bg-secondary disabled:opacity-50"
+                onClick={() => setCurrentMonth(1)}
+                disabled={currentMonth === 1}
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="grid grid-cols-7 gap-1 text-center text-xs">
+              {["S", "M", "T", "W", "T", "F", "S"].map((day, i) => (
+                <div key={i} className="text-muted-foreground py-2">
+                  {day}
+                </div>
+              ))}
+              {Array.from({ length: currentMonthData.startDay }, (_, i) => (
+                <div key={`empty-${i}`} className="py-2" />
+              ))}
+              {Array.from({ length: currentMonthData.days }, (_, i) => i + 1).map((date) => {
+                const isAvailable = monthAvailableDates.includes(date)
+                const dateStr = `${currentMonth === 0 ? "Dec" : "Jan"} ${date}, ${currentMonth === 0 ? "2025" : "2026"}`
+                const isSelected = selectedDate === dateStr
+
+                return (
+                  <button
+                    key={date}
+                    onClick={() => isAvailable && handleDateSelect(dateStr)}
+                    disabled={!isAvailable}
+                    className={`py-2 rounded-lg transition-colors ${
+                      isSelected
+                        ? "bg-primary text-primary-foreground"
+                        : isAvailable
+                          ? "hover:bg-secondary"
+                          : "text-muted-foreground/30 cursor-not-allowed"
+                    }`}
+                  >
+                    {date}
+                  </button>
+                )
+              })}
+            </div>
+            <div className="flex items-center gap-4 mt-3 text-xs text-muted-foreground">
+              <span className="flex items-center gap-1">
+                <div className="w-3 h-3 rounded bg-primary" /> Available
+              </span>
+              <span className="flex items-center gap-1">
+                <div className="w-3 h-3 rounded bg-muted" /> Unavailable
+              </span>
+            </div>
+          </Card>
+        </section>
+
+        <section>
+          <h2 className="text-sm font-medium text-muted-foreground mb-3">Select New Time</h2>
+          <div className="grid grid-cols-3 gap-2">
+            {allTimeSlots.map((time) => {
+              const isAvailable = availableTimesForDate.includes(time)
+              return (
+                <Button
+                  key={time}
+                  variant={selectedTime === time ? "default" : "outline"}
+                  size="sm"
+                  className={
+                    selectedTime === time
+                      ? ""
+                      : isAvailable
+                        ? "bg-transparent"
+                        : "bg-transparent opacity-40 cursor-not-allowed"
+                  }
+                  onClick={() => isAvailable && setSelectedTime(time)}
+                  disabled={!isAvailable}
+                >
+                  {time}
+                </Button>
+              )
+            })}
+          </div>
+          {!selectedDate && (
+            <p className="text-xs text-muted-foreground mt-2">Please select a date first to see available times</p>
+          )}
+        </section>
+
+        <Button
+          className="w-full"
+          disabled={!selectedDate || !selectedTime}
+          onClick={() => {
+            rescheduleAppointment(appointmentToReschedule.id, selectedDate, selectedTime)
+            setRescheduledDetails({
+              date: selectedDate,
+              time: selectedTime,
+              type: appointmentToReschedule.type,
+            })
+            setShowReschedule(false)
+            setAppointmentToReschedule(null)
+            setSelectedDate("")
+            setSelectedTime("")
+            setShowRescheduleSuccess(true)
+          }}
+        >
+          Confirm Reschedule
+        </Button>
+      </div>
+    )
+  }
+
+  if (showBooking) {
+    const currentMonthData = months[currentMonth]
+    const monthAvailableDates = availableDates[currentMonthData.key] || []
+    const availableTimesForDate = selectedDate ? availableTimeSlotsPerDate[selectedDate] || [] : []
+
+    return (
+      <div className="p-4 space-y-5">
+        <header className="flex items-center gap-3">
+          <button
+            onClick={() => setShowBooking(false)}
+            className="p-2 -ml-2 rounded-full hover:bg-secondary transition-colors"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <h1 className="text-lg font-semibold">Book Appointment</h1>
+        </header>
+
+        {/* Category Selection */}
+        <section>
+          <h2 className="text-sm font-medium text-muted-foreground mb-3">Select Category</h2>
+          <div className="grid grid-cols-2 gap-2">
+            {appointmentCategories.map((cat) => {
+              const IconComponent = categoryIcons[cat.id] || Stethoscope
+              return (
+                <Card
+                  key={cat.id}
+                  className={`p-3 cursor-pointer transition-all ${
+                    selectedCategory === cat.id ? "border-primary bg-primary/5" : "hover:bg-secondary"
+                  }`}
+                  onClick={() => setSelectedCategory(cat.id)}
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                      <IconComponent className="w-4 h-4 text-primary" />
+                    </div>
+                    <span className="text-xs font-medium">{cat.name}</span>
+                    {selectedCategory === cat.id && <Check className="w-3 h-3 text-primary ml-auto" />}
+                  </div>
+                </Card>
+              )
+            })}
+          </div>
+        </section>
 
         {/* Hospital Selection */}
         <section>
@@ -351,7 +415,7 @@ export function AppointmentsScreen() {
                   <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                     <Building2 className="w-5 h-5 text-primary" />
                   </div>
-                  <span className="text-sm font-medium">{hospital}</span>
+                  <span className="font-medium text-sm">{hospital}</span>
                   {selectedHospital === hospital && <Check className="w-4 h-4 text-primary ml-auto" />}
                 </div>
               </Card>
@@ -359,6 +423,7 @@ export function AppointmentsScreen() {
           </div>
         </section>
 
+        {/* Calendar with only available dates */}
         <section>
           <h2 className="text-sm font-medium text-muted-foreground mb-3">Select Date</h2>
           <Card className="p-4">
@@ -385,19 +450,18 @@ export function AppointmentsScreen() {
                   {day}
                 </div>
               ))}
-              {/* Empty cells for start day offset */}
               {Array.from({ length: currentMonthData.startDay }, (_, i) => (
                 <div key={`empty-${i}`} className="py-2" />
               ))}
               {Array.from({ length: currentMonthData.days }, (_, i) => i + 1).map((date) => {
-                const isAvailable = currentMonthData.availableDates.includes(date)
-                const dateStr = `${currentMonth === 0 ? "Dec" : "Jan"} ${date}`
+                const isAvailable = monthAvailableDates.includes(date)
+                const dateStr = `${currentMonth === 0 ? "Dec" : "Jan"} ${date}, ${currentMonth === 0 ? "2025" : "2026"}`
                 const isSelected = selectedDate === dateStr
 
                 return (
                   <button
                     key={date}
-                    onClick={() => isAvailable && setSelectedDate(dateStr)}
+                    onClick={() => isAvailable && handleDateSelect(dateStr)}
                     disabled={!isAvailable}
                     className={`py-2 rounded-lg transition-colors ${
                       isSelected
@@ -426,23 +490,36 @@ export function AppointmentsScreen() {
         <section>
           <h2 className="text-sm font-medium text-muted-foreground mb-3">Available Time Slots</h2>
           <div className="grid grid-cols-3 gap-2">
-            {timeSlots.map((time) => (
-              <Button
-                key={time}
-                variant={selectedTime === time ? "default" : "outline"}
-                size="sm"
-                className={`text-xs ${selectedTime === time ? "" : "bg-transparent"}`}
-                onClick={() => setSelectedTime(time)}
-              >
-                {time}
-              </Button>
-            ))}
+            {allTimeSlots.map((time) => {
+              const isAvailable = availableTimesForDate.includes(time)
+              return (
+                <Button
+                  key={time}
+                  variant={selectedTime === time ? "default" : "outline"}
+                  size="sm"
+                  className={`text-xs ${
+                    selectedTime === time
+                      ? ""
+                      : isAvailable
+                        ? "bg-transparent"
+                        : "bg-transparent opacity-40 cursor-not-allowed"
+                  }`}
+                  onClick={() => isAvailable && setSelectedTime(time)}
+                  disabled={!isAvailable}
+                >
+                  {time}
+                </Button>
+              )
+            })}
           </div>
+          {!selectedDate && (
+            <p className="text-xs text-muted-foreground mt-2">Please select a date first to see available times</p>
+          )}
         </section>
 
         <Button
           className="w-full"
-          disabled={!selectedHospital || !selectedDate || !selectedTime}
+          disabled={!selectedCategory || !selectedHospital || !selectedDate || !selectedTime}
           onClick={() => setShowConfirmation(true)}
         >
           Confirm Booking
@@ -456,136 +533,130 @@ export function AppointmentsScreen() {
 
   return (
     <div className="p-4 space-y-5">
-      {/* Header */}
       <header className="flex items-center justify-between">
-        <h1 className="text-lg font-semibold">Appointments</h1>
+        <div>
+          <h1 className="text-lg font-semibold">Appointments</h1>
+          <p className="text-sm text-muted-foreground">Manage your appointments</p>
+        </div>
         <Button size="sm" onClick={() => setShowBooking(true)}>
           <Plus className="w-4 h-4 mr-1" /> Book
         </Button>
       </header>
 
+      {/* Tabs */}
       <div className="flex gap-2">
-        <Badge
-          variant={activeTab === "upcoming" ? "default" : "secondary"}
-          className="cursor-pointer"
-          onClick={() => setActiveTab("upcoming")}
-        >
-          Upcoming
-        </Badge>
-        <Badge
-          variant={activeTab === "past" ? "default" : "secondary"}
-          className="cursor-pointer"
-          onClick={() => setActiveTab("past")}
-        >
-          Past
-        </Badge>
-        <Badge
-          variant={activeTab === "cancelled" ? "default" : "secondary"}
-          className="cursor-pointer"
-          onClick={() => setActiveTab("cancelled")}
-        >
-          Cancelled
-        </Badge>
+        {(["upcoming", "past", "cancelled"] as const).map((tab) => (
+          <Button
+            key={tab}
+            size="sm"
+            variant={activeTab === tab ? "default" : "outline"}
+            className={activeTab !== tab ? "bg-transparent" : ""}
+            onClick={() => setActiveTab(tab)}
+          >
+            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+          </Button>
+        ))}
       </div>
 
       {/* Appointments List */}
       <div className="space-y-3">
         {displayedAppointments.length === 0 ? (
-          <Card className="p-6 text-center">
+          <Card className="p-8 text-center">
             <p className="text-muted-foreground">No {activeTab} appointments</p>
           </Card>
         ) : (
           displayedAppointments.map((apt) => (
             <Card key={apt.id} className="p-4">
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <h3 className="font-medium text-foreground">{apt.type}</h3>
-                  <p className="text-sm text-muted-foreground">{apt.doctor}</p>
-                  <p className="text-xs text-muted-foreground">{apt.specialty}</p>
+              <div className="flex items-start gap-3">
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Calendar className="w-6 h-6 text-primary" />
                 </div>
-                <Badge
-                  variant={
-                    apt.status === "confirmed" || apt.status === "completed"
-                      ? "default"
-                      : apt.status === "cancelled"
-                        ? "destructive"
-                        : "secondary"
-                  }
-                  className={
-                    apt.status === "confirmed" || apt.status === "completed" ? "bg-accent text-accent-foreground" : ""
-                  }
-                >
-                  {apt.status.charAt(0).toUpperCase() + apt.status.slice(1)}
-                </Badge>
-              </div>
-              <div className="flex items-center gap-4 text-xs text-muted-foreground mb-3">
-                <span className="flex items-center gap-1">
-                  <Calendar className="w-3 h-3" /> {apt.date}
-                </span>
-                <span className="flex items-center gap-1">
-                  <Clock className="w-3 h-3" /> {apt.time}
-                </span>
-                <span className="flex items-center gap-1">
-                  <MapPin className="w-3 h-3" /> {apt.location}
-                </span>
-              </div>
-              {activeTab === "upcoming" && (
-                <>
-                  {showCancelConfirm === apt.id ? (
-                    <div className="space-y-2">
-                      <p className="text-sm text-center text-muted-foreground">Cancel this appointment?</p>
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="flex-1 text-xs h-8 bg-transparent"
-                          onClick={() => setShowCancelConfirm(null)}
-                        >
-                          No, Keep
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          className="flex-1 text-xs h-8"
-                          onClick={() => handleCancel(apt.id)}
-                        >
-                          Yes, Cancel
-                        </Button>
-                      </div>
+                <div className="flex-1">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h3 className="font-medium">{apt.type}</h3>
+                      <p className="text-xs text-muted-foreground">{apt.doctor}</p>
                     </div>
-                  ) : (
-                    <div className="flex gap-2">
+                    <Badge
+                      variant={
+                        apt.status === "confirmed"
+                          ? "default"
+                          : apt.status === "completed"
+                            ? "default"
+                            : apt.status === "cancelled"
+                              ? "destructive"
+                              : apt.status === "pending reschedule"
+                                ? "outline"
+                                : "secondary"
+                      }
+                      className={
+                        apt.status === "confirmed"
+                          ? "bg-green-500 text-white"
+                          : apt.status === "completed"
+                            ? "bg-green-500 text-white"
+                            : apt.status === "pending reschedule"
+                              ? "bg-yellow-500/20 text-yellow-700 border-yellow-500"
+                              : ""
+                      }
+                    >
+                      {apt.status}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
+                    <span className="flex items-center gap-1">
+                      <Calendar className="w-3 h-3" /> {apt.date}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-3 h-3" /> {apt.time}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
+                    <MapPin className="w-3 h-3" /> {apt.location}
+                  </div>
+
+                  {activeTab === "upcoming" && apt.status !== "cancelled" && (
+                    <div className="flex gap-2 mt-3">
                       <Button
                         size="sm"
                         variant="outline"
-                        className="flex-1 text-xs h-8 bg-transparent"
-                        onClick={() => {
-                          const aptToReschedule = appointments.find(a => a.id === apt.id);
-                          if (aptToReschedule) {
-                          setAppointmentToReschedule(aptToReschedule); // Save the appointment data
-                          
-                        // Pre-fill the form fields with the current appointment's data
-                          setSelectedDate(aptToReschedule.date);
-                          setSelectedTime(aptToReschedule.time);
-        
-                          setShowReschedule(true); // Trigger the display
-                          }
-                        }}
+                        className="flex-1 bg-transparent"
+                        onClick={() => handleOpenReschedule(apt)}
                       >
                         Reschedule
                       </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="flex-1 text-xs h-8 text-destructive hover:bg-destructive hover:text-destructive-foreground bg-transparent"
-                        onClick={() => setShowCancelConfirm(apt.id)}
-                      >
-                        Cancel
-                      </Button>
+                      {showCancelConfirm === apt.id ? (
+                        <div className="flex gap-1 flex-1">
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            className="flex-1"
+                            onClick={() => handleCancelAppointment(apt.id)}
+                          >
+                            <Check className="w-3 h-3" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="flex-1 bg-transparent"
+                            onClick={() => setShowCancelConfirm(null)}
+                          >
+                            <X className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="flex-1 text-destructive border-destructive bg-transparent hover:bg-destructive/90"
+                          onClick={() => setShowCancelConfirm(apt.id)}
+                        >
+                          Cancel
+                        </Button>
+                      )}
                     </div>
                   )}
-                </>
-              )}
+                </div>
+              </div>
             </Card>
           ))
         )}
