@@ -27,34 +27,12 @@ const Home: React.FC = () => {
             }}
         >
             <HealthcareHeader 
-                title="HealthCare Pro"
-                subtitle={language === "bm" ? "Sistem Pengurusan Kesihatan Profesional" : "Professional Healthcare Management"}
+                title="MyHealth"
+                subtitle={language === "bm" 
+                    ? "Aplikasi penjagaan kesihatan kerajaan Malaysia yang menyeluruh dan inklusif."
+                    : "Malaysia's all-in-one, inclusive government healthcare app."
+                }
             />
-
-            {/* Welcome Message */}
-            <Box sx={{ 
-                textAlign: 'center', 
-                mb: { xs: 2.5, sm: 3 },
-                px: { xs: 0.5, sm: 1 },
-                width: '100%',
-                maxWidth: '100%',
-                boxSizing: 'border-box'
-            }}>
-                <Typography 
-                    variant="body1" 
-                    sx={{ 
-                        color: '#1a1a1a',
-                        lineHeight: 1.6,
-                        fontSize: { xs: '0.8125rem', sm: '0.9375rem' },
-                        wordBreak: 'break-word'
-                    }}
-                >
-                    {language === "bm" 
-                        ? "Selamat datang ke sistem pengurusan kesihatan yang komprehensif. Log masuk atau buat akaun untuk bermula."
-                        : "Welcome to your comprehensive healthcare management system. Sign in or create an account to get started."
-                    }
-                </Typography>
-            </Box>
 
             {/* Action Buttons */}
             <Box sx={{ 

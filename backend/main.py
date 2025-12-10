@@ -74,7 +74,7 @@ def initialize_test_user():
     if len(users_db) == 0:
         test_user_id = "060101145678"
         test_user = {
-            "full_name": "TAN SENG HONG",
+            "full_name": "TAN WEI QI",
             "ic_number": test_user_id,
             "address": "N277 JALAN PERKASA 1 TAMAN MALURI, 55100, KUALA LUMPUR",
             "mode": "normal",
@@ -110,7 +110,7 @@ def create_test_user():
     """Create a test user for login testing"""
     test_user_id = "060101145678"
     test_user = {
-        "full_name": "TAN SENG HONG",
+        "full_name": "TAN WEI QI",
         "ic_number": test_user_id,
         "address": "N277 JALAN PERKASA 1 TAMAN MALURI, 55100, KUALA LUMPUR",
         "mode": "normal",

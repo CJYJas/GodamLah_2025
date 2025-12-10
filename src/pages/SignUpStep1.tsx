@@ -32,7 +32,7 @@ const SignUpStep1: React.FC = () => {
         // Simulate backend processing
         setTimeout(() => {
             const mockResult = {
-                fullName: "TAN SENG HONG",
+                fullName: "TAN WEI QI",
                 icNumber: "060101-14-5678",
                 address: "N277 JALAN PERKASA 1 TAMAN MALURI, 55100, KUALA LUMPUR"
             };
