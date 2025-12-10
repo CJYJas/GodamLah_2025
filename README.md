@@ -73,10 +73,10 @@ These components are prototypes showcasing the unique UI/UX designs for our acce
 | Name | Role / Focus |
 | :--- | :--- |
 | **Jasmine Chin Jia Yee** | Team Lead / Easy Mode Development |
-| **Josephine Ding Jie Yu** | UI Design / Normal Mode Prototype |
+| **Josephine Ding Jie Yu** | UI Design / Normal Mode Prototype Development |
 | **Ng Shao Ern** | Rural Mode Prototype Development |
-| **Ng Geok Liuu** | Sign In / Sign Up Backend & Logic |
-| **Wong Zi Xin** | Sign In / Sign Up Frontend & Integration |
+| **Ng Geok Liu** | Sign In / Sign Up Backend & Logic |
+| **Wong Zixin** | Sign In / Sign Up Frontend & Integration |
 
 ## 🏆 What's Next (Future Vision)
 
