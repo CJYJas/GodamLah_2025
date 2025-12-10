@@ -3,9 +3,8 @@
   "version": "1.0.0",
   "description": "MyHealth: The Inclusive Digital Health Platform",
   "scripts": {
-    "build-css": "tailwindcss -i ./website/src/input.css -o ./website/dist/output.css --watch",
-    "build": "tailwindcss -i ./website/src/input.css -o ./website/dist/output.css",
-    "dev": "tailwindcss -i ./website/src/input.css -o ./website/dist/output.css --watch"
+    "build": "exit 0",
+    "dev": "echo 'Open website/index.html in your browser or use: npx serve website'"
   },
   "devDependencies": {
     "tailwindcss": "^3.4.0"
