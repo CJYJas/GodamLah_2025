@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "MyHealth: The Inclusive Digital Health Platform",
   "scripts": {
-    "build": "exit 0",
+    "build": "node -e \"console.log('Build complete - using Tailwind CDN')\"",
     "dev": "echo 'Open website/index.html in your browser or use: npx serve website'"
   },
   "devDependencies": {
