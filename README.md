@@ -1,5 +1,7 @@
 # 🚀 NextG GodamLah 2.0: Smart ID - HEALTHCARE PRO
 
+**🔗 Live Demo/Prototype:** [myhealth-godamlah20.vercel.app/#cta](https://myhealth-godamlah20.vercel.app/#cta)
+
 ## ✨ Project Summary
 
 In the era of rapid digital transformation, access to essential health services is often fragmented across multiple applications and limited by technological barriers. The **Smart ID** application aims to **unify** existing medical health services into a single, intuitive platform, while critically addressing issues of **digital inclusivity** and **accessibility** for all segments of society, regardless of age or location.
