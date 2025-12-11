@@ -1,74 +1,112 @@
-# 🚀 NextG GodamLah 2.0: Smart ID - HEALTHCARE PRO
+# 🚀 MyHealth | Inclusive Government Healthcare Super-App
 
-**🔗 Live Demo/Prototype:** [myhealth-godamlah20.vercel.app/#cta](https://myhealth-godamlah20.vercel.app/#cta)
+**🔗 Live Demo/Prototype:** [myhealth-godamlah20.vercel.app/#cta](https://myhealth-godamlah20.vercel.app/)
 
-## ✨ Project Summary
+**MyHealth: Malaysia's all-in-one, inclusive government healthcare app.**
 
-In the era of rapid digital transformation, access to essential health services is often fragmented across multiple applications and limited by technological barriers. The **Smart ID** application aims to **unify** existing medical health services into a single, intuitive platform, while critically addressing issues of **digital inclusivity** and **accessibility** for all segments of society, regardless of age or location.
+We merge MySejahtera + MyUbat into a unified super-app with adaptive modes, offline resilience, voice authentication, and IC-linked health records synced nationwide.
 
-Our core innovation is leveraging the national Identity Card (IC) as a universal, secure key to personal and medical data, streamlining the entire healthcare process.
+| Authentication | Data Linkage | Accessibility | Security |
+| :--- | :--- | :--- | :--- |
+| Voice Auth | IC-Linked | Offline Ready | Secure |
 
-## 💡 The Problem & Our Solution
+---
 
-| Problem | Smart ID Solution |
+## 💡 The Problem: Why Malaysia Needs MyHealth
+
+| Statistic | Description |
 | :--- | :--- |
-| **Fragmented Health Data:** Users must navigate multiple apps for appointments, records, and prescriptions. | **All-in-One Integration:** Consolidates all personal medical records, appointment booking, and health services into a single, comprehensive interface. |
-| **Access/Inclusivity Barriers:** Old people, those with poor connectivity, or those unfamiliar with complex apps struggle to access services. | **Three Specialized Modes:** Normal, Easy, and Rural modes cater the experience to the user's need. |
-| **Password/Login Difficulty:** Users forget passwords, leading to friction and security risks. | **Effortless & Secure Authentication:** Uses **Voice Recognition** for login and IC Card scanning for hassle-free sign-up. |
+| **6.6M** | B40 Households (~20% of population) |
+| **600K+** | OKU Registered (Persons with Disabilities) |
+| **3.5M** | Elderly (60+), growing annually |
+| **30%** | Rural Population (Limited connectivity) |
 
-## 🔑 Key Features & Inclusivity Track Focus
+### 1. Fragmented Apps
+MySejahtera, MyUbat, and other government health apps operate in silos. Users must manage multiple accounts, learn different interfaces, and manually transfer information, leading to multiple logins, data silos, and no integration.
 
-### 1. Seamless Onboarding & Authentication
+### 2. Marginalized Groups
+Elderly, OKU (disabled persons), rural communities, and B40 households face digital barriers. Current apps lack accessibility features, offline support, and simplified interfaces (No VoiceOver, Complex UIs, Online-only).
 
-* **Voice Recognition Login:** Users can log in using their unique voiceprint, eliminating the need to remember complex passwords.
-* **IC Snap Sign-Up:** Users simply snap a photo of their IC during sign-up. The app uses OCR to securely extract necessary personal information, simplifying the initial registration process.
+### 3. ICs Cannot Sync Data
+Health data cannot sync nationwide across clinics and hospitals. When citizens visit different facilities, their medical history, prescriptions, and test results don't follow them, resulting in no portability, duplicate tests, and lost records.
 
-### 2. Centralized Data Access (Future State)
+---
 
-* **Assumption:** We assume that in the future, the national IC number will be connected to a government central database.
-* **Functionality:** Upon successful authentication, all personal information and consolidated medical records will be securely obtained from this central database, ensuring up-to-date and accurate data.
+## ✅ Our Solution: MyHealth Unified Super-App
 
-### 3. Inclusivity (Our Track Focus: Accessibility)
-
-To ensure that *everyone* can benefit, the app offers three distinct operational modes:
-
-| Mode | Target User | Key Accessibility Features |
-| :--- | :--- | :--- |
-| **Normal Mode** | Tech-savvy users, urban areas. | The default, fully integrated, feature-rich interface. |
-| **Easy Mode** | Older adults, visually impaired users. | **Large Fonts and Icons**, high-contrast colors, and a **Button-centric** interface to minimize typing. |
-| **Rural Mode** | Users in remote areas with limited infrastructure. | **Specialized Transport Options** (e.g., boat, helicopter) for emergencies, and a **House Call Service** where medical staff can be dispatched directly to the user's home. |
-
-## ⚙️ How to Run the Prototype
-
-Our project is divided into distinct components for presentation and demonstration.
-
-### Part 1: Full-Stack Demo (Sign-up, Sign-in, and Easy Mode)
-
-These components are fully integrated with working backend logic.
-
-| Component | Location | Command |
-| :--- | :--- | :--- |
-| **Frontend (Easy Mode)** | `frontend/easymode` | `npm start` |
-| **Backend (Easy Mode Logic)** | `backend/easymode` | `python app.py` |
-| **Backend (Sign-in/Sign-up)** | `backend/signinsignup` | `python main.py` |
-
-### Part 2: Frontend Prototypes (Normal & Rural Mode)
-
-These components are prototypes showcasing the unique UI/UX designs for our accessibility track.
-
-* **Normal Mode Prototype**
-* **Rural Mode Prototype**
-
-| Location | Command |
+| Solution | Description |
 | :--- | :--- |
-| **Frontend Root** | `frontend` | `npm start dev` |
+| **Unified App** | Combine MySejahtera + MyUbat into one super-app. Single login, single dashboard, all your health needs in one place. |
+| **Adaptive Modes** | Three specialized modes: Easy (VoiceOver, large text, voice auth), Normal (fast workflows), Rural (offline + home visit support). |
+| **Future IC Sync** | Nationwide health record spine linked to IC. Your verified medical data follows you to any clinic or hospital in Malaysia. |
 
-## 🛠️ Technology Stack
+---
 
-* **Frontend:** React
-* **Backend:** Python (FastAPI, Uvicorn, Flask)
-* **ML/Auth:** Librosa, NumPy, SciPy, OCR Library
-* **Database:** JSON File Storage / (Future Government Integration)
+## 🔑 Adaptive Modes: Personalized experience for every user
+
+### 1. Elderly / Easy Mode
+For seniors and users needing accessibility.
+
+* **Full VoiceOver Support:** Screen reader compatible with Bahasa Malaysia and English.
+* **Extra Large Text and Buttons:** Minimum 18px fonts, large tap targets (48x48px minimum).
+* **Voice Recognition Login:** Replace password with voice authentication for easier access.
+* **High Contrast Theme:** WCAG AAA compliant colors, dyslexia-friendly fonts.
+* **Powered by iPhone's Built-in VoiceOver:** Leverages native accessibility features for the most reliable solution.
+
+### 2. Normal Mode
+Fast, efficient workflows for everyday users.
+
+* **Unified Dashboard:** All health data, appointments, medications in one view.
+* **2-Tap Actions:** Book appointments and refill medications in just 2 taps.
+* **Smart Notifications:** Personalized reminders for appointments and medications.
+* **Voice Recognition Login:** Secure voice authentication - no passwords to remember.
+
+### 3. Rural Mode
+For areas with limited connectivity.
+
+* **Offline-First Architecture:** Full functionality without internet, syncs when connected.
+* **Home Visit Support:** Healthcare agents can serve patients at home with a mobile app.
+* **Low-Bandwidth Optimization:** Compressed assets, minimal data usage (under 1MB/session).
+* **Local Data Cache:** Encrypted SQLite stores critical health data locally.
+
+---
+
+## 🏥 Public Kiosk Mode (Unique Differentiator)
+
+### IC + Voice = Instant Access
+Our system can be deployed on public kiosks in hospitals, clinics, and government offices. Users simply insert their IC (MyKad) and use voice recognition to authenticate - **no smartphone or password required.**
+
+* **Step 1:** Insert MyKad (Kiosk reads IC chip and retrieves your profile).
+* **Step 2:** Voice Authentication (Speak a simple phrase to verify your identity).
+* **Step 3:** Access Healthcare (View records, book appointments, refill medications).
+
+This ensures **Zero Learning** and is **100% Inclusive** for the elderly, disabled, and users without smartphones, while remaining **Secure by Design** (IC chip + voice recognition = strong two-factor authentication).
+
+---
+
+## 🛠️ Tech Stack: Modern, scalable, and secure
+
+| Component | Key Technologies | Description |
+| :--- | :--- | :--- |
+| **Frontend / UI** | Next.js (App Router), TypeScript, Tailwind CSS, React Native (Mobile) |
+| **Local Database (Edge)** | SQLite (Encrypted), Offline-first cache, Local Hash Chain | **CRITICAL for Offline Mode** |
+| **Central Database** | PostgreSQL, Supabase / Neon, Eligibility Ledger, Permanent Audit Log | **Source of Truth** |
+| **Identity Capture** | WebRTC, OCR (Tesseract.js), Voice Recognition, IC Chip Reader | |
+
+---
+
+## 🚀 Future Plans & Expected Impact
+
+### Expected Impact
+* **Centralization of Healthcare Data:** One unified health record per citizen, accessible from any healthcare facility nationwide.
+* **Zero Digital Exclusion:** Every Malaysian can access healthcare services regardless of age, disability, location, or smartphone ownership through adaptive modes and public kiosks.
+* **Reducing Digital Friction:** Voice and IC authentication eliminates password barriers, making healthcare access as simple as speaking your name.
+
+### Future Plans
+* **Contextual Smart Mode Switching (Coming Soon):** The app will automatically detect context (location, time of day, user behavior) and switch modes accordingly (e.g., enter a rural clinic? Offline mode activates. Using a kiosk? Easy mode appears).
+* **Predictive Adaptivity (Roadmap):** AI-powered predictions for medication refills, appointment suggestions based on health patterns, and proactive health alerts. The system learns user preferences and adapts the interface dynamically.
+
+---
 
 ## 👤 Team
 
@@ -80,13 +118,4 @@ These components are prototypes showcasing the unique UI/UX designs for our acce
 | **Ng Geok Liu** | Sign In / Sign Up Backend & Logic |
 | **Wong Zixin** | Sign In / Sign Up Frontend & Integration |
 
-## 🏆 What's Next (Future Vision)
-
-* **PWA (Progressive Web App) Support:** Implement PWA features to allow users to **install the app directly from the web** and **use core functionalities offline** or in low-connectivity areas, ensuring high reliability for users in rural or remote locations.
-* Integration with wearable fitness trackers.
-* Telemedicine consultation features, optimized for low-bandwidth environments (Rural Mode).
-* Integration of predictive health analytics based on historical data.
-
----
-
-**Thank you for considering our project for the NextG GodamLah 2.0 Smart ID Hackathon!**
+**MyHealth is ready to bring inclusive, unified healthcare to every Malaysian. Let's build a healthier, more connected future together.**
