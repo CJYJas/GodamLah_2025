@@ -6,9 +6,12 @@
         "mode": "normal",
         "security": {
             "question1": "What is your mother's maiden name?",
-            "answer1": "test",
+            "answer1": "mary",
             "question2": "What is the name of your first pet?",
-            "answer2": "test"
-        }
+            "answer2": "mimi"
+        },
+        "ic_front": "ic_images/990101145678_front.png",
+        "ic_back": "ic_images/990101145678_back.png",
+        "voice_path": "voices/990101145678.wav"
     }
 }

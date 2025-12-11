@@ -1,0 +1,1633 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MyHealth | Inclusive Government Healthcare Super-App</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui'] },
+          colors: {
+            primary: '#8799E0',
+            secondary: '#EBEEF7',
+            accent: '#594F81',
+            brand: {
+              50: '#EBEEF7',
+              100: '#e0e5f5',
+              200: '#d5dcf3',
+              500: '#8799E0',
+              600: '#748cd8',
+              700: '#677bcc',
+              800: '#594F81',
+            },
+          },
+          animation: {
+            'float': 'float 6s ease-in-out infinite',
+            'float-delayed': 'float 6s ease-in-out 2s infinite',
+            'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'gradient': 'gradient 8s ease infinite',
+            'flow': 'flow 2s ease-in-out infinite',
+            'ping-slow': 'ping 2s cubic-bezier(0, 0, 0.2, 1) infinite',
+            'slide-right': 'slideRight 2s ease-in-out infinite',
+            'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
+            'phone-float': 'phoneFloat 4s ease-in-out infinite',
+            'phone-tilt': 'phoneTilt 6s ease-in-out infinite',
+            'screen-glow': 'screenGlow 3s ease-in-out infinite',
+            'notch-pulse': 'notchPulse 2s ease-in-out infinite',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-10px)' },
+            },
+            gradient: {
+              '0%, 100%': { backgroundPosition: '0% 50%' },
+              '50%': { backgroundPosition: '100% 50%' },
+            },
+            flow: {
+              '0%, 100%': { opacity: '0.3', transform: 'translateX(0)' },
+              '50%': { opacity: '1', transform: 'translateX(10px)' },
+            },
+            slideRight: {
+              '0%': { transform: 'translateX(-100%)', opacity: '0' },
+              '50%': { opacity: '1' },
+              '100%': { transform: 'translateX(100%)', opacity: '0' },
+            },
+            pulseGlow: {
+              '0%, 100%': { boxShadow: '0 0 5px rgba(135, 153, 224, 0.5)' },
+              '50%': { boxShadow: '0 0 20px rgba(135, 153, 224, 0.8), 0 0 30px rgba(135, 153, 224, 0.4)' },
+            },
+            phoneFloat: {
+              '0%, 100%': { transform: 'translateY(0) rotate(-2deg)' },
+              '50%': { transform: 'translateY(-15px) rotate(2deg)' },
+            },
+            phoneTilt: {
+              '0%, 100%': { transform: 'perspective(1000px) rotateY(-5deg) rotateX(5deg)' },
+              '50%': { transform: 'perspective(1000px) rotateY(5deg) rotateX(-5deg)' },
+            },
+            screenGlow: {
+              '0%, 100%': { boxShadow: '0 0 30px rgba(135, 153, 224, 0.3), inset 0 0 20px rgba(255,255,255,0.1)' },
+              '50%': { boxShadow: '0 0 50px rgba(135, 153, 224, 0.5), inset 0 0 30px rgba(255,255,255,0.2)' },
+            },
+            notchPulse: {
+              '0%, 100%': { opacity: '0.6' },
+              '50%': { opacity: '1' },
+            },
+          },
+        },
+      },
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      min-height: 100%;
+    }
+
+    .card-hover {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card-hover:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px -12px rgba(135, 153, 224, 0.25);
+    }
+
+    .nav-link {
+      position: relative;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #748cd8, #594F81);
+      transition: width 0.3s ease;
+      border-radius: 2px;
+    }
+    .nav-link:hover::after {
+      width: 100%;
+    }
+
+    .btn-shine {
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-shine::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s ease;
+    }
+    .btn-shine:hover::before {
+      left: 100%;
+    }
+
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.6s ease forwards;
+    }
+    
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .stagger-children > *:nth-child(1) { animation-delay: 0.1s; }
+    .stagger-children > *:nth-child(2) { animation-delay: 0.2s; }
+    .stagger-children > *:nth-child(3) { animation-delay: 0.3s; }
+    .stagger-children > *:nth-child(4) { animation-delay: 0.4s; }
+
+    .mobile-menu {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease, opacity 0.3s ease;
+      opacity: 0;
+    }
+    .mobile-menu.open {
+      max-height: 400px;
+      opacity: 1;
+    }
+
+    .scroll-indicator {
+      animation: bounce 2s infinite;
+    }
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-8px); }
+      60% { transform: translateY(-4px); }
+    }
+
+    .icon-pulse:hover svg {
+      animation: iconPulse 0.4s ease;
+    }
+    @keyframes iconPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #EBEEF7; }
+    ::-webkit-scrollbar-thumb { background: #8799E0; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #748cd8; }
+
+    /* Architecture flow animation */
+    .flow-line {
+      stroke-dasharray: 10;
+      animation: dash 1.5s linear infinite;
+    }
+    @keyframes dash {
+      to { stroke-dashoffset: -20; }
+    }
+
+    /* Kiosk glow effect */
+    .kiosk-glow {
+      animation: kioskGlow 3s ease-in-out infinite;
+    }
+    @keyframes kioskGlow {
+      0%, 100% { filter: drop-shadow(0 0 10px rgba(135, 153, 224, 0.3)); }
+      50% { filter: drop-shadow(0 0 25px rgba(135, 153, 224, 0.6)); }
+    }
+
+    /* Table hover */
+    .comparison-row:hover {
+      background: rgba(135, 153, 224, 0.1);
+    }
+
+    /* ============================================== */
+    /* iPhone Mockup Styles */
+    /* ============================================== */
+    .iphone-container {
+      perspective: 1000px;
+    }
+
+    .iphone-mockup {
+      position: relative;
+      width: 260px;
+      height: 530px;
+      background: linear-gradient(145deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+      border-radius: 45px;
+      padding: 10px;
+      box-shadow: 
+        0 50px 100px -20px rgba(0,0,0,0.5),
+        0 30px 60px -30px rgba(0,0,0,0.5),
+        inset 0 2px 4px rgba(255,255,255,0.1),
+        inset 0 -2px 4px rgba(0,0,0,0.3);
+    }
+
+    .iphone-frame {
+      position: absolute;
+      inset: 0;
+      border-radius: 45px;
+      border: 3px solid #333;
+      pointer-events: none;
+    }
+
+    .iphone-screen {
+      width: 100%;
+      height: 100%;
+      background: #f5f5f7;
+      border-radius: 38px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Dynamic Island / Notch */
+    .iphone-dynamic-island {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90px;
+      height: 28px;
+      background: #1a1a1a;
+      border-radius: 20px;
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .iphone-camera {
+      width: 10px;
+      height: 10px;
+      background: radial-gradient(circle, #1e3a5f 0%, #0d1b2a 50%, #000 100%);
+      border-radius: 50%;
+      box-shadow: inset 0 0 2px rgba(255,255,255,0.3);
+    }
+
+    .iphone-home-bar {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 4px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 2px;
+      z-index: 30;
+    }
+
+    .screenshot-wrapper {
+      width: 100%;
+      height: 100%;
+      padding-top: 45px;
+      padding-bottom: 25px;
+      overflow: hidden;
+    }
+
+    .screenshot-content {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(180deg, #f8fafc 0%, #e8f0fe 100%);
+    }
+
+    .screenshot-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+      display: block;
+    }
+    
+    .screenshot-img:not([src]),
+    .screenshot-img[src=""],
+    img[src*="drive.google.com"] {
+      display: none;
+    }
+
+    .screenshot-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+
+    /* Glow effects for different modes */
+    .glow-brand {
+      box-shadow: 0 0 60px rgba(135, 153, 224, 0.4), 0 0 100px rgba(135, 153, 224, 0.2);
+    }
+    .glow-slate {
+      box-shadow: 0 0 60px rgba(100, 116, 139, 0.3), 0 0 100px rgba(100, 116, 139, 0.15);
+    }
+    .glow-green {
+      box-shadow: 0 0 60px rgba(34, 197, 94, 0.3), 0 0 100px rgba(34, 197, 94, 0.15);
+    }
+
+    /* VoiceOver highlight box */
+    .voiceover-highlight {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      border: 2px solid #f59e0b;
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 16px;
+    }
+  </style>
+</head>
+<body class="bg-secondary text-slate-900 font-sans antialiased">
+  <div class="relative overflow-hidden">
+    <!-- Animated background -->
+    <div class="fixed inset-0 bg-gradient-to-br from-secondary via-white to-primary/30 pointer-events-none"></div>
+    <div class="fixed inset-0 pointer-events-none opacity-50">
+      <div class="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full blur-3xl animate-float"></div>
+      <div class="absolute top-40 right-20 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-float-delayed"></div>
+      <div class="absolute bottom-20 left-1/3 w-80 h-80 bg-brand-200/30 rounded-full blur-3xl animate-float"></div>
+    </div>
+
+    <!-- Navbar -->
+    <header class="sticky top-0 z-50 backdrop-blur-md bg-white/80 border-b border-white/60 shadow-sm">
+      <div class="max-w-6xl mx-auto px-6 py-4">
+        <div class="flex items-center justify-between">
+          <a href="#" class="flex items-center gap-3 group">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-600 to-brand-800 text-white grid place-items-center font-bold shadow-lg shadow-brand-500/30 group-hover:shadow-brand-500/50 group-hover:scale-105 transition-all duration-300">MyH</div>
+            <div>
+              <p class="text-lg font-semibold text-brand-800 group-hover:text-brand-600 transition-colors">MyHealth</p>
+              <p class="text-xs text-slate-500">Inclusive Digital Health Spine</p>
+            </div>
+          </a>
+          
+          <nav class="hidden md:flex items-center gap-6 text-sm font-semibold text-slate-700">
+            <a class="nav-link hover:text-brand-600 py-1" href="#problem">Problem</a>
+            <a class="nav-link hover:text-brand-600 py-1" href="#solution">Solution</a>
+            <a class="nav-link hover:text-brand-600 py-1" href="#modes">Modes</a>
+            <a class="nav-link hover:text-brand-600 py-1" href="#kiosk">Kiosk</a>
+            <a class="nav-link hover:text-brand-600 py-1" href="#tech">Tech</a>
+            <a class="nav-link hover:text-brand-600 py-1" href="#architecture">Architecture</a>
+            <a class="nav-link hover:text-brand-600 py-1" href="#comparison">Compare</a>
+            <a class="nav-link hover:text-brand-600 py-1" href="#future">Future</a>
+          </nav>
+          
+          <div class="flex items-center gap-3">
+            <a href="#cta" class="hidden md:inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-brand-600 to-brand-700 text-white font-semibold shadow-lg shadow-brand-500/30 hover:shadow-brand-500/50 hover:scale-105 btn-shine transition-all duration-300">
+              Pitch Demo
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+            </a>
+            
+            <button id="menuBtn" class="md:hidden p-2 rounded-lg hover:bg-brand-50 transition-colors" aria-label="Toggle menu">
+              <svg id="menuIcon" class="w-6 h-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+              </svg>
+              <svg id="closeIcon" class="w-6 h-6 text-slate-700 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        
+        <nav id="mobileMenu" class="mobile-menu md:hidden">
+          <div class="pt-4 pb-2 space-y-1">
+            <a class="block px-4 py-3 rounded-xl hover:bg-brand-50 text-slate-700 font-medium transition-colors" href="#problem">Problem</a>
+            <a class="block px-4 py-3 rounded-xl hover:bg-brand-50 text-slate-700 font-medium transition-colors" href="#solution">Solution</a>
+            <a class="block px-4 py-3 rounded-xl hover:bg-brand-50 text-slate-700 font-medium transition-colors" href="#modes">Modes</a>
+            <a class="block px-4 py-3 rounded-xl hover:bg-brand-50 text-slate-700 font-medium transition-colors" href="#kiosk">Kiosk</a>
+            <a class="block px-4 py-3 rounded-xl hover:bg-brand-50 text-slate-700 font-medium transition-colors" href="#tech">Tech</a>
+            <a class="block px-4 py-3 rounded-xl hover:bg-brand-50 text-slate-700 font-medium transition-colors" href="#architecture">Architecture</a>
+            <a class="block px-4 py-3 rounded-xl hover:bg-brand-50 text-slate-700 font-medium transition-colors" href="#comparison">Compare</a>
+            <a class="block px-4 py-3 rounded-xl hover:bg-brand-50 text-slate-700 font-medium transition-colors" href="#future">Future</a>
+            <a class="block px-4 py-3 mt-2 rounded-xl bg-gradient-to-r from-brand-600 to-brand-700 text-white font-semibold text-center" href="#cta">Pitch Demo</a>
+          </div>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="relative max-w-6xl mx-auto px-6 py-16 md:py-24 flex flex-col gap-8">
+      <div class="fade-in" style="animation-delay: 0.1s;">
+        <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-green-100 text-green-700 text-sm font-semibold shadow-sm">
+          <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+          Inclusivity First - Elderly - Rural - Disabled - Public Kiosk Ready
+        </span>
+        <h1 class="mt-6 text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight text-brand-800">
+          MyHealth: Malaysia's all-in-one, <span class="bg-gradient-to-r from-brand-600 to-accent bg-clip-text text-transparent">inclusive</span> government healthcare app.
+        </h1>
+        <p class="mt-4 text-lg md:text-xl text-slate-600 max-w-2xl leading-relaxed">
+          We merge MySejahtera + MyUbat into a unified super-app with adaptive modes, offline resilience, voice authentication, and IC-linked health records synced nationwide.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-4">
+          <a href="#solution" class="group px-6 py-3.5 rounded-full bg-gradient-to-r from-brand-600 to-brand-700 text-white font-semibold shadow-lg shadow-brand-500/30 hover:shadow-brand-500/50 hover:scale-105 btn-shine transition-all duration-300 flex items-center gap-2">
+            See the Solution
+            <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+          </a>
+          <a href="#architecture" class="px-6 py-3.5 rounded-full bg-white/80 backdrop-blur text-brand-700 font-semibold border border-brand-200 hover:border-brand-400 hover:bg-white shadow-sm hover:shadow-md transition-all duration-300">
+            System Architecture
+          </a>
+        </div>
+        <div class="mt-8 flex flex-wrap items-center gap-6 text-sm text-slate-600">
+          <span class="flex items-center gap-2 icon-pulse">
+            <span class="w-8 h-8 rounded-lg bg-brand-50 grid place-items-center">
+              <svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
+            </span>
+            Voice Auth
+          </span>
+          <span class="flex items-center gap-2 icon-pulse">
+            <span class="w-8 h-8 rounded-lg bg-brand-50 grid place-items-center">
+              <svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0"/></svg>
+            </span>
+            IC-Linked
+          </span>
+          <span class="flex items-center gap-2 icon-pulse">
+            <span class="w-8 h-8 rounded-lg bg-brand-50 grid place-items-center">
+              <svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"/></svg>
+            </span>
+            Offline Ready
+          </span>
+          <span class="flex items-center gap-2 icon-pulse">
+            <span class="w-8 h-8 rounded-lg bg-brand-50 grid place-items-center">
+              <svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+            </span>
+            Secure
+          </span>
+        </div>
+      </div>
+      
+      <div class="flex justify-center mt-4">
+        <a href="#problem" class="scroll-indicator text-brand-400 hover:text-brand-600 transition-colors" aria-label="Scroll down">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+        </a>
+      </div>
+    </section>
+
+    <!-- Problem Statement Section -->
+    <section id="problem" class="py-20 bg-white/80 backdrop-blur-sm relative">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="flex items-center gap-4 mb-8">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-red-100 to-red-200 text-red-600 grid place-items-center shadow-lg shadow-red-500/20">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+          </div>
+          <div>
+            <h2 class="text-3xl md:text-4xl font-bold text-slate-900">The Problem</h2>
+            <p class="text-slate-500 font-medium">Why Malaysia Needs MyHealth</p>
+          </div>
+        </div>
+
+        <!-- Stats Banner -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+          <div class="p-5 rounded-2xl bg-gradient-to-br from-red-50 to-white border border-red-100 text-center fade-in">
+            <p class="text-3xl md:text-4xl font-extrabold text-red-600 mb-1">6.6M</p>
+            <p class="text-sm text-slate-600">B40 Households</p>
+            <p class="text-xs text-slate-400 mt-1">~20% of population</p>
+          </div>
+          <div class="p-5 rounded-2xl bg-gradient-to-br from-amber-50 to-white border border-amber-100 text-center fade-in">
+            <p class="text-3xl md:text-4xl font-extrabold text-amber-600 mb-1">600K+</p>
+            <p class="text-sm text-slate-600">OKU Registered</p>
+            <p class="text-xs text-slate-400 mt-1">Persons with Disabilities</p>
+          </div>
+          <div class="p-5 rounded-2xl bg-gradient-to-br from-blue-50 to-white border border-blue-100 text-center fade-in">
+            <p class="text-3xl md:text-4xl font-extrabold text-blue-600 mb-1">3.5M</p>
+            <p class="text-sm text-slate-600">Elderly (60+)</p>
+            <p class="text-xs text-slate-400 mt-1">Growing annually</p>
+          </div>
+          <div class="p-5 rounded-2xl bg-gradient-to-br from-green-50 to-white border border-green-100 text-center fade-in">
+            <p class="text-3xl md:text-4xl font-extrabold text-green-600 mb-1">30%</p>
+            <p class="text-sm text-slate-600">Rural Population</p>
+            <p class="text-xs text-slate-400 mt-1">Limited connectivity</p>
+          </div>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-6 stagger-children">
+          <!-- Problem 1: Fragmented Apps -->
+          <div class="card-hover p-6 rounded-2xl bg-gradient-to-br from-red-50 to-white border border-red-100 shadow-sm fade-in">
+            <div class="w-12 h-12 rounded-xl bg-red-100 grid place-items-center mb-4">
+              <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"/></svg>
+            </div>
+            <p class="text-xl font-bold text-red-700 mb-2">Fragmented Apps</p>
+            <p class="text-slate-600 text-sm leading-relaxed mb-3">MySejahtera, MyUbat, and other government health apps operate in silos. Users must manage multiple accounts, learn different interfaces, and manually transfer information.</p>
+            <div class="flex flex-wrap gap-2">
+              <span class="px-2 py-1 rounded-full bg-red-100 text-red-600 text-xs font-medium">Multiple logins</span>
+              <span class="px-2 py-1 rounded-full bg-red-100 text-red-600 text-xs font-medium">Data silos</span>
+              <span class="px-2 py-1 rounded-full bg-red-100 text-red-600 text-xs font-medium">No integration</span>
+            </div>
+          </div>
+
+          <!-- Problem 2: Marginalized Groups -->
+          <div class="card-hover p-6 rounded-2xl bg-gradient-to-br from-amber-50 to-white border border-amber-100 shadow-sm fade-in">
+            <div class="w-12 h-12 rounded-xl bg-amber-100 grid place-items-center mb-4">
+              <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+            </div>
+            <p class="text-xl font-bold text-amber-700 mb-2">Marginalized Groups</p>
+            <p class="text-slate-600 text-sm leading-relaxed mb-3">Elderly, OKU (disabled persons), rural communities, and B40 households face digital barriers. Current apps lack accessibility features, offline support, and simplified interfaces.</p>
+            <div class="flex flex-wrap gap-2">
+              <span class="px-2 py-1 rounded-full bg-amber-100 text-amber-600 text-xs font-medium">No VoiceOver</span>
+              <span class="px-2 py-1 rounded-full bg-amber-100 text-amber-600 text-xs font-medium">Complex UIs</span>
+              <span class="px-2 py-1 rounded-full bg-amber-100 text-amber-600 text-xs font-medium">Online-only</span>
+            </div>
+          </div>
+
+          <!-- Problem 3: No IC Sync -->
+          <div class="card-hover p-6 rounded-2xl bg-gradient-to-br from-blue-50 to-white border border-blue-100 shadow-sm fade-in">
+            <div class="w-12 h-12 rounded-xl bg-blue-100 grid place-items-center mb-4">
+              <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
+            </div>
+            <p class="text-xl font-bold text-blue-700 mb-2">ICs Cannot Sync Data</p>
+            <p class="text-slate-600 text-sm leading-relaxed mb-3">Health data cannot sync nationwide across clinics and hospitals. When citizens visit different facilities, their medical history, prescriptions, and test results don't follow them.</p>
+            <div class="flex flex-wrap gap-2">
+              <span class="px-2 py-1 rounded-full bg-blue-100 text-blue-600 text-xs font-medium">No portability</span>
+              <span class="px-2 py-1 rounded-full bg-blue-100 text-blue-600 text-xs font-medium">Duplicate tests</span>
+              <span class="px-2 py-1 rounded-full bg-blue-100 text-blue-600 text-xs font-medium">Lost records</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Solution Section -->
+    <section id="solution" class="py-20 relative">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="flex items-center gap-4 mb-8">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-green-100 to-green-200 text-green-600 grid place-items-center shadow-lg shadow-green-500/20">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+          </div>
+          <div>
+            <h2 class="text-3xl md:text-4xl font-bold text-slate-900">Our Solution</h2>
+            <p class="text-slate-500 font-medium">MyHealth Unified Super-App</p>
+          </div>
+        </div>
+        <div class="grid md:grid-cols-3 gap-6 stagger-children">
+          <div class="card-hover p-8 rounded-3xl bg-white shadow-xl border border-white/60 fade-in group">
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand-100 to-brand-200 grid place-items-center mb-5 group-hover:scale-110 transition-transform">
+              <svg class="w-7 h-7 text-brand-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
+            </div>
+            <p class="text-xl font-bold text-brand-800 mb-2">Unified App</p>
+            <p class="text-slate-600 leading-relaxed">Combine MySejahtera + MyUbat into one super-app. Single login, single dashboard, all your health needs in one place.</p>
+          </div>
+          <div class="card-hover p-8 rounded-3xl bg-white shadow-xl border border-white/60 fade-in group">
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-teal-100 to-teal-200 grid place-items-center mb-5 group-hover:scale-110 transition-transform">
+              <svg class="w-7 h-7 text-teal-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+            </div>
+            <p class="text-xl font-bold text-teal-800 mb-2">Adaptive Modes</p>
+            <p class="text-slate-600 leading-relaxed">Three specialized modes: Easy (VoiceOver, large text, voice auth), Normal (fast workflows), Rural (offline + home visit support).</p>
+          </div>
+          <div class="card-hover p-8 rounded-3xl bg-white shadow-xl border border-white/60 fade-in group">
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-100 to-indigo-200 grid place-items-center mb-5 group-hover:scale-110 transition-transform">
+              <svg class="w-7 h-7 text-indigo-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"/></svg>
+            </div>
+            <p class="text-xl font-bold text-indigo-800 mb-2">Future IC Sync</p>
+            <p class="text-slate-600 leading-relaxed">Nationwide health record spine linked to IC. Your verified medical data follows you to any clinic or hospital in Malaysia.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Adaptive Modes Section with iPhone Mockups -->
+    <section id="modes" class="py-20 bg-gradient-to-b from-secondary via-white to-primary/20 relative">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="flex items-center gap-4 mb-8">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-100 to-brand-200 text-brand-600 grid place-items-center shadow-lg shadow-brand-500/20">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+          </div>
+          <div>
+            <h2 class="text-3xl md:text-4xl font-bold text-slate-900">Adaptive Modes</h2>
+            <p class="text-slate-500 font-medium">Personalized experience for every user</p>
+          </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- MODE 1: ELDERLY / EASY MODE -->
+        <!-- ============================================== -->
+        <div class="mb-16 p-8 rounded-3xl bg-white shadow-xl border-2 border-brand-200 fade-in">
+          <div class="grid lg:grid-cols-2 gap-8 items-center">
+            <div>
+              <div class="flex items-center gap-4 mb-4">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 text-white grid place-items-center shadow-lg shadow-brand-500/30">
+                  <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                </div>
+                <div>
+                  <p class="text-2xl font-bold text-brand-800">Elderly / Easy Mode</p>
+                  <p class="text-sm text-slate-500">For seniors and users needing accessibility</p>
+                </div>
+              </div>
+              <ul class="space-y-4 text-slate-600">
+                <li class="flex items-start gap-3">
+                  <div class="w-6 h-6 rounded-full bg-brand-100 grid place-items-center flex-shrink-0 mt-0.5">
+                    <svg class="w-3 h-3 text-brand-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                  </div>
+                  <div>
+                    <p class="font-semibold text-slate-800">Full VoiceOver Support</p>
+                    <p class="text-sm">Screen reader compatible with Bahasa Malaysia and English</p>
+                  </div>
+                </li>
+                <li class="flex items-start gap-3">
+                  <div class="w-6 h-6 rounded-full bg-brand-100 grid place-items-center flex-shrink-0 mt-0.5">
+                    <svg class="w-3 h-3 text-brand-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                  </div>
+                  <div>
+                    <p class="font-semibold text-slate-800">Extra Large Text and Buttons</p>
+                    <p class="text-sm">Minimum 18px fonts, large tap targets (48x48px minimum)</p>
+                  </div>
+                </li>
+                <li class="flex items-start gap-3">
+                  <div class="w-6 h-6 rounded-full bg-brand-100 grid place-items-center flex-shrink-0 mt-0.5">
+                    <svg class="w-3 h-3 text-brand-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                  </div>
+                  <div>
+                    <p class="font-semibold text-slate-800">Voice Recognition Login</p>
+                    <p class="text-sm">Replace password with voice authentication for easier access</p>
+                  </div>
+                </li>
+                <li class="flex items-start gap-3">
+                  <div class="w-6 h-6 rounded-full bg-brand-100 grid place-items-center flex-shrink-0 mt-0.5">
+                    <svg class="w-3 h-3 text-brand-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                  </div>
+                  <div>
+                    <p class="font-semibold text-slate-800">High Contrast Theme</p>
+                    <p class="text-sm">WCAG AAA compliant colors, dyslexia-friendly fonts</p>
+                  </div>
+                </li>
+              </ul>
+
+              <!-- Added VoiceOver highlight box using iPhone built-in system -->
+              <div class="voiceover-highlight mt-6">
+                <div class="flex items-center gap-3 mb-2">
+                  <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                  <p class="font-bold text-amber-800">Powered by iPhone's Built-in VoiceOver</p>
+                </div>
+                <p class="text-sm text-amber-700">We leverage iOS's native VoiceOver system - the simplest, most reliable, and ready-to-use accessibility solution. No additional setup required. Users can enable VoiceOver in Settings and our app works seamlessly.</p>
+              </div>
+            </div>
+            
+            <!-- iPhone Mockup for Elderly Mode -->
+            <div class="relative flex justify-center">
+              <div class="iphone-container">
+                <div class="phone-float-1">
+                  <div class="iphone-mockup glow-brand">
+                    <div class="iphone-frame"></div>
+                    <div class="iphone-screen">
+                      <div class="iphone-dynamic-island">
+                        <div class="iphone-camera"></div>
+                      </div>
+                      <div class="screenshot-wrapper">
+                        <div class="screenshot-content" style="background: linear-gradient(180deg, #eef2ff 0%, #e0e7ff 100%);">
+                          <div class="screenshot-placeholder">
+                            <img src="./images/easymode.jpeg.jpeg" alt="Easy Mode Screenshot" class="screenshot-img" onerror="this.style.display='none'; this.parentElement.innerHTML='<p style=\'color:#999; font-size:12px;\'>Image not found: easymode.jpeg.jpeg</p>';" />
+                          </div>
+                        </div>
+                      </div>
+                      <div class="iphone-home-bar"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- Decorative glow -->
+              <div class="absolute -bottom-8 -right-8 w-40 h-40 bg-brand-300 rounded-full blur-3xl opacity-30"></div>
+              <div class="absolute -top-8 -left-8 w-32 h-32 bg-brand-200 rounded-full blur-2xl opacity-40"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- MODE 2: NORMAL MODE -->
+        <!-- ============================================== -->
+        <div class="mb-16 p-8 rounded-3xl bg-white shadow-xl border border-slate-200 fade-in">
+          <div class="grid lg:grid-cols-2 gap-8 items-center">
+            <div class="lg:order-2">
+              <div class="flex items-center gap-4 mb-4">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-slate-600 to-slate-800 text-white grid place-items-center shadow-lg shadow-slate-500/30">
+                  <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                </div>
+                <div>
+                  <p class="text-2xl font-bold text-slate-800">Normal Mode</p>
+                  <p class="text-sm text-slate-500">Fast, efficient workflows for everyday users</p>
+                </div>
+              </div>
+              <ul class="space-y-4 text-slate-600">
+                <li class="flex items-start gap-3">
+                  <div class="w-6 h-6 rounded-full bg-slate-100 grid place-items-center flex-shrink-0 mt-0.5">
+                    <svg class="w-3 h-3 text-slate-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                  </div>
+                  <div>
+                    <p class="font-semibold text-slate-800">Unified Dashboard</p>
+                    <p class="text-sm">All health data, appointments, medications in one view</p>
+                  </div>
+                </li>
+                <li class="flex items-start gap-3">
+                  <div class="w-6 h-6 rounded-full bg-slate-100 grid place-items-center flex-shrink-0 mt-0.5">
+                    <svg class="w-3 h-3 text-slate-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                  </div>
+                  <div>
+                    <p class="font-semibold text-slate-800">2-Tap Actions</p>
+                    <p class="text-sm">Book appointments and refill medications in just 2 taps</p>
+                  </div>
+                </li>
+                <li class="flex items-start gap-3">
+                  <div class="w-6 h-6 rounded-full bg-slate-100 grid place-items-center flex-shrink-0 mt-0.5">
+                    <svg class="w-3 h-3 text-slate-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                  </div>
+                  <div>
+                    <p class="font-semibold text-slate-800">Smart Notifications</p>
+                    <p class="text-sm">Personalized reminders for appointments and medications</p>
+                  </div>
+                </li>
+               
+                <li class="flex items-start gap-3">
+                  <div class="w-6 h-6 rounded-full bg-slate-100 grid place-items-center flex-shrink-0 mt-0.5">
+                    <svg class="w-3 h-3 text-slate-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                  </div>
+                  <div>
+                    <p class="font-semibold text-slate-800">Voice Recognition Login</p>
+                    <p class="text-sm">Secure voice authentication - no passwords to remember</p>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            
+            <!-- iPhone Mockup for Normal Mode -->
+            <div class="relative flex justify-center lg:order-1">
+              <div class="iphone-container">
+                <div class="phone-float-2">
+                  <div class="iphone-mockup glow-slate">
+                    <div class="iphone-frame"></div>
+                    <div class="iphone-screen">
+                      <div class="iphone-dynamic-island">
+                        <div class="iphone-camera"></div>
+                      </div>
+                      <div class="screenshot-wrapper">
+                        <div class="screenshot-content" style="background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);">             
+                          <div class="screenshot-placeholder">
+                            <img src="./images/normalmode.jpeg.png" alt="Normal Mode Screenshot" class="screenshot-img" onerror="this.style.display='none'; this.parentElement.innerHTML='<p style=\'color:#999; font-size:12px;\'>Image not found: normalmode.jpeg.png</p>';" />
+                          </div>
+                        </div>
+                      </div>
+                      <div class="iphone-home-bar"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- Decorative glow -->
+              <div class="absolute -bottom-8 -left-8 w-40 h-40 bg-slate-300 rounded-full blur-3xl opacity-30"></div>
+              <div class="absolute -top-8 -right-8 w-32 h-32 bg-slate-200 rounded-full blur-2xl opacity-40"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- MODE 3: RURAL MODE -->
+        <!-- ============================================== -->
+        <div class="p-8 rounded-3xl bg-white shadow-xl border-2 border-green-200 fade-in">
+          <div class="grid lg:grid-cols-2 gap-8 items-center">
+            <div>
+              <div class="flex items-center gap-4 mb-4">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-500 to-green-700 text-white grid place-items-center shadow-lg shadow-green-500/30">
+                  <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <div>
+                  <p class="text-2xl font-bold text-green-800">Rural Mode</p>
+                  <p class="text-sm text-slate-500">For areas with limited connectivity</p>
+                </div>
+              </div>
+              <ul class="space-y-4 text-slate-600">
+                <li class="flex items-start gap-3">
+                  <div class="w-6 h-6 rounded-full bg-green-100 grid place-items-center flex-shrink-0 mt-0.5">
+                    <svg class="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                  </div>
+                  <div>
+                    <p class="font-semibold text-slate-800">Offline-First Architecture</p>
+                    <p class="text-sm">Full functionality without internet, syncs when connected</p>
+                  </div>
+                </li>
+                <li class="flex items-start gap-3">
+                  <div class="w-6 h-6 rounded-full bg-green-100 grid place-items-center flex-shrink-0 mt-0.5">
+                    <svg class="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                  </div>
+                  <div>
+                    <p class="font-semibold text-slate-800">Home Visit Support</p>
+                    <p class="text-sm">Healthcare agents can serve patients at home with mobile app</p>
+                  </div>
+                </li>
+                <li class="flex items-start gap-3">
+                  <div class="w-6 h-6 rounded-full bg-green-100 grid place-items-center flex-shrink-0 mt-0.5">
+                    <svg class="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                  </div>
+                  <div>
+                    <p class="font-semibold text-slate-800">Low-Bandwidth Optimization</p>
+                    <p class="text-sm">Compressed assets, minimal data usage (under 1MB/session)</p>
+                  </div>
+                </li>
+                <li class="flex items-start gap-3">
+                  <div class="w-6 h-6 rounded-full bg-green-100 grid place-items-center flex-shrink-0 mt-0.5">
+                    <svg class="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                  </div>
+                  <div>
+                    <p class="font-semibold text-slate-800">Local Data Cache</p>
+                    <p class="text-sm">Encrypted SQLite stores critical health data locally</p>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            
+            <!-- iPhone Mockup for Rural Mode -->
+            <div class="relative flex justify-center">
+              <div class="iphone-container">
+                <div class="phone-float-3">
+                  <div class="iphone-mockup glow-green">
+                    <div class="iphone-frame"></div>
+                    <div class="iphone-screen">
+                      <div class="iphone-dynamic-island">
+                        <div class="iphone-camera"></div>
+                      </div>
+                      <div class="screenshot-wrapper">
+                        <div class="screenshot-content" style="background: linear-gradient(180deg, #f0fdf4 0%, #dcfce7 100%);">
+                          
+                          <div class="screenshot-placeholder">
+                            
+                            <img src="./images/ruralmode.jpeg.jpeg" alt="Rural Mode Screenshot" class="screenshot-img" onerror="this.style.display='none'; this.parentElement.innerHTML='<p style=\'color:#999; font-size:12px;\'>Image not found: ruralmode.jpeg.jpeg</p>';" />
+                          </div>
+                        </div>
+                      </div>
+                      <div class="iphone-home-bar"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- Decorative glow -->
+              <div class="absolute -bottom-8 -right-8 w-40 h-40 bg-green-300 rounded-full blur-3xl opacity-30"></div>
+              <div class="absolute -top-8 -left-8 w-32 h-32 bg-green-200 rounded-full blur-2xl opacity-40"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Public Kiosk Section -->
+    <section id="kiosk" class="py-20 bg-gradient-to-r from-brand-800 via-brand-700 to-accent text-white relative overflow-hidden">
+      <div class="absolute inset-0 opacity-10">
+        <div class="absolute top-10 left-10 w-40 h-40 border border-white rounded-full"></div>
+        <div class="absolute bottom-10 right-10 w-60 h-60 border border-white rounded-full"></div>
+      </div>
+      <div class="max-w-6xl mx-auto px-6 relative">
+        <div class="flex items-center gap-4 mb-8">
+          <div class="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur grid place-items-center">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          </div>
+          <div>
+            <h2 class="text-3xl md:text-4xl font-bold">Public Kiosk Mode</h2>
+            <p class="text-white/70 font-medium">Healthcare access without a smartphone</p>
+          </div>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-10 items-center">
+          <div>
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 text-sm font-semibold mb-6">
+              <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+              Unique Feature - Our Key Differentiator
+            </div>
+            <h3 class="text-2xl md:text-3xl font-bold mb-4">IC + Voice = Instant Access</h3>
+            <p class="text-white/80 text-lg leading-relaxed mb-6">
+              Our system can be deployed on public kiosks in hospitals, clinics, and government offices. Users simply insert their IC (MyKad) and use voice recognition to authenticate - no smartphone or password required. This is the simplest solution for digital inclusion.
+            </p>
+            <div class="space-y-4">
+              <div class="flex items-start gap-4">
+                <div class="w-10 h-10 rounded-xl bg-white/20 grid place-items-center flex-shrink-0">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0"/></svg>
+                </div>
+                <div>
+                  <p class="font-semibold">Step 1: Insert MyKad</p>
+                  <p class="text-sm text-white/70">Kiosk reads IC chip and retrieves your profile</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-4">
+                <div class="w-10 h-10 rounded-xl bg-white/20 grid place-items-center flex-shrink-0">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
+                </div>
+                <div>
+                  <p class="font-semibold">Step 2: Voice Authentication</p>
+                  <p class="text-sm text-white/70">Speak a simple phrase to verify your identity</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-4">
+                <div class="w-10 h-10 rounded-xl bg-white/20 grid place-items-center flex-shrink-0">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <div>
+                  <p class="font-semibold">Step 3: Access Healthcare</p>
+                  <p class="text-sm text-white/70">View records, book appointments, refill medications</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Kiosk Illustration -->
+          <div class="relative flex justify-center">
+            <div class="kiosk-glow">
+              <svg class="w-64 h-80" viewBox="0 0 200 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Kiosk body -->
+                <rect x="30" y="20" width="140" height="200" rx="10" fill="white" fill-opacity="0.1" stroke="white" stroke-width="2"/>
+                <!-- Screen -->
+                <rect x="45" y="35" width="110" height="100" rx="5" fill="white" fill-opacity="0.2"/>
+                <!-- Easy Mode text on screen -->
+                <text x="100" y="75" text-anchor="middle" font-size="10" fill="white" font-weight="bold">Easy Mode</text>
+                <text x="100" y="95" text-anchor="middle" font-size="8" fill="white" opacity="0.8">Large Buttons</text>
+                <!-- IC slot -->
+                <rect x="70" y="150" width="60" height="8" rx="2" fill="white" fill-opacity="0.3" stroke="white" stroke-width="1"/>
+                <text x="100" y="175" text-anchor="middle" font-size="6" fill="white" opacity="0.7">Insert IC Here</text>
+                <!-- Microphone icon -->
+                <circle cx="100" cy="195" r="15" fill="white" fill-opacity="0.2" stroke="white" stroke-width="1.5"/>
+                <path d="M100 187v8m0 0a3 3 0 01-3 3m3-3a3 3 0 003 3m-6-3v2a6 6 0 0012 0v-2" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                <!-- Stand -->
+                <rect x="85" y="220" width="30" height="40" fill="white" fill-opacity="0.1" stroke="white" stroke-width="2"/>
+                <rect x="60" y="260" width="80" height="10" rx="3" fill="white" fill-opacity="0.2"/>
+                <!-- Animated pulse rings -->
+                <circle cx="100" cy="195" r="25" stroke="white" stroke-width="1" fill="none" opacity="0.3">
+                  <animate attributeName="r" values="25;35;25" dur="2s" repeatCount="indefinite"/>
+                  <animate attributeName="opacity" values="0.3;0.1;0.3" dur="2s" repeatCount="indefinite"/>
+                </circle>
+              </svg>
+            </div>
+            <!-- Labels -->
+            <div class="absolute top-16 right-0 px-3 py-1.5 rounded-lg bg-white/20 backdrop-blur text-xs font-medium">
+              Easy Mode UI
+            </div>
+            <div class="absolute top-40 left-0 px-3 py-1.5 rounded-lg bg-white/20 backdrop-blur text-xs font-medium">
+              IC Reader
+            </div>
+            <div class="absolute bottom-32 right-0 px-3 py-1.5 rounded-lg bg-white/20 backdrop-blur text-xs font-medium">
+              Voice Mic
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-12 grid md:grid-cols-3 gap-6">
+          <div class="p-5 rounded-2xl bg-white/10 backdrop-blur border border-white/20">
+            <p class="text-2xl font-bold mb-1">Zero Learning</p>
+            <p class="text-sm text-white/70">No app download, no account creation, no passwords to remember</p>
+          </div>
+          <div class="p-5 rounded-2xl bg-white/10 backdrop-blur border border-white/20">
+            <p class="text-2xl font-bold mb-1">100% Inclusive</p>
+            <p class="text-sm text-white/70">Works for elderly, disabled, and users without smartphones</p>
+          </div>
+          <div class="p-5 rounded-2xl bg-white/10 backdrop-blur border border-white/20">
+            <p class="text-2xl font-bold mb-1">Secure by Design</p>
+            <p class="text-sm text-white/70">IC chip + voice recognition = strong two-factor authentication</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tech Stack Section -->
+    <section id="tech" class="py-20 relative">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="flex items-center gap-4 mb-8">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-100 to-blue-200 text-blue-600 grid place-items-center shadow-lg shadow-blue-500/20">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+          </div>
+          <div>
+            <h2 class="text-3xl md:text-4xl font-bold text-slate-900">Tech Stack</h2>
+            <p class="text-slate-500 font-medium">Modern, scalable, and secure</p>
+          </div>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <!-- Frontend -->
+          <div class="card-hover p-6 rounded-2xl bg-white shadow-lg border border-white/70 fade-in">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-100 to-cyan-200 grid place-items-center mb-4">
+              <svg class="w-6 h-6 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            </div>
+            <p class="text-lg font-bold text-slate-800 mb-3">Frontend / UI</p>
+            <ul class="space-y-2 text-sm text-slate-600">
+              <li class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-cyan-500"></span>
+                Next.js (App Router)
+              </li>
+              <li class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-cyan-500"></span>
+                TypeScript
+              </li>
+              <li class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-cyan-500"></span>
+                Tailwind CSS
+              </li>
+              <li class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-cyan-500"></span>
+                React Native (Mobile)
+              </li>
+            </ul>
+          </div>
+
+          <!-- Local Database -->
+          <div class="card-hover p-6 rounded-2xl bg-white shadow-lg border border-white/70 fade-in">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-green-100 to-green-200 grid place-items-center mb-4">
+              <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+            </div>
+            <p class="text-lg font-bold text-slate-800 mb-3">Local Database (Edge)</p>
+            <ul class="space-y-2 text-sm text-slate-600">
+              <li class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                SQLite (Encrypted)
+              </li>
+              <li class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                Offline-first cache
+              </li>
+              <li class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                Local Hash Chain
+              </li>
+              <li class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                Kiosk/Agent storage
+              </li>
+            </ul>
+            <p class="mt-3 text-xs text-green-600 font-medium bg-green-50 px-2 py-1 rounded">CRITICAL for Offline Mode</p>
+          </div>
+
+          <!-- Central Database -->
+          <div class="card-hover p-6 rounded-2xl bg-white shadow-lg border border-white/70 fade-in">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-100 to-indigo-200 grid place-items-center mb-4">
+              <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/></svg>
+            </div>
+            <p class="text-lg font-bold text-slate-800 mb-3">Central Database</p>
+            <ul class="space-y-2 text-sm text-slate-600">
+              <li class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+                PostgreSQL
+              </li>
+              <li class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+                Supabase / Neon
+              </li>
+              <li class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+                Eligibility Ledger
+              </li>
+              <li class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+                Permanent Audit Log
+              </li>
+            </ul>
+            <p class="mt-3 text-xs text-indigo-600 font-medium bg-indigo-50 px-2 py-1 rounded">Source of Truth</p>
+          </div>
+
+          <!-- Identity Capture -->
+          <div class="card-hover p-6 rounded-2xl bg-white shadow-lg border border-white/70 fade-in">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-100 to-amber-200 grid place-items-center mb-4">
+              <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            </div>
+            <p class="text-lg font-bold text-slate-800 mb-3">Identity Capture</p>
+            <ul class="space-y-2 text-sm text-slate-600">
+              <li class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                WebRTC
+              </li>
+              <li class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                OCR (Tesseract.js)
+              </li>
+              <li class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                Voice Recognition
+              </li>
+              <li class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                IC Chip Reader
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- System Architecture Section -->
+    <section id="architecture" class="py-20 bg-white/80 backdrop-blur-sm relative">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="flex items-center gap-4 mb-8">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-100 to-teal-200 text-teal-600 grid place-items-center shadow-lg shadow-teal-500/20">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+          </div>
+          <div>
+            <h2 class="text-3xl md:text-4xl font-bold text-slate-900">System Architecture</h2>
+            <p class="text-slate-500 font-medium">Animated data flow visualization</p>
+          </div>
+        </div>
+
+        <!-- Architecture Diagram -->
+        <div class="p-8 rounded-3xl bg-white shadow-xl border border-white/70 overflow-hidden">
+          <div class="relative overflow-x-auto">
+            <!-- SVG Architecture Diagram -->
+            <svg class="w-full min-w-[800px] h-auto" viewBox="0 0 1000 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Background grid -->
+              <defs>
+                <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                  <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#e0e5f5" stroke-width="0.5"/>
+                </pattern>
+                <!-- Animated gradient for flow lines -->
+                <linearGradient id="flowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style="stop-color:#8799E0;stop-opacity:0">
+                    <animate attributeName="offset" values="-1;1" dur="2s" repeatCount="indefinite"/>
+                  </stop>
+                  <stop offset="50%" style="stop-color:#8799E0;stop-opacity:1">
+                    <animate attributeName="offset" values="-0.5;1.5" dur="2s" repeatCount="indefinite"/>
+                  </stop>
+                  <stop offset="100%" style="stop-color:#8799E0;stop-opacity:0">
+                    <animate attributeName="offset" values="0;2" dur="2s" repeatCount="indefinite"/>
+                  </stop>
+                </linearGradient>
+              </defs>
+              <rect width="1000" height="500" fill="url(#grid)"/>
+
+              <!-- User Layer -->
+              <g transform="translate(50, 200)">
+                <!-- Mobile App -->
+                <rect x="0" y="0" width="100" height="140" rx="12" fill="#EBEEF7" stroke="#8799E0" stroke-width="2"/>
+                <rect x="10" y="20" width="80" height="80" rx="4" fill="white"/>
+                <text x="50" y="120" text-anchor="middle" font-size="11" font-weight="600" fill="#594F81">Mobile App</text>
+                <circle cx="50" cy="55" r="20" fill="#8799E0" opacity="0.2"/>
+                <path d="M42 55 L50 63 L58 55 L50 47 Z" fill="#8799E0"/>
+              </g>
+
+              <g transform="translate(50, 50)">
+                <!-- Kiosk -->
+                <rect x="0" y="0" width="100" height="120" rx="8" fill="#EBEEF7" stroke="#22c55e" stroke-width="2"/>
+                <rect x="15" y="15" width="70" height="50" rx="4" fill="white"/>
+                <rect x="35" y="75" width="30" height="8" rx="2" fill="#22c55e" opacity="0.3"/>
+                <text x="50" y="105" text-anchor="middle" font-size="11" font-weight="600" fill="#15803d">Public Kiosk</text>
+              </g>
+
+              <!-- Flow lines from User to Edge -->
+              <g>
+                <path d="M160 270 Q 220 270 280 220" stroke="#d5dcf3" stroke-width="3" fill="none"/>
+                <path d="M160 270 Q 220 270 280 220" stroke="url(#flowGradient)" stroke-width="3" fill="none" class="flow-line"/>
+                
+                <path d="M160 110 Q 220 110 280 180" stroke="#d5dcf3" stroke-width="3" fill="none"/>
+                <path d="M160 110 Q 220 110 280 180" stroke="url(#flowGradient)" stroke-width="3" fill="none" class="flow-line"/>
+              </g>
+
+              <!-- Edge/Local Layer -->
+              <g transform="translate(280, 150)">
+                <rect x="0" y="0" width="140" height="100" rx="12" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+                <text x="70" y="30" text-anchor="middle" font-size="12" font-weight="700" fill="#15803d">Local Edge</text>
+                <text x="70" y="50" text-anchor="middle" font-size="10" fill="#166534">SQLite (Encrypted)</text>
+                <text x="70" y="68" text-anchor="middle" font-size="10" fill="#166534">Hash Chain</text>
+                <text x="70" y="86" text-anchor="middle" font-size="10" fill="#166534">Offline Cache</text>
+                <!-- Pulse animation -->
+                <circle cx="70" cy="50" r="45" stroke="#22c55e" stroke-width="1" fill="none" opacity="0.3">
+                  <animate attributeName="r" values="45;55;45" dur="2s" repeatCount="indefinite"/>
+                  <animate attributeName="opacity" values="0.3;0.1;0.3" dur="2s" repeatCount="indefinite"/>
+                </circle>
+              </g>
+
+              <!-- Flow lines from Edge to API -->
+              <g>
+                <path d="M430 200 L 520 200" stroke="#d5dcf3" stroke-width="3" fill="none"/>
+                <path d="M430 200 L 520 200" stroke="url(#flowGradient)" stroke-width="3" fill="none" class="flow-line"/>
+                <!-- Data packet -->
+                <circle cx="475" cy="200" r="6" fill="#8799E0">
+                  <animate attributeName="cx" values="430;520;430" dur="3s" repeatCount="indefinite"/>
+                </circle>
+              </g>
+
+              <!-- API Gateway -->
+              <g transform="translate(520, 160)">
+                <rect x="0" y="0" width="120" height="80" rx="12" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+                <text x="60" y="30" text-anchor="middle" font-size="12" font-weight="700" fill="#b45309">API Gateway</text>
+                <text x="60" y="50" text-anchor="middle" font-size="10" fill="#92400e">Next.js Routes</text>
+                <text x="60" y="66" text-anchor="middle" font-size="10" fill="#92400e">Auth + Validation</text>
+              </g>
+
+              <!-- Flow lines from API to Databases -->
+              <g>
+                <path d="M650 180 Q 700 120 760 120" stroke="#d5dcf3" stroke-width="3" fill="none"/>
+                <path d="M650 180 Q 700 120 760 120" stroke="url(#flowGradient)" stroke-width="3" fill="none" class="flow-line"/>
+                
+                <path d="M650 220 Q 700 280 760 280" stroke="#d5dcf3" stroke-width="3" fill="none"/>
+                <path d="M650 220 Q 700 280 760 280" stroke="url(#flowGradient)" stroke-width="3" fill="none" class="flow-line"/>
+              </g>
+
+              <!-- PostgreSQL Database -->
+              <g transform="translate(760, 70)">
+                <ellipse cx="70" cy="20" rx="70" ry="20" fill="#ddd6fe" stroke="#8b5cf6" stroke-width="2"/>
+                <path d="M0 20 L0 80 Q0 100 70 100 Q140 100 140 80 L140 20" fill="#ddd6fe" stroke="#8b5cf6" stroke-width="2"/>
+                <ellipse cx="70" cy="80" rx="70" ry="20" fill="#ddd6fe" stroke="#8b5cf6" stroke-width="2"/>
+                <text x="70" y="55" text-anchor="middle" font-size="11" font-weight="700" fill="#6d28d9">PostgreSQL</text>
+                <text x="70" y="72" text-anchor="middle" font-size="9" fill="#7c3aed">Supabase/Neon</text>
+              </g>
+
+              <!-- Audit Log -->
+              <g transform="translate(760, 230)">
+                <rect x="0" y="0" width="140" height="80" rx="8" fill="#fce7f3" stroke="#ec4899" stroke-width="2"/>
+                <text x="70" y="30" text-anchor="middle" font-size="11" font-weight="700" fill="#be185d">Audit Log</text>
+                <text x="70" y="48" text-anchor="middle" font-size="9" fill="#db2777">Eligibility Ledger</text>
+                <text x="70" y="64" text-anchor="middle" font-size="9" fill="#db2777">Immutable Records</text>
+              </g>
+
+              <!-- Identity Services -->
+              <g transform="translate(520, 350)">
+                <rect x="0" y="0" width="180" height="70" rx="12" fill="#e0e7ff" stroke="#6366f1" stroke-width="2"/>
+                <text x="90" y="25" text-anchor="middle" font-size="11" font-weight="700" fill="#4338ca">Identity Services</text>
+                <text x="90" y="43" text-anchor="middle" font-size="9" fill="#4f46e5">WebRTC + Tesseract.js (OCR)</text>
+                <text x="90" y="58" text-anchor="middle" font-size="9" fill="#4f46e5">Voice Recognition + IC Reader</text>
+              </g>
+
+              <!-- Connection from Identity to API -->
+              <path d="M610 350 L 580 250" stroke="#d5dcf3" stroke-width="2" fill="none" stroke-dasharray="5,5"/>
+
+              <!-- Legend -->
+              <g transform="translate(50, 420)">
+                <text x="0" y="0" font-size="10" font-weight="600" fill="#64748b">Legend:</text>
+                <circle cx="70" cy="-4" r="5" fill="#8799E0"/>
+                <text x="80" y="0" font-size="9" fill="#64748b">Data Flow</text>
+                <line x1="130" y1="-4" x2="160" y2="-4" stroke="#d5dcf3" stroke-width="2" stroke-dasharray="5,5"/>
+                <text x="170" y="0" font-size="9" fill="#64748b">Optional</text>
+              </g>
+            </svg>
+          </div>
+
+          <!-- Architecture Description -->
+          <div class="mt-8 grid md:grid-cols-3 gap-6">
+            <div class="p-4 rounded-xl bg-green-50 border border-green-200">
+              <p class="font-semibold text-green-800 mb-1">Edge Layer</p>
+              <p class="text-sm text-green-700">Encrypted SQLite on device enables offline functionality with local hash chain for transaction integrity</p>
+            </div>
+            <div class="p-4 rounded-xl bg-amber-50 border border-amber-200">
+              <p class="font-semibold text-amber-800 mb-1">API Layer</p>
+              <p class="text-sm text-amber-700">Next.js API routes handle authentication, validation, and sync between edge and cloud</p>
+            </div>
+            <div class="p-4 rounded-xl bg-indigo-50 border border-indigo-200">
+              <p class="font-semibold text-indigo-800 mb-1">Cloud Layer</p>
+              <p class="text-sm text-indigo-700">PostgreSQL as source of truth with immutable audit logs and eligibility ledger</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Comparison Table Section -->
+    <section id="comparison" class="py-20 relative">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="flex items-center gap-4 mb-8">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-100 to-orange-200 text-orange-600 grid place-items-center shadow-lg shadow-orange-500/20">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          </div>
+          <div>
+            <h2 class="text-3xl md:text-4xl font-bold text-slate-900">Innovation Comparison</h2>
+            <p class="text-slate-500 font-medium">MyHealth vs Existing Apps</p>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto rounded-2xl shadow-xl border border-white/70">
+          <table class="w-full bg-white">
+            <thead>
+              <tr class="bg-gradient-to-r from-brand-600 to-brand-700 text-white">
+                <th class="px-6 py-4 text-left font-semibold">Feature</th>
+                <th class="px-6 py-4 text-center font-semibold">MySejahtera</th>
+                <th class="px-6 py-4 text-center font-semibold">MyUbat</th>
+                <th class="px-6 py-4 text-center font-semibold bg-white/20">MyHealth (Ours)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              <tr class="comparison-row transition-colors">
+                <td class="px-6 py-4 font-medium text-slate-800">Unified App</td>
+                <td class="px-6 py-4 text-center">
+                  <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-100 text-red-600">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-center">
+                  <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-100 text-red-600">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-center bg-green-50">
+                  <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-100 text-green-600">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                  </span>
+                </td>
+              </tr>
+              <tr class="comparison-row transition-colors">
+                <td class="px-6 py-4 font-medium text-slate-800">VoiceOver / Screen Reader</td>
+                <td class="px-6 py-4 text-center">
+                  <span class="text-amber-600 text-sm">Partial</span>
+                </td>
+                <td class="px-6 py-4 text-center">
+                  <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-100 text-red-600">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-center bg-green-50">
+                  <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-100 text-green-600">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                  </span>
+                </td>
+              </tr>
+              <tr class="comparison-row transition-colors">
+                <td class="px-6 py-4 font-medium text-slate-800">Offline Mode</td>
+                <td class="px-6 py-4 text-center">
+                  <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-100 text-red-600">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-center">
+                  <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-100 text-red-600">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-center bg-green-50">
+                  <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-100 text-green-600">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                  </span>
+                </td>
+              </tr>
+              <tr class="comparison-row transition-colors">
+                <td class="px-6 py-4 font-medium text-slate-800">Voice Recognition Login</td>
+                <td class="px-6 py-4 text-center">
+                  <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-100 text-red-600">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-center">
+                  <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-100 text-red-600">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-center bg-green-50">
+                  <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-100 text-green-600">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                  </span>
+                </td>
+              </tr>
+              <tr class="comparison-row transition-colors">
+                <td class="px-6 py-4 font-medium text-slate-800">Public Kiosk Support</td>
+                <td class="px-6 py-4 text-center">
+                  <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-100 text-red-600">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-center">
+                  <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-100 text-red-600">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-center bg-green-50">
+                  <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-100 text-green-600">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                  </span>
+                </td>
+              </tr>
+              <tr class="comparison-row transition-colors">
+                <td class="px-6 py-4 font-medium text-slate-800">IC-Linked Nationwide Sync</td>
+                <td class="px-6 py-4 text-center">
+                  <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-100 text-red-600">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-center">
+                  <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-100 text-red-600">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-center bg-green-50">
+                  <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-100 text-green-600">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                  </span>
+                </td>
+              </tr>
+              <tr class="comparison-row transition-colors">
+                <td class="px-6 py-4 font-medium text-slate-800">Adaptive UI Modes</td>
+                <td class="px-6 py-4 text-center">
+                  <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-100 text-red-600">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-center">
+                  <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-100 text-red-600">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-center bg-green-50">
+                  <span class="text-green-700 font-semibold text-sm">3 Modes</span>
+                </td>
+              </tr>
+              <tr class="comparison-row transition-colors">
+                <td class="px-6 py-4 font-medium text-slate-800">Home Visit Support</td>
+                <td class="px-6 py-4 text-center">
+                  <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-100 text-red-600">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-center">
+                  <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-100 text-red-600">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-center bg-green-50">
+                  <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-100 text-green-600">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="mt-8 p-6 rounded-2xl bg-gradient-to-r from-brand-50 to-indigo-50 border border-brand-200">
+          <p class="text-center text-brand-800 font-semibold">MyHealth addresses every gap left by existing government health apps, creating a truly inclusive digital healthcare ecosystem for all Malaysians.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Future Plans & Expected Impact Section -->
+    <section id="future" class="py-20 bg-gradient-to-b from-white to-secondary relative">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="flex items-center gap-4 mb-8">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-100 to-purple-200 text-purple-600 grid place-items-center shadow-lg shadow-purple-500/20">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+          </div>
+          <div>
+            <h2 class="text-3xl md:text-4xl font-bold text-slate-900">Future Plans & Expected Impact</h2>
+            <p class="text-slate-500 font-medium">Where we're headed and why it matters</p>
+          </div>
+        </div>
+
+        <!-- Expected Impact -->
+        <div class="mb-12">
+          <h3 class="text-2xl font-bold text-slate-800 mb-6">Expected Impact</h3>
+          <div class="grid md:grid-cols-3 gap-6">
+            <div class="card-hover p-6 rounded-2xl bg-white shadow-lg border border-white/70 fade-in">
+              <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-100 to-blue-200 grid place-items-center mb-4">
+                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/></svg>
+              </div>
+              <p class="text-xl font-bold text-slate-800 mb-2">Centralization of Healthcare Data</p>
+              <p class="text-slate-600 text-sm leading-relaxed">One unified health record per citizen, accessible from any healthcare facility nationwide. No more lost records or duplicate tests.</p>
+            </div>
+            <div class="card-hover p-6 rounded-2xl bg-white shadow-lg border border-white/70 fade-in">
+              <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-green-100 to-green-200 grid place-items-center mb-4">
+                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              </div>
+              <p class="text-xl font-bold text-slate-800 mb-2">Zero Digital Exclusion</p>
+              <p class="text-slate-600 text-sm leading-relaxed">Every Malaysian can access healthcare services regardless of age, disability, location, or smartphone ownership through adaptive modes and public kiosks.</p>
+            </div>
+            <div class="card-hover p-6 rounded-2xl bg-white shadow-lg border border-white/70 fade-in">
+              <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-100 to-amber-200 grid place-items-center mb-4">
+                <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
+              </div>
+              <p class="text-xl font-bold text-slate-800 mb-2">Reducing Digital Friction</p>
+              <p class="text-slate-600 text-sm leading-relaxed">Voice and IC authentication eliminates password barriers, making healthcare access as simple as speaking your name.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Future Plans -->
+        <div>
+          <h3 class="text-2xl font-bold text-slate-800 mb-6">Future Plans</h3>
+          <div class="grid md:grid-cols-2 gap-6">
+            <div class="p-6 rounded-2xl bg-gradient-to-br from-purple-50 to-white border-2 border-purple-200 fade-in">
+              <div class="flex items-center gap-4 mb-4">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-700 text-white grid place-items-center">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                </div>
+                <div>
+                  <p class="text-xl font-bold text-purple-800">Contextual Smart Mode Switching</p>
+                  <span class="inline-block px-2 py-0.5 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">Coming Soon</span>
+                </div>
+              </div>
+              <p class="text-slate-600 leading-relaxed">The app will automatically detect context (location, time of day, user behavior) and switch modes accordingly. Enter a rural clinic? Offline mode activates. Using a kiosk? Easy mode with large buttons appears.</p>
+            </div>
+            <div class="p-6 rounded-2xl bg-gradient-to-br from-indigo-50 to-white border-2 border-indigo-200 fade-in">
+              <div class="flex items-center gap-4 mb-4">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 text-white grid place-items-center">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                </div>
+                <div>
+                  <p class="text-xl font-bold text-indigo-800">Predictive Adaptivity</p>
+                  <span class="inline-block px-2 py-0.5 bg-indigo-100 text-indigo-700 text-xs font-medium rounded-full">Roadmap</span>
+                </div>
+              </div>
+              <p class="text-slate-600 leading-relaxed">AI-powered predictions for medication refills, appointment suggestions based on health patterns, and proactive health alerts. The system learns user preferences and adapts the interface dynamically.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section id="cta" class="py-20 bg-gradient-to-r from-brand-700 via-brand-600 to-accent text-white relative overflow-hidden">
+      <div class="absolute inset-0 opacity-10">
+        <div class="absolute top-0 left-0 w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzBoLTJ2LTJoMnYyem0wLTRoLTJ2LTJoMnYyem0tNCA0aC0ydi0yaDJ2MnptMC00aC0ydi0yaDJ2MnoiLz48L2c+PC9nPjwvc3ZnPg==')]"></div>
+      </div>
+      <div class="max-w-4xl mx-auto px-6 text-center relative">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4">Ready to Transform Healthcare Access?</h2>
+        <p class="text-lg text-white/80 mb-8 max-w-2xl mx-auto">MyHealth is ready to bring inclusive, unified healthcare to every Malaysian. Let's build a healthier, more connected future together.</p>
+        <div class="flex flex-wrap justify-center gap-4">
+          <a href="#" class="px-8 py-4 rounded-full bg-white/20 backdrop-blur text-white font-bold border border-white/30 hover:bg-white/30 transition-all duration-300">
+            Contact Us
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 bg-slate-900 text-white">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-white grid place-items-center font-bold">MyH</div>
+            <div>
+              <p class="font-semibold">MyHealth</p>
+              <p class="text-xs text-slate-400">Inclusive Digital Health Spine</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-6 text-sm text-slate-400">
+            <a href="#" class="hover:text-white transition-colors">Privacy</a>
+            <a href="#" class="hover:text-white transition-colors">Terms</a>
+            <a href="#" class="hover:text-white transition-colors">Contact</a>
+          </div>
+          <p class="text-sm text-slate-500">2024 MyHealth. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Back to top button -->
+  <button id="backToTop" class="fixed bottom-6 right-6 p-3 rounded-full bg-brand-600 text-white shadow-lg opacity-0 invisible hover:bg-brand-700 hover:scale-110 transition-all duration-300 z-50" aria-label="Back to top">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+  </button>
+
+  <script>
+    // Mobile menu toggle
+    const menuBtn = document.getElementById('menuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const menuIcon = document.getElementById('menuIcon');
+    const closeIcon = document.getElementById('closeIcon');
+
+    if (menuBtn && mobileMenu && menuIcon && closeIcon) {
+      menuBtn.addEventListener('click', function() {
+        mobileMenu.classList.toggle('open');
+        menuIcon.classList.toggle('hidden');
+        closeIcon.classList.toggle('hidden');
+      });
+
+      // Close mobile menu when clicking a link
+      mobileMenu.querySelectorAll('a').forEach(function(link) {
+        link.addEventListener('click', function() {
+          mobileMenu.classList.remove('open');
+          menuIcon.classList.remove('hidden');
+          closeIcon.classList.add('hidden');
+        });
+      });
+    }
+
+    // Back to top button
+    const backToTop = document.getElementById('backToTop');
+    if (backToTop) {
+      window.addEventListener('scroll', function() {
+        if (window.scrollY > 500) {
+          backToTop.classList.remove('opacity-0', 'invisible');
+          backToTop.classList.add('opacity-100', 'visible');
+        } else {
+          backToTop.classList.add('opacity-0', 'invisible');
+          backToTop.classList.remove('opacity-100', 'visible');
+        }
+      });
+
+      backToTop.addEventListener('click', function() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
+
+    // Intersection Observer for fade-in animations
+    var observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.style.animationPlayState = 'running';
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('.fade-in').forEach(function(el) {
+      el.style.animationPlayState = 'paused';
+      observer.observe(el);
+    });
+  </script>
+</body>
+</html>
