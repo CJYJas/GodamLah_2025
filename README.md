@@ -1,6 +1,6 @@
 # 🚀 MyHealth | Inclusive Government Healthcare Super-App
 
-**🔗 Live Demo/Prototype:** [myhealth-godamlah20.vercel.app/#cta](https://myhealth-godamlah20.vercel.app/)
+**🔗 Live Demo/Prototype:** [myhealth-godamlah20.vercel.app/#cta](https://myhealth-godamlah20.vercel.app/#cta)
 
 **MyHealth: Malaysia's all-in-one, inclusive government healthcare app.**
 
@@ -44,11 +44,12 @@ Health data cannot sync nationwide across clinics and hospitals. When citizens v
 
 ## 🔑 Adaptive Modes: Personalized experience for every user
 
+
 ### 1. Elderly / Easy Mode
 For seniors and users needing accessibility.
 
 * **Full VoiceOver Support:** Screen reader compatible with Bahasa Malaysia and English.
-* **Extra Large Text and Buttons:** Minimum 18px fonts, large tap targets (48x48px minimum).
+* **Extra Large Text and Buttons:** Minimum 18px fonts, large tap targets ($48\text{x}48\text{px}$ minimum).
 * **Voice Recognition Login:** Replace password with voice authentication for easier access.
 * **High Contrast Theme:** WCAG AAA compliant colors, dyslexia-friendly fonts.
 * **Powered by iPhone's Built-in VoiceOver:** Leverages native accessibility features for the most reliable solution.
@@ -66,7 +67,7 @@ For areas with limited connectivity.
 
 * **Offline-First Architecture:** Full functionality without internet, syncs when connected.
 * **Home Visit Support:** Healthcare agents can serve patients at home with a mobile app.
-* **Low-Bandwidth Optimization:** Compressed assets, minimal data usage (under 1MB/session).
+* **Low-Bandwidth Optimization:** Compressed assets, minimal data usage (under $1\text{MB}$/session).
 * **Local Data Cache:** Encrypted SQLite stores critical health data locally.
 
 ---
@@ -86,12 +87,40 @@ This ensures **Zero Learning** and is **100% Inclusive** for the elderly, disabl
 
 ## 🛠️ Tech Stack: Modern, scalable, and secure
 
+
 | Component | Key Technologies | Description |
 | :--- | :--- | :--- |
 | **Frontend / UI** | Next.js (App Router), TypeScript, Tailwind CSS, React Native (Mobile) |
 | **Local Database (Edge)** | SQLite (Encrypted), Offline-first cache, Local Hash Chain | **CRITICAL for Offline Mode** |
 | **Central Database** | PostgreSQL, Supabase / Neon, Eligibility Ledger, Permanent Audit Log | **Source of Truth** |
 | **Identity Capture** | WebRTC, OCR (Tesseract.js), Voice Recognition, IC Chip Reader | |
+
+---
+
+## ⚙️ How to Run the Prototype
+
+Our project is divided into distinct components for presentation and demonstration.
+
+### Part 1: Full-Stack Demo (Sign-up, Sign-in, and Easy Mode)
+
+These components are fully integrated with working backend logic.
+
+| Component | Location | Command |
+| :--- | :--- | :--- |
+| **Frontend (Easy Mode)** | `frontend/easymode` | `npm start` |
+| **Backend (Easy Mode Logic)** | `backend/easymode` | `python app.py` |
+| **Backend (Sign-in/Sign-up)** | `backend/signinsignup` | `python main.py` |
+
+### Part 2: Frontend Prototypes (Normal & Rural Mode)
+
+These components are prototypes showcasing the unique UI/UX designs for our accessibility track.
+
+* **Normal Mode Prototype**
+* **Rural Mode Prototype**
+
+| Location | Command |
+| :--- | :--- |
+| **Frontend Root** |  `npm start dev` |
 
 ---
 
