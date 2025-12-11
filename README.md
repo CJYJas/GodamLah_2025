@@ -27,7 +27,7 @@ MySejahtera, MyUbat, and other government health apps operate in silos. Users mu
 ### 2. Marginalized Groups
 Elderly, OKU (disabled persons), rural communities, and B40 households face digital barriers. Current apps lack accessibility features, offline support, and simplified interfaces (No VoiceOver, Complex UIs, Online-only).
 
-### 3. ICs Cannot Sync Data
+### 3. ICs Cannot Sync Health Data
 Health data cannot sync nationwide across clinics and hospitals. When citizens visit different facilities, their medical history, prescriptions, and test results don't follow them, resulting in no portability, duplicate tests, and lost records.
 
 ---
@@ -66,7 +66,7 @@ Fast, efficient workflows for everyday users.
 For areas with limited connectivity.
 
 * **Offline-First Architecture:** Full functionality without internet, syncs when connected.
-* **Home Visit Support:** Healthcare agents can serve patients at home with a mobile app.
+* **Home Visit & Special Transportation Support:** Bring expert medical care right to your doorstep & provide air and water transport services.
 * **Low-Bandwidth Optimization:** Compressed assets, minimal data usage (under $1\text{MB}$/session).
 * **Local Data Cache:** Encrypted SQLite stores critical health data locally.
 
