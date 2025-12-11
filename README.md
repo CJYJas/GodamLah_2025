@@ -1,6 +1,6 @@
 # 🚀 MyHealth | Inclusive Government Healthcare Super-App
 
-**🔗 Live Demo/Prototype:** [myhealth-godamlah20.vercel.app/#cta](https://myhealth-godamlah20.vercel.app/#cta)
+**🔗 Live Demo/Prototype:** [myhealth-godamlah20.vercel.app/#cta](https://myhealth-godamlah20.vercel.app/)
 
 **MyHealth: Malaysia's all-in-one, inclusive government healthcare app.**
 
